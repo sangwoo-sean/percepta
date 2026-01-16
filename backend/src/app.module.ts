@@ -12,7 +12,7 @@ import { AiModule } from './modules/ai/ai.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['.env.local', '.env'],
+      ignoreEnvFile: true, // dotenv-cli로 환경변수 로드
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],

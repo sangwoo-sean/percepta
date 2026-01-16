@@ -4,9 +4,12 @@
   "private": true,
   "description": "AI Persona Feedback Service MVP",
   "scripts": {
-    "backend": "pnpm --filter backend",
-    "frontend": "pnpm --filter frontend",
+    "backend": "pnpm --filter backend dev",
+    "backend:local": "pnpm --filter backend dev:local",
+    "frontend": "pnpm --filter frontend dev",
+    "frontend:local": "pnpm --filter frontend dev:local",
     "dev": "pnpm run --parallel dev",
+    "dev:local": "pnpm run --parallel dev:local",
     "build": "pnpm run --parallel build",
     "test": "pnpm run --parallel test",
     "lint": "pnpm run --parallel lint"
