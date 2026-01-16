@@ -24,7 +24,7 @@ Percepta는 AI 페르소나 기반 피드백 서비스입니다. 사용자가 �
 | 데이터베이스 | PostgreSQL 16 (Docker) |
 | 인증 | JWT + Google OAuth (Passport.js) |
 | 파일 저장 | Supabase Storage |
-| AI | Google Gemini API (gemini-2.0-flash) |
+| AI | AIProvider 추상화 (Gemini, Mock 지원) |
 | 테스트 | Jest (백엔드), Vitest (프론트엔드) |
 
 ## 프로젝트 구조
@@ -193,6 +193,10 @@ SUPABASE_URL=
 SUPABASE_ANON_KEY=
 SUPABASE_BUCKET=uploads
 
+# Mock Mode (로컬 개발용)
+MOCK_STORAGE=true
+MOCK_AI=true
+
 # Google Gemini
 GEMINI_API_KEY=
 
@@ -300,7 +304,7 @@ docs: AI 에이전트용 프로젝트 컨텍스트 문서 작성
 
 1. **크레딧 시스템**: 페르소나당 1크레딧 차감. 크레딧 부족 시 피드백 생성 불가.
 
-2. **Gemini API 실패 처리**: API 실패 시 mock 응답 반환 (개발/테스트용).
+2. **AI 서비스 추상화**: `MOCK_AI=true` 또는 `GEMINI_API_KEY` 미설정 시 MockAIService 사용. GPT/Claude 등 추가 시 AIProvider 인터페이스 구현.
 
 3. **TypeORM synchronize**: 개발 환경에서만 true. 프로덕션에서는 마이그레이션 사용.
 
@@ -318,6 +322,11 @@ docs: AI 에이전트용 프로젝트 컨텍스트 문서 작성
 - [ ] 프로덕션 배포 설정
 
 ## 최근 변경사항
+
+### 2026-01-17
+- 로컬 개발 환경 설정 (.env.local, Docker 포트 5434)
+- AI 서비스 추상화 (AIProvider 인터페이스, MockAIService)
+- 외부 서비스 없이 로컬 실행 가능 (MOCK_STORAGE, MOCK_AI)
 
 ### 2026-01-16
 - 초기 MVP 구현 완료
