@@ -6,7 +6,7 @@ import { FeedbackService } from './feedback.service';
 import { FeedbackSession } from './entities/feedback-session.entity';
 import { FeedbackResult } from './entities/feedback-result.entity';
 import { PersonasService } from '../personas/personas.service';
-import { GeminiService } from '../ai/gemini.service';
+import { AIProvider, AI_PROVIDER } from '../ai/ai-provider.interface';
 import { UsersService } from '../users/users.service';
 
 describe('FeedbackService', () => {
@@ -14,7 +14,7 @@ describe('FeedbackService', () => {
   let sessionsRepository: jest.Mocked<Repository<FeedbackSession>>;
   let resultsRepository: jest.Mocked<Repository<FeedbackResult>>;
   let personasService: jest.Mocked<PersonasService>;
-  let geminiService: jest.Mocked<GeminiService>;
+  let aiProvider: jest.Mocked<AIProvider>;
   let usersService: jest.Mocked<UsersService>;
 
   const mockUser = {
@@ -89,7 +89,7 @@ describe('FeedbackService', () => {
           },
         },
         {
-          provide: GeminiService,
+          provide: AI_PROVIDER,
           useValue: {
             generateFeedback: jest.fn(),
             generateSummary: jest.fn(),
@@ -109,7 +109,7 @@ describe('FeedbackService', () => {
     sessionsRepository = module.get(getRepositoryToken(FeedbackSession));
     resultsRepository = module.get(getRepositoryToken(FeedbackResult));
     personasService = module.get(PersonasService);
-    geminiService = module.get(GeminiService);
+    aiProvider = module.get(AI_PROVIDER);
     usersService = module.get(UsersService);
   });
 
@@ -166,7 +166,7 @@ describe('FeedbackService', () => {
       sessionsRepository.findOne.mockResolvedValue(mockSession);
       sessionsRepository.save.mockResolvedValue(mockSession);
       personasService.findByIdOrFail.mockResolvedValue(mockPersona as any);
-      geminiService.generateFeedback.mockResolvedValue({
+      aiProvider.generateFeedback.mockResolvedValue({
         feedbackText: '좋은 아이디어입니다',
         sentiment: 'positive',
         purchaseIntent: 'high',
@@ -183,7 +183,7 @@ describe('FeedbackService', () => {
       );
 
       expect(result).toHaveLength(1);
-      expect(geminiService.generateFeedback).toHaveBeenCalled();
+      expect(aiProvider.generateFeedback).toHaveBeenCalled();
     });
 
     it('should throw NotFoundException when session not owned by user', async () => {
@@ -206,7 +206,7 @@ describe('FeedbackService', () => {
       };
       sessionsRepository.findOne.mockResolvedValue(sessionWithResults);
       sessionsRepository.save.mockResolvedValue(sessionWithResults);
-      geminiService.generateSummary.mockResolvedValue('종합 분석 결과입니다');
+      aiProvider.generateSummary.mockResolvedValue('종합 분석 결과입니다');
 
       const result = await service.generateSummary('session-uuid', 'user-uuid');
 

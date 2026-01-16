@@ -1,11 +1,11 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FeedbackSession } from './entities/feedback-session.entity';
 import { FeedbackResult } from './entities/feedback-result.entity';
 import { CreateSessionDto } from './dto/create-session.dto';
 import { PersonasService } from '../personas/personas.service';
-import { GeminiService } from '../ai/gemini.service';
+import { AIProvider, AI_PROVIDER } from '../ai/ai-provider.interface';
 import { UsersService } from '../users/users.service';
 
 const CREDITS_PER_PERSONA = 1;
@@ -18,7 +18,8 @@ export class FeedbackService {
     @InjectRepository(FeedbackResult)
     private readonly resultsRepository: Repository<FeedbackResult>,
     private readonly personasService: PersonasService,
-    private readonly geminiService: GeminiService,
+    @Inject(AI_PROVIDER)
+    private readonly aiProvider: AIProvider,
     private readonly usersService: UsersService,
   ) {}
 
@@ -104,7 +105,7 @@ export class FeedbackService {
       for (const personaId of targetPersonaIds) {
         const persona = await this.personasService.findByIdOrFail(personaId);
 
-        const aiResponse = await this.geminiService.generateFeedback(
+        const aiResponse = await this.aiProvider.generateFeedback(
           session.inputContent,
           persona,
         );
@@ -145,7 +146,7 @@ export class FeedbackService {
       throw new BadRequestException('No feedback results to summarize');
     }
 
-    const summary = await this.geminiService.generateSummary(
+    const summary = await this.aiProvider.generateSummary(
       session.inputContent,
       session.results,
     );

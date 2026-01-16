@@ -3,17 +3,10 @@ import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import { Persona } from '../personas/entities/persona.entity';
 import { FeedbackResult, Sentiment, PurchaseIntent } from '../feedback/entities/feedback-result.entity';
-
-export interface AIFeedbackResponse {
-  feedbackText: string;
-  sentiment: Sentiment;
-  purchaseIntent: PurchaseIntent;
-  keyPoints: string[];
-  score: number;
-}
+import { AIProvider, AIFeedbackResponse } from './ai-provider.interface';
 
 @Injectable()
-export class GeminiService {
+export class GeminiService implements AIProvider {
   private apiKey: string;
   private apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
