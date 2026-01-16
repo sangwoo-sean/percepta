@@ -218,6 +218,84 @@ FRONTEND_URL=http://localhost:5173
 - Redux slice별 상태 관리
 - 테스트 파일: `*.test.tsx`
 
+## Git 컨벤션
+
+### 커밋 메시지 형식
+```
+<type>(<scope>): <description>
+
+<body (optional)>
+
+Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
+```
+
+### Type
+| Type | 설명 |
+|------|------|
+| feat | 새로운 기능 추가 |
+| fix | 버그 수정 |
+| docs | 문서 변경 |
+| style | 코드 포맷팅 (기능 변경 없음) |
+| refactor | 리팩토링 |
+| test | 테스트 추가/수정 |
+| chore | 빌드, 설정 파일 변경 |
+
+### Scope
+| Scope | 설명 |
+|-------|------|
+| root | 루트 설정 (모노레포, 워크스페이스) |
+| infra | 인프라 설정 (Docker, CI/CD) |
+| backend | 백엔드 전체 또는 기본 설정 |
+| frontend | 프론트엔드 전체 또는 기본 설정 |
+| (모듈명) | 특정 모듈 (예: auth, users, personas) |
+
+### 커밋 단위 기준
+작업을 다음 기준으로 논리적 단위로 분리하여 커밋:
+
+1. **인프라/설정 단위**
+   - 모노레포 구조 설정
+   - Docker/CI 설정
+   - 패키지 의존성 변경
+
+2. **백엔드 모듈 단위**
+   - 각 NestJS 모듈별로 커밋 (엔티티 + 서비스 + 컨트롤러 + 테스트)
+   - 순서: Users → Auth → Personas → Upload → AI → Feedback
+
+3. **프론트엔드 레이어 단위**
+   - 기본 설정 (Vite, TypeScript, Tailwind)
+   - 공통 UI 컴포넌트 (Button, Input, Card, Modal)
+   - 레이아웃 컴포넌트 (Header, Sidebar, Layout)
+   - API 클라이언트 및 상태 관리 (Redux)
+   - 도메인 컴포넌트 (페르소나, 피드백)
+   - 페이지 컴포넌트
+
+4. **문서화**
+   - README, CLAUDE.md 등 문서 변경은 별도 커밋
+
+### 커밋 예시
+```bash
+# 인프라 설정
+feat(root): pnpm 워크스페이스 기반 모노레포 구조 설정
+feat(infra): PostgreSQL Docker Compose 설정
+
+# 백엔드 모듈
+feat(backend): NestJS 백엔드 기본 설정
+feat(backend): Users 모듈 구현
+feat(backend): Auth 모듈 구현
+feat(backend): Personas 모듈 구현
+
+# 프론트엔드
+feat(frontend): React + Vite + Tailwind 기본 설정
+feat(frontend): 공통 UI 컴포넌트 구현
+feat(frontend): 레이아웃 컴포넌트 구현
+feat(frontend): API 클라이언트 및 상태 관리 구현
+feat(frontend): 페르소나 컴포넌트 구현
+feat(frontend): 페이지 컴포넌트 구현
+
+# 문서화
+docs: AI 에이전트용 프로젝트 컨텍스트 문서 작성
+```
+
 ## 작업 시 주의사항
 
 1. **크레딧 시스템**: 페르소나당 1크레딧 차감. 크레딧 부족 시 피드백 생성 불가.
