@@ -1,0 +1,21 @@
+{
+  "name": "percepta",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI Persona Feedback Service MVP",
+  "scripts": {
+    "backend": "pnpm --filter backend",
+    "frontend": "pnpm --filter frontend",
+    "dev": "pnpm run --parallel dev",
+    "build": "pnpm run --parallel build",
+    "test": "pnpm run --parallel test",
+    "lint": "pnpm run --parallel lint"
+  },
+  "keywords": ["ai", "feedback", "persona"],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
