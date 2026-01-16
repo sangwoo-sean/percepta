@@ -6,6 +6,13 @@ node_modules/
 dist/
 build/
 .next/
+*.tsbuildinfo
+vite.config.js
+vite.config.d.ts
+vite.config.d.ts.map
+vitest.config.js
+vitest.config.d.ts
+vitest.config.d.ts.map
 
 # Environment files
 .env
