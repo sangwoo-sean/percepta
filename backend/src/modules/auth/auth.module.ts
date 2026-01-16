@@ -8,6 +8,20 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { GoogleStrategy } from './strategies/google.strategy';
 import { UsersModule } from '../users/users.module';
 
+// Conditionally provide GoogleStrategy only if credentials are configured
+const googleStrategyProvider = {
+  provide: GoogleStrategy,
+  useFactory: (configService: ConfigService) => {
+    const clientId = configService.get<string>('GOOGLE_CLIENT_ID');
+    if (clientId) {
+      return new GoogleStrategy(configService);
+    }
+    // Return null if Google OAuth is not configured
+    return null;
+  },
+  inject: [ConfigService],
+};
+
 @Module({
   imports: [
     UsersModule,
@@ -23,7 +37,7 @@ import { UsersModule } from '../users/users.module';
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthService, JwtStrategy, GoogleStrategy],
+  providers: [AuthService, JwtStrategy, googleStrategyProvider],
   controllers: [AuthController],
   exports: [AuthService],
 })

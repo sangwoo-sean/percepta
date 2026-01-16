@@ -32,7 +32,7 @@ export class FeedbackSession {
   @Column({ name: 'input_content', type: 'text' })
   inputContent: string;
 
-  @Column({ name: 'input_url', nullable: true })
+  @Column({ name: 'input_url', type: 'varchar', nullable: true })
   inputUrl: string | null;
 
   @Column({ default: 'pending' })

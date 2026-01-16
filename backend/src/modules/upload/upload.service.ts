@@ -18,13 +18,15 @@ export interface ScrapedContent {
 
 @Injectable()
 export class UploadService {
-  private supabase: SupabaseClient;
+  private supabase: SupabaseClient | null = null;
   private bucket: string;
+  private mockStorage: boolean;
 
   constructor(private configService: ConfigService) {
     const supabaseUrl = this.configService.get<string>('SUPABASE_URL');
     const supabaseKey = this.configService.get<string>('SUPABASE_ANON_KEY');
     this.bucket = this.configService.get<string>('SUPABASE_BUCKET', 'uploads');
+    this.mockStorage = this.configService.get<string>('MOCK_STORAGE') === 'true';
 
     if (supabaseUrl && supabaseKey) {
       this.supabase = createClient(supabaseUrl, supabaseKey);
@@ -35,10 +37,6 @@ export class UploadService {
     file: Express.Multer.File,
     userId: string,
   ): Promise<UploadResult> {
-    if (!this.supabase) {
-      throw new BadRequestException('Storage not configured');
-    }
-
     const allowedTypes = [
       'image/jpeg',
       'image/png',
@@ -61,6 +59,19 @@ export class UploadService {
     const ext = file.originalname.split('.').pop();
     const filename = `${uuidv4()}.${ext}`;
     const path = `${userId}/${filename}`;
+
+    // Mock storage mode for local development
+    if (this.mockStorage) {
+      return {
+        url: `http://localhost:3000/mock-uploads/${path}`,
+        path,
+        filename: file.originalname,
+      };
+    }
+
+    if (!this.supabase) {
+      throw new BadRequestException('Storage not configured. Set MOCK_STORAGE=true for local development.');
+    }
 
     const { error } = await this.supabase.storage
       .from(this.bucket)

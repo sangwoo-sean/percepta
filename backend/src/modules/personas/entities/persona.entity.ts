@@ -28,7 +28,7 @@ export class Persona {
   @Column()
   name: string;
 
-  @Column({ name: 'avatar_url', nullable: true })
+  @Column({ name: 'avatar_url', type: 'varchar', nullable: true })
   avatarUrl: string | null;
 
   @Column({ name: 'age_group' })
@@ -40,7 +40,7 @@ export class Persona {
   @Column({ type: 'jsonb', name: 'personality_traits', default: [] })
   personalityTraits: string[];
 
-  @Column({ nullable: true })
+  @Column({ type: 'text', nullable: true })
   description: string | null;
 
   @CreateDateColumn({ name: 'created_at' })

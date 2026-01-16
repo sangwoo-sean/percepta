@@ -20,10 +20,10 @@ export class User {
   @Column()
   name: string;
 
-  @Column({ name: 'avatar_url', nullable: true })
+  @Column({ name: 'avatar_url', type: 'varchar', nullable: true })
   avatarUrl: string | null;
 
-  @Column({ name: 'google_id', nullable: true })
+  @Column({ name: 'google_id', type: 'varchar', nullable: true })
   googleId: string | null;
 
   @Column({ default: 10 })

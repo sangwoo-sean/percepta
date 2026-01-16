@@ -12,7 +12,7 @@ import { AiModule } from './modules/ai/ai.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      envFilePath: ['.env.local', '.env'],
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
