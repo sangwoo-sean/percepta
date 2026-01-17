@@ -6,10 +6,26 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(configService: ConfigService) {
+    const clientID = configService.get<string>('GOOGLE_CLIENT_ID');
+    const clientSecret = configService.get<string>('GOOGLE_CLIENT_SECRET');
+    const callbackURL = configService.get<string>('GOOGLE_CALLBACK_URL');
+
+    if (!clientID || !clientSecret) {
+      // Use placeholder values to prevent crash on startup
+      // Authentication will fail at runtime if credentials are not configured
+      super({
+        clientID: 'not-configured',
+        clientSecret: 'not-configured',
+        callbackURL: callbackURL || 'http://localhost:3000/api/auth/google/callback',
+        scope: ['email', 'profile'],
+      });
+      return;
+    }
+
     super({
-      clientID: configService.get<string>('GOOGLE_CLIENT_ID'),
-      clientSecret: configService.get<string>('GOOGLE_CLIENT_SECRET'),
-      callbackURL: configService.get<string>('GOOGLE_CALLBACK_URL'),
+      clientID,
+      clientSecret,
+      callbackURL,
       scope: ['email', 'profile'],
     });
   }
