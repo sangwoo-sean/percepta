@@ -6,6 +6,21 @@
   "stats": {
     "total": "전체 페르소나"
   },
+  "card": {
+    "gender": "성별",
+    "genderOptions": {
+      "male": "남성",
+      "female": "여성"
+    },
+    "location": "거주지",
+    "education": "학력",
+    "incomeLevel": "소득 수준",
+    "dailyPattern": "일상 패턴",
+    "strengths": "강점",
+    "weaknesses": "약점",
+    "description": "설명",
+    "personalityTraits": "성격 특성"
+  },
   "empty": {
     "title": "아직 페르소나가 없습니다",
     "description": "첫 번째 페르소나를 만들어 AI 기반 피드백을 받아보세요.",

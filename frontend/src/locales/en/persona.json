@@ -6,6 +6,21 @@
   "stats": {
     "total": "Total Personas"
   },
+  "card": {
+    "gender": "Gender",
+    "genderOptions": {
+      "male": "Male",
+      "female": "Female"
+    },
+    "location": "Location",
+    "education": "Education",
+    "incomeLevel": "Income Level",
+    "dailyPattern": "Daily Pattern",
+    "strengths": "Strengths",
+    "weaknesses": "Weaknesses",
+    "description": "Description",
+    "personalityTraits": "Personality Traits"
+  },
   "empty": {
     "title": "No personas yet",
     "description": "Create your first persona to start getting AI-powered feedback.",
