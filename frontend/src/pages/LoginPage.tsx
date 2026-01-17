@@ -1,11 +1,13 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { authApi } from '../api/auth';
-import { Button } from '../components/common';
+import { Button, LanguageSwitcher } from '../components/common';
 
 export const LoginPage: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth();
+  const { t } = useTranslation('auth');
 
   if (isLoading) {
     return (
@@ -25,17 +27,20 @@ export const LoginPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center px-4">
+      <div className="absolute top-4 right-4">
+        <LanguageSwitcher />
+      </div>
       <div className="max-w-md w-full">
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-primary-600 mb-2">Percepta</h1>
-            <p className="text-gray-600">AI Persona Feedback Service</p>
+            <h1 className="text-3xl font-bold text-primary-600 mb-2">{t('login.title')}</h1>
+            <p className="text-gray-600">{t('login.subtitle')}</p>
           </div>
 
           <div className="space-y-4">
             <div className="text-center text-sm text-gray-500 mb-6">
-              <p>Get valuable feedback from AI-powered personas</p>
-              <p>that represent your target audience.</p>
+              <p>{t('login.description1')}</p>
+              <p>{t('login.description2')}</p>
             </div>
 
             <Button onClick={handleGoogleLogin} variant="outline" className="w-full flex items-center justify-center gap-3">
@@ -48,23 +53,23 @@ export const LoginPage: React.FC = () => {
                 <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
                 <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
               </svg>
-              Continue with Google
+              {t('login.googleButton')}
             </Button>
           </div>
 
           <div className="mt-8 pt-6 border-t border-gray-200">
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
-                <div className="text-2xl font-bold text-primary-600">AI</div>
-                <div className="text-xs text-gray-500">Powered</div>
+                <div className="text-2xl font-bold text-primary-600">{t('login.features.ai.title')}</div>
+                <div className="text-xs text-gray-500">{t('login.features.ai.subtitle')}</div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-primary-600">10+</div>
-                <div className="text-xs text-gray-500">Personas</div>
+                <div className="text-2xl font-bold text-primary-600">{t('login.features.personas.title')}</div>
+                <div className="text-xs text-gray-500">{t('login.features.personas.subtitle')}</div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-primary-600">Fast</div>
-                <div className="text-xs text-gray-500">Feedback</div>
+                <div className="text-2xl font-bold text-primary-600">{t('login.features.fast.title')}</div>
+                <div className="text-xs text-gray-500">{t('login.features.fast.subtitle')}</div>
               </div>
             </div>
           </div>

@@ -3,3 +3,4 @@ export { Input } from './Input';
 export { Card, CardHeader } from './Card';
 export { Modal } from './Modal';
 export { Select } from './Select';
+export { LanguageSwitcher } from './LanguageSwitcher';

@@ -1,0 +1,30 @@
+{
+  "welcome": "Welcome, {{name}}!",
+  "overview": "Here's an overview of your Percepta activity.",
+  "stats": {
+    "personas": "Personas",
+    "feedbackSessions": "Feedback Sessions",
+    "credits": "Credits"
+  },
+  "quickActions": {
+    "title": "Quick Actions",
+    "subtitle": "Get started with your feedback",
+    "newSession": "New Feedback Session",
+    "managePersonas": "Manage Personas"
+  },
+  "recentPersonas": {
+    "title": "Recent Personas",
+    "totalCount": "{{count}} total personas",
+    "empty": "No personas yet. Create one to get started!"
+  },
+  "recentFeedback": {
+    "title": "Recent Feedback",
+    "subtitle": "Your latest feedback sessions",
+    "columns": {
+      "input": "Input",
+      "type": "Type",
+      "status": "Status",
+      "date": "Date"
+    }
+  }
+}

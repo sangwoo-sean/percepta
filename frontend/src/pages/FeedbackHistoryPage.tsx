@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { useAppDispatch } from '../hooks/useAppDispatch';
 import { fetchSessions } from '../store/feedbackSlice';
 import type { RootState } from '../store';
@@ -9,6 +10,8 @@ import { Card, Button } from '../components/common';
 export const FeedbackHistoryPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const { sessions, isLoading } = useSelector((state: RootState) => state.feedback);
+  const { t } = useTranslation('feedback');
+  const { t: tCommon } = useTranslation('common');
 
   useEffect(() => {
     dispatch(fetchSessions());
@@ -26,9 +29,9 @@ export const FeedbackHistoryPage: React.FC = () => {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Feedback History</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('history.title')}</h1>
           <p className="text-gray-600 mt-1">
-            View all your past feedback sessions
+            {t('history.subtitle')}
           </p>
         </div>
         <Link to="/feedback/new">
@@ -36,7 +39,7 @@ export const FeedbackHistoryPage: React.FC = () => {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            New Feedback
+            {t('history.newFeedback')}
           </Button>
         </Link>
       </div>
@@ -56,12 +59,12 @@ export const FeedbackHistoryPage: React.FC = () => {
               d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
             />
           </svg>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No feedback yet</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">{t('history.empty.title')}</h3>
           <p className="text-gray-500 mb-4">
-            Create your first feedback session to get started.
+            {t('history.empty.description')}
           </p>
           <Link to="/feedback/new">
-            <Button>Create Your First Feedback</Button>
+            <Button>{t('history.empty.createButton')}</Button>
           </Link>
         </Card>
       ) : (
@@ -79,7 +82,7 @@ export const FeedbackHistoryPage: React.FC = () => {
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
                         <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${
                             session.inputType === 'text'
                               ? 'bg-blue-100 text-blue-800'
                               : session.inputType === 'url'
@@ -87,7 +90,7 @@ export const FeedbackHistoryPage: React.FC = () => {
                               : 'bg-green-100 text-green-800'
                           }`}
                         >
-                          {session.inputType}
+                          {tCommon(`inputType.${session.inputType}`)}
                         </span>
                         <span
                           className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -100,7 +103,7 @@ export const FeedbackHistoryPage: React.FC = () => {
                               : 'bg-gray-100 text-gray-800'
                           }`}
                         >
-                          {session.status}
+                          {tCommon(`status.${session.status}`)}
                         </span>
                       </div>
                       <p className="text-gray-700 line-clamp-2">
@@ -109,8 +112,8 @@ export const FeedbackHistoryPage: React.FC = () => {
                       </p>
                       <div className="flex items-center gap-4 mt-3 text-sm text-gray-500">
                         <span>{new Date(session.createdAt).toLocaleDateString()}</span>
-                        <span>{session.results?.length || 0} feedbacks</span>
-                        <span>{session.creditsUsed} credits used</span>
+                        <span>{t('history.feedbackCount', { count: session.results?.length || 0 })}</span>
+                        <span>{t('history.creditsUsed', { count: session.creditsUsed })}</span>
                       </div>
                     </div>
                     {avgScore !== null && (
@@ -123,7 +126,7 @@ export const FeedbackHistoryPage: React.FC = () => {
                             {avgScore.toFixed(1)}
                           </span>
                         </div>
-                        <p className="text-xs text-gray-500">Avg. score</p>
+                        <p className="text-xs text-gray-500">{t('history.avgScore')}</p>
                       </div>
                     )}
                   </div>

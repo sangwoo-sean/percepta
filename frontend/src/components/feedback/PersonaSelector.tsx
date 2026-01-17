@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { useAppDispatch } from '../../hooks/useAppDispatch';
 import { fetchPersonas } from '../../store/personaSlice';
 import type { RootState } from '../../store';
@@ -22,6 +23,7 @@ export const PersonaSelector: React.FC<PersonaSelectorProps> = ({
   const dispatch = useAppDispatch();
   const { personas, isLoading } = useSelector((state: RootState) => state.persona);
   const { user } = useSelector((state: RootState) => state.auth);
+  const { t } = useTranslation('feedback');
 
   useEffect(() => {
     dispatch(fetchPersonas());
@@ -59,10 +61,10 @@ export const PersonaSelector: React.FC<PersonaSelectorProps> = ({
     return (
       <div className="text-center py-12">
         <p className="text-gray-600 mb-4">
-          You don't have any personas yet. Create some personas first to get feedback.
+          {t('selector.empty.message')}
         </p>
         <Button onClick={() => (window.location.href = '/personas')}>
-          Create Personas
+          {t('selector.empty.createButton')}
         </Button>
       </div>
     );
@@ -72,16 +74,16 @@ export const PersonaSelector: React.FC<PersonaSelectorProps> = ({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="font-semibold text-gray-900">Select Personas</h3>
+          <h3 className="font-semibold text-gray-900">{t('selector.title')}</h3>
           <p className="text-sm text-gray-500">
-            Choose which personas should review your content
+            {t('selector.subtitle')}
           </p>
         </div>
         <button
           onClick={handleSelectAll}
           className="text-sm text-primary-600 hover:text-primary-700"
         >
-          {selectedIds.length === personas.length ? 'Deselect all' : 'Select all'}
+          {selectedIds.length === personas.length ? t('selector.deselectAll') : t('selector.selectAll')}
         </button>
       </div>
 
@@ -100,17 +102,21 @@ export const PersonaSelector: React.FC<PersonaSelectorProps> = ({
       <div className="flex items-center justify-between bg-gray-50 rounded-lg p-4">
         <div>
           <p className="font-medium text-gray-900">
-            {selectedIds.length} persona{selectedIds.length !== 1 ? 's' : ''} selected
+            {selectedIds.length === 1
+              ? t('selector.selected', { count: selectedIds.length })
+              : t('selector.selectedPlural', { count: selectedIds.length })}
           </p>
           <p className="text-sm text-gray-500">
-            Cost: {totalCredits} credit{totalCredits !== 1 ? 's' : ''} | You have: {user?.credits || 0} credits
+            {totalCredits === 1
+              ? t('selector.cost', { count: totalCredits })
+              : t('selector.costPlural', { count: totalCredits })} | {t('selector.available', { count: user?.credits || 0 })}
           </p>
         </div>
         <Button
           onClick={onConfirm}
           disabled={selectedIds.length === 0 || !hasEnoughCredits}
         >
-          {!hasEnoughCredits ? 'Insufficient Credits' : 'Continue'}
+          {!hasEnoughCredits ? t('selector.insufficientCredits') : t('selector.continue')}
         </Button>
       </div>
     </div>

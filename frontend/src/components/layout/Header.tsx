@@ -1,9 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
+import { LanguageSwitcher } from '../common';
 
 export const Header: React.FC = () => {
   const { user, logout } = useAuth();
+  const { t } = useTranslation();
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
@@ -15,6 +18,8 @@ export const Header: React.FC = () => {
 
           {user && (
             <div className="flex items-center gap-4">
+              <LanguageSwitcher />
+
               <div className="flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-full">
                 <svg
                   className="w-4 h-4 text-yellow-500"
@@ -23,7 +28,7 @@ export const Header: React.FC = () => {
                 >
                   <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" />
                 </svg>
-                <span className="text-sm font-medium">{user.credits} credits</span>
+                <span className="text-sm font-medium">{t('header.credits', { count: user.credits })}</span>
               </div>
 
               <div className="flex items-center gap-3">
@@ -47,7 +52,7 @@ export const Header: React.FC = () => {
                   onClick={logout}
                   className="text-gray-500 hover:text-gray-700 text-sm"
                 >
-                  Logout
+                  {t('header.logout')}
                 </button>
               </div>
             </div>

@@ -1,0 +1,38 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "personas": "Personas",
+    "newFeedback": "New Feedback",
+    "history": "History",
+    "settings": "Settings"
+  },
+  "header": {
+    "credits": "{{count}} credits",
+    "logout": "Logout"
+  },
+  "language": {
+    "ko": "한국어",
+    "en": "English"
+  },
+  "button": {
+    "back": "Back",
+    "continue": "Continue",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "save": "Save",
+    "create": "Create",
+    "viewAll": "View all"
+  },
+  "status": {
+    "pending": "Pending",
+    "processing": "Processing",
+    "completed": "Completed",
+    "failed": "Failed"
+  },
+  "inputType": {
+    "text": "Text",
+    "file": "File",
+    "url": "URL"
+  }
+}

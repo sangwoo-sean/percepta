@@ -1,0 +1,133 @@
+{
+  "new": {
+    "title": "새 피드백 세션",
+    "subtitle": "페르소나로부터 AI 기반 피드백을 받아보세요",
+    "steps": {
+      "content": "콘텐츠 추가",
+      "personas": "페르소나 선택",
+      "generating": "피드백 생성"
+    },
+    "step1": {
+      "title": "1단계: 콘텐츠 추가",
+      "subtitle": "피드백을 받고 싶은 콘텐츠를 입력하세요"
+    },
+    "step2": {
+      "title": "2단계: 페르소나 선택",
+      "subtitle": "콘텐츠를 검토할 페르소나를 선택하세요",
+      "contentPreview": "콘텐츠 미리보기:"
+    },
+    "generating": {
+      "title": "피드백 생성 중...",
+      "description": "AI 페르소나가 콘텐츠를 검토하고 있습니다. 잠시 기다려주세요."
+    },
+    "error": "피드백 생성에 실패했습니다. 다시 시도해주세요."
+  },
+  "upload": {
+    "modes": {
+      "text": "텍스트",
+      "file": "파일",
+      "url": "URL"
+    },
+    "text": {
+      "placeholder": "콘텐츠를 입력하세요. 제품 설명, 마케팅 문구, 앱 아이디어 등 피드백을 받고 싶은 내용을 작성해주세요...",
+      "continueButton": "이 콘텐츠로 계속하기"
+    },
+    "file": {
+      "uploading": "업로드 중...",
+      "success": "파일이 성공적으로 업로드되었습니다",
+      "dropzone": "파일을 여기에 끌어다 놓거나, 클릭하여 선택하세요",
+      "dropzoneActive": "파일을 여기에 놓으세요",
+      "supportedFormats": "텍스트, 이미지, PDF 지원 (최대 10MB)",
+      "error": "파일 업로드에 실패했습니다. 다시 시도해주세요."
+    },
+    "url": {
+      "placeholder": "https://example.com/page",
+      "fetchButton": "가져오기",
+      "description": "콘텐츠를 스크래핑할 URL을 입력하세요. 분석을 위해 주요 텍스트 콘텐츠를 추출합니다.",
+      "error": "URL을 가져오는 데 실패했습니다. URL을 확인하고 다시 시도해주세요."
+    }
+  },
+  "selector": {
+    "title": "페르소나 선택",
+    "subtitle": "콘텐츠를 검토할 페르소나를 선택하세요",
+    "selectAll": "전체 선택",
+    "deselectAll": "전체 해제",
+    "selected": "{{count}}개 페르소나 선택됨",
+    "selectedPlural": "{{count}}개 페르소나 선택됨",
+    "cost": "비용: {{count}} 크레딧",
+    "costPlural": "비용: {{count}} 크레딧",
+    "available": "보유: {{count}} 크레딧",
+    "continue": "계속",
+    "insufficientCredits": "크레딧 부족",
+    "empty": {
+      "message": "아직 페르소나가 없습니다. 먼저 페르소나를 생성하세요.",
+      "createButton": "페르소나 생성"
+    }
+  },
+  "result": {
+    "title": "피드백 결과",
+    "createdOn": "생성일: {{date}}",
+    "generateSummary": "AI 요약 생성",
+    "newFeedback": "새 피드백",
+    "viewSource": "원본 보기",
+    "individualFeedback": "개별 피드백 ({{count}}개)",
+    "noResults": "아직 피드백 결과가 없습니다."
+  },
+  "history": {
+    "title": "피드백 히스토리",
+    "subtitle": "지난 피드백 세션을 확인하세요",
+    "newFeedback": "새 피드백",
+    "empty": {
+      "title": "아직 피드백이 없습니다",
+      "description": "첫 번째 피드백 세션을 만들어 시작하세요.",
+      "createButton": "첫 번째 피드백 만들기"
+    },
+    "feedbackCount": "{{count}}개 피드백",
+    "creditsUsed": "{{count}} 크레딧 사용",
+    "avgScore": "평균 점수"
+  },
+  "card": {
+    "unknownPersona": "알 수 없는 페르소나",
+    "purchaseIntent": "구매 의향: {{intent}}",
+    "keyPoints": "주요 포인트:"
+  },
+  "summary": {
+    "title": "요약",
+    "basedOn": "{{count}}개 페르소나 피드백 기준",
+    "avgScore": "평균 점수",
+    "positive": "긍정적",
+    "neutral": "중립적",
+    "negative": "부정적",
+    "purchaseIntent": "구매 의향 분포",
+    "intent": {
+      "high": "높음",
+      "medium": "보통",
+      "low": "낮음",
+      "none": "없음"
+    },
+    "aiAnalysis": "AI 분석"
+  },
+  "settings": {
+    "title": "설정",
+    "subtitle": "계정 설정을 관리하세요",
+    "profile": {
+      "title": "프로필",
+      "subtitle": "계정 정보",
+      "memberSince": "가입일: {{date}}"
+    },
+    "credits": {
+      "title": "크레딧",
+      "subtitle": "현재 크레딧 잔액",
+      "available": "사용 가능한 크레딧",
+      "rate": "1 크레딧 = 1 페르소나 피드백"
+    },
+    "mvpMode": {
+      "title": "MVP 모드",
+      "description": "현재 크레딧은 수동으로 관리됩니다. 크레딧을 더 구매하려면 관리자에게 문의하세요."
+    },
+    "accountActions": {
+      "title": "계정 작업",
+      "signOut": "로그아웃"
+    }
+  }
+}

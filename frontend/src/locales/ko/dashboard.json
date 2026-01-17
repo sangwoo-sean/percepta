@@ -1,0 +1,30 @@
+{
+  "welcome": "안녕하세요, {{name}}님!",
+  "overview": "Percepta 활동 요약입니다.",
+  "stats": {
+    "personas": "페르소나",
+    "feedbackSessions": "피드백 세션",
+    "credits": "크레딧"
+  },
+  "quickActions": {
+    "title": "빠른 실행",
+    "subtitle": "피드백을 시작하세요",
+    "newSession": "새 피드백 세션",
+    "managePersonas": "페르소나 관리"
+  },
+  "recentPersonas": {
+    "title": "최근 페르소나",
+    "totalCount": "총 {{count}}개의 페르소나",
+    "empty": "아직 페르소나가 없습니다. 하나 만들어보세요!"
+  },
+  "recentFeedback": {
+    "title": "최근 피드백",
+    "subtitle": "최근 피드백 세션 목록",
+    "columns": {
+      "input": "입력",
+      "type": "타입",
+      "status": "상태",
+      "date": "날짜"
+    }
+  }
+}

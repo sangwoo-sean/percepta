@@ -1,0 +1,133 @@
+{
+  "new": {
+    "title": "New Feedback Session",
+    "subtitle": "Get AI-powered feedback from your personas",
+    "steps": {
+      "content": "Add Content",
+      "personas": "Select Personas",
+      "generating": "Generate Feedback"
+    },
+    "step1": {
+      "title": "Step 1: Add Your Content",
+      "subtitle": "Enter the content you want to get feedback on"
+    },
+    "step2": {
+      "title": "Step 2: Select Personas",
+      "subtitle": "Choose which personas should review your content",
+      "contentPreview": "Content preview:"
+    },
+    "generating": {
+      "title": "Generating Feedback...",
+      "description": "Our AI personas are reviewing your content. This may take a moment."
+    },
+    "error": "Failed to generate feedback. Please try again."
+  },
+  "upload": {
+    "modes": {
+      "text": "Text",
+      "file": "File",
+      "url": "URL"
+    },
+    "text": {
+      "placeholder": "Enter your content here. This could be a product description, marketing copy, app idea, or any text you want feedback on...",
+      "continueButton": "Continue with this content"
+    },
+    "file": {
+      "uploading": "Uploading...",
+      "success": "File uploaded successfully",
+      "dropzone": "Drag and drop a file here, or click to select",
+      "dropzoneActive": "Drop your file here",
+      "supportedFormats": "Supports text, images, and PDF (max 10MB)",
+      "error": "Failed to upload file. Please try again."
+    },
+    "url": {
+      "placeholder": "https://example.com/page",
+      "fetchButton": "Fetch",
+      "description": "Enter a URL to scrape content from. We'll extract the main text content for analysis.",
+      "error": "Failed to fetch URL. Please check the URL and try again."
+    }
+  },
+  "selector": {
+    "title": "Select Personas",
+    "subtitle": "Choose which personas should review your content",
+    "selectAll": "Select all",
+    "deselectAll": "Deselect all",
+    "selected": "{{count}} persona selected",
+    "selectedPlural": "{{count}} personas selected",
+    "cost": "Cost: {{count}} credit",
+    "costPlural": "Cost: {{count}} credits",
+    "available": "You have: {{count}} credits",
+    "continue": "Continue",
+    "insufficientCredits": "Insufficient Credits",
+    "empty": {
+      "message": "You don't have any personas yet. Create some personas first to get feedback.",
+      "createButton": "Create Personas"
+    }
+  },
+  "result": {
+    "title": "Feedback Results",
+    "createdOn": "Created on {{date}}",
+    "generateSummary": "Generate AI Summary",
+    "newFeedback": "New Feedback",
+    "viewSource": "View original source",
+    "individualFeedback": "Individual Feedback ({{count}})",
+    "noResults": "No feedback results yet."
+  },
+  "history": {
+    "title": "Feedback History",
+    "subtitle": "View all your past feedback sessions",
+    "newFeedback": "New Feedback",
+    "empty": {
+      "title": "No feedback yet",
+      "description": "Create your first feedback session to get started.",
+      "createButton": "Create Your First Feedback"
+    },
+    "feedbackCount": "{{count}} feedbacks",
+    "creditsUsed": "{{count}} credits used",
+    "avgScore": "Avg. score"
+  },
+  "card": {
+    "unknownPersona": "Unknown Persona",
+    "purchaseIntent": "Purchase Intent: {{intent}}",
+    "keyPoints": "Key Points:"
+  },
+  "summary": {
+    "title": "Summary",
+    "basedOn": "Based on {{count}} persona feedbacks",
+    "avgScore": "Avg. Score",
+    "positive": "Positive",
+    "neutral": "Neutral",
+    "negative": "Negative",
+    "purchaseIntent": "Purchase Intent Distribution",
+    "intent": {
+      "high": "high",
+      "medium": "medium",
+      "low": "low",
+      "none": "none"
+    },
+    "aiAnalysis": "AI Analysis"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your account settings",
+    "profile": {
+      "title": "Profile",
+      "subtitle": "Your account information",
+      "memberSince": "Member since {{date}}"
+    },
+    "credits": {
+      "title": "Credits",
+      "subtitle": "Your current credit balance",
+      "available": "Available credits",
+      "rate": "1 credit = 1 persona feedback"
+    },
+    "mvpMode": {
+      "title": "MVP Mode",
+      "description": "Credits are currently managed manually. Contact the administrator to purchase more credits."
+    },
+    "accountActions": {
+      "title": "Account Actions",
+      "signOut": "Sign Out"
+    }
+  }
+}

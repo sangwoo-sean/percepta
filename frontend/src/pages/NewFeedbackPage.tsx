@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAppDispatch } from '../hooks/useAppDispatch';
 import { createSession, generateFeedback } from '../store/feedbackSlice';
 import { fetchCurrentUser } from '../store/authSlice';
@@ -12,6 +13,8 @@ type WizardStep = 'content' | 'personas' | 'generating';
 export const NewFeedbackPage: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const { t } = useTranslation('feedback');
+  const { t: tCommon } = useTranslation('common');
   const [step, setStep] = useState<WizardStep>('content');
   const [content, setContent] = useState('');
   const [inputType, setInputType] = useState<InputType>('text');
@@ -47,32 +50,30 @@ export const NewFeedbackPage: React.FC = () => {
         })
       ).unwrap();
 
-      // Refresh user credits
       dispatch(fetchCurrentUser());
 
       navigate(`/feedback/${session.id}`);
     } catch (err) {
-      setError('Failed to generate feedback. Please try again.');
+      setError(t('new.error'));
       setStep('personas');
     }
   };
 
   const steps = [
-    { id: 'content', label: 'Add Content' },
-    { id: 'personas', label: 'Select Personas' },
-    { id: 'generating', label: 'Generate Feedback' },
+    { id: 'content', label: t('new.steps.content') },
+    { id: 'personas', label: t('new.steps.personas') },
+    { id: 'generating', label: t('new.steps.generating') },
   ];
 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">New Feedback Session</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t('new.title')}</h1>
         <p className="text-gray-600 mt-1">
-          Get AI-powered feedback from your personas
+          {t('new.subtitle')}
         </p>
       </div>
 
-      {/* Progress Steps */}
       <div className="flex items-center justify-between max-w-2xl">
         {steps.map((s, index) => (
           <React.Fragment key={s.id}>
@@ -111,13 +112,12 @@ export const NewFeedbackPage: React.FC = () => {
         </div>
       )}
 
-      {/* Step Content */}
       <Card>
         {step === 'content' && (
           <>
             <CardHeader
-              title="Step 1: Add Your Content"
-              subtitle="Enter the content you want to get feedback on"
+              title={t('new.step1.title')}
+              subtitle={t('new.step1.subtitle')}
             />
             <FileUpload onContentReady={handleContentReady} />
           </>
@@ -126,17 +126,17 @@ export const NewFeedbackPage: React.FC = () => {
         {step === 'personas' && (
           <>
             <CardHeader
-              title="Step 2: Select Personas"
-              subtitle="Choose which personas should review your content"
+              title={t('new.step2.title')}
+              subtitle={t('new.step2.subtitle')}
               action={
                 <Button variant="outline" size="sm" onClick={() => setStep('content')}>
-                  Back
+                  {tCommon('button.back')}
                 </Button>
               }
             />
             <div className="mb-4 p-4 bg-gray-50 rounded-lg">
               <p className="text-sm text-gray-600">
-                <strong>Content preview:</strong> {content.substring(0, 200)}
+                <strong>{t('new.step2.contentPreview')}</strong> {content.substring(0, 200)}
                 {content.length > 200 && '...'}
               </p>
             </div>
@@ -152,10 +152,10 @@ export const NewFeedbackPage: React.FC = () => {
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary-600 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              Generating Feedback...
+              {t('new.generating.title')}
             </h3>
             <p className="text-gray-600">
-              Our AI personas are reviewing your content. This may take a moment.
+              {t('new.generating.description')}
             </p>
           </div>
         )}

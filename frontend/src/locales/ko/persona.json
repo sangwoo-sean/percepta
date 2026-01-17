@@ -1,0 +1,60 @@
+{
+  "title": "페르소나",
+  "subtitle": "AI 피드백 페르소나를 관리하세요",
+  "createButton": "페르소나 생성",
+  "stats": {
+    "total": "전체 페르소나"
+  },
+  "empty": {
+    "title": "아직 페르소나가 없습니다",
+    "description": "첫 번째 페르소나를 만들어 AI 기반 피드백을 받아보세요.",
+    "createButton": "첫 번째 페르소나 만들기"
+  },
+  "deleteConfirm": "이 페르소나를 삭제하시겠습니까?",
+  "form": {
+    "title": "새 페르소나 생성",
+    "name": {
+      "label": "이름 (선택 - 비워두면 자동 생성)",
+      "placeholder": "페르소나 이름을 입력하세요"
+    },
+    "ageGroup": {
+      "label": "연령대",
+      "options": {
+        "10s": "10대",
+        "20s": "20대",
+        "30s": "30대",
+        "40s": "40대",
+        "50s": "50대",
+        "60+": "60대 이상"
+      }
+    },
+    "occupation": {
+      "label": "직업",
+      "placeholder": "예: 학생, 엔지니어"
+    },
+    "personalityTraits": {
+      "label": "성격 특성",
+      "traits": {
+        "Analytical": "분석적",
+        "Creative": "창의적",
+        "Curious": "호기심 많은",
+        "Detail-oriented": "꼼꼼한",
+        "Early adopter": "얼리어답터",
+        "Frugal": "검소한",
+        "Health-conscious": "건강 중시",
+        "Impulsive": "충동적",
+        "Practical": "실용적",
+        "Quality-focused": "품질 중시",
+        "Social": "사교적",
+        "Tech-savvy": "기술에 능숙한",
+        "Trendy": "트렌디한",
+        "Value-driven": "가치 중심"
+      }
+    },
+    "description": {
+      "label": "설명 (선택)",
+      "placeholder": "이 페르소나에 대한 추가 정보..."
+    },
+    "submitButton": "페르소나 생성"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "title": "Personas",
+  "subtitle": "Manage your AI feedback personas",
+  "createButton": "Create Persona",
+  "stats": {
+    "total": "Total Personas"
+  },
+  "empty": {
+    "title": "No personas yet",
+    "description": "Create your first persona to start getting AI-powered feedback.",
+    "createButton": "Create Your First Persona"
+  },
+  "deleteConfirm": "Are you sure you want to delete this persona?",
+  "form": {
+    "title": "Create New Persona",
+    "name": {
+      "label": "Name (optional - auto-generated if empty)",
+      "placeholder": "Enter persona name"
+    },
+    "ageGroup": {
+      "label": "Age Group",
+      "options": {
+        "10s": "10s",
+        "20s": "20s",
+        "30s": "30s",
+        "40s": "40s",
+        "50s": "50s",
+        "60+": "60+"
+      }
+    },
+    "occupation": {
+      "label": "Occupation",
+      "placeholder": "e.g., Student, Engineer"
+    },
+    "personalityTraits": {
+      "label": "Personality Traits",
+      "traits": {
+        "Analytical": "Analytical",
+        "Creative": "Creative",
+        "Curious": "Curious",
+        "Detail-oriented": "Detail-oriented",
+        "Early adopter": "Early adopter",
+        "Frugal": "Frugal",
+        "Health-conscious": "Health-conscious",
+        "Impulsive": "Impulsive",
+        "Practical": "Practical",
+        "Quality-focused": "Quality-focused",
+        "Social": "Social",
+        "Tech-savvy": "Tech-savvy",
+        "Trendy": "Trendy",
+        "Value-driven": "Value-driven"
+      }
+    },
+    "description": {
+      "label": "Description (optional)",
+      "placeholder": "Additional details about this persona..."
+    },
+    "submitButton": "Create Persona"
+  }
+}

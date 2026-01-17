@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { useAppDispatch } from '../hooks/useAppDispatch';
 import { useAuth } from '../hooks/useAuth';
 import { fetchPersonas, fetchPersonaStats } from '../store/personaSlice';
@@ -13,6 +14,8 @@ export const DashboardPage: React.FC = () => {
   const { user } = useAuth();
   const { personas, stats } = useSelector((state: RootState) => state.persona);
   const { sessions } = useSelector((state: RootState) => state.feedback);
+  const { t } = useTranslation('dashboard');
+  const { t: tCommon } = useTranslation('common');
 
   useEffect(() => {
     dispatch(fetchPersonas());
@@ -26,10 +29,10 @@ export const DashboardPage: React.FC = () => {
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">
-          Welcome, {user?.name}!
+          {t('welcome', { name: user?.name })}
         </h1>
         <p className="text-gray-600 mt-1">
-          Here's an overview of your Percepta activity.
+          {t('overview')}
         </p>
       </div>
 
@@ -42,7 +45,7 @@ export const DashboardPage: React.FC = () => {
               </svg>
             </div>
             <div>
-              <p className="text-sm text-gray-500">Personas</p>
+              <p className="text-sm text-gray-500">{t('stats.personas')}</p>
               <p className="text-2xl font-bold text-gray-900">{stats?.total || 0}</p>
             </div>
           </div>
@@ -56,7 +59,7 @@ export const DashboardPage: React.FC = () => {
               </svg>
             </div>
             <div>
-              <p className="text-sm text-gray-500">Feedback Sessions</p>
+              <p className="text-sm text-gray-500">{t('stats.feedbackSessions')}</p>
               <p className="text-2xl font-bold text-gray-900">{sessions.length}</p>
             </div>
           </div>
@@ -70,7 +73,7 @@ export const DashboardPage: React.FC = () => {
               </svg>
             </div>
             <div>
-              <p className="text-sm text-gray-500">Credits</p>
+              <p className="text-sm text-gray-500">{t('stats.credits')}</p>
               <p className="text-2xl font-bold text-gray-900">{user?.credits || 0}</p>
             </div>
           </div>
@@ -80,8 +83,8 @@ export const DashboardPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader
-            title="Quick Actions"
-            subtitle="Get started with your feedback"
+            title={t('quickActions.title')}
+            subtitle={t('quickActions.subtitle')}
           />
           <div className="space-y-3">
             <Link to="/feedback/new">
@@ -89,12 +92,12 @@ export const DashboardPage: React.FC = () => {
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
-                New Feedback Session
+                {t('quickActions.newSession')}
               </Button>
             </Link>
             <Link to="/personas">
               <Button variant="outline" className="w-full">
-                Manage Personas
+                {t('quickActions.managePersonas')}
               </Button>
             </Link>
           </div>
@@ -102,11 +105,11 @@ export const DashboardPage: React.FC = () => {
 
         <Card>
           <CardHeader
-            title="Recent Personas"
-            subtitle={`${personas.length} total personas`}
+            title={t('recentPersonas.title')}
+            subtitle={t('recentPersonas.totalCount', { count: personas.length })}
             action={
               <Link to="/personas" className="text-sm text-primary-600 hover:text-primary-700">
-                View all
+                {tCommon('button.viewAll')}
               </Link>
             }
           />
@@ -133,7 +136,7 @@ export const DashboardPage: React.FC = () => {
               </div>
             ))}
             {personas.length === 0 && (
-              <p className="text-gray-500 text-sm">No personas yet. Create one to get started!</p>
+              <p className="text-gray-500 text-sm">{t('recentPersonas.empty')}</p>
             )}
           </div>
         </Card>
@@ -142,11 +145,11 @@ export const DashboardPage: React.FC = () => {
       {recentSessions.length > 0 && (
         <Card>
           <CardHeader
-            title="Recent Feedback"
-            subtitle="Your latest feedback sessions"
+            title={t('recentFeedback.title')}
+            subtitle={t('recentFeedback.subtitle')}
             action={
               <Link to="/feedback/history" className="text-sm text-primary-600 hover:text-primary-700">
-                View all
+                {tCommon('button.viewAll')}
               </Link>
             }
           />
@@ -154,17 +157,17 @@ export const DashboardPage: React.FC = () => {
             <table className="w-full">
               <thead>
                 <tr className="text-left text-sm text-gray-500 border-b">
-                  <th className="pb-3">Input</th>
-                  <th className="pb-3">Type</th>
-                  <th className="pb-3">Status</th>
-                  <th className="pb-3">Date</th>
+                  <th className="pb-3">{t('recentFeedback.columns.input')}</th>
+                  <th className="pb-3">{t('recentFeedback.columns.type')}</th>
+                  <th className="pb-3">{t('recentFeedback.columns.status')}</th>
+                  <th className="pb-3">{t('recentFeedback.columns.date')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
                 {recentSessions.map((session) => (
                   <tr key={session.id}>
                     <td className="py-3 max-w-xs truncate">{session.inputContent.substring(0, 50)}...</td>
-                    <td className="py-3 capitalize">{session.inputType}</td>
+                    <td className="py-3">{tCommon(`inputType.${session.inputType}`)}</td>
                     <td className="py-3">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                         session.status === 'completed' ? 'bg-green-100 text-green-800' :
@@ -172,7 +175,7 @@ export const DashboardPage: React.FC = () => {
                         session.status === 'failed' ? 'bg-red-100 text-red-800' :
                         'bg-gray-100 text-gray-800'
                       }`}>
-                        {session.status}
+                        {tCommon(`status.${session.status}`)}
                       </span>
                     </td>
                     <td className="py-3 text-sm text-gray-500">

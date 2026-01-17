@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { useAppDispatch } from '../hooks/useAppDispatch';
 import { fetchSession, fetchSummary } from '../store/feedbackSlice';
 import type { RootState } from '../store';
@@ -14,6 +15,7 @@ export const FeedbackResultPage: React.FC = () => {
     (state: RootState) => state.feedback
   );
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
+  const { t } = useTranslation('feedback');
 
   useEffect(() => {
     if (id) {
@@ -44,9 +46,9 @@ export const FeedbackResultPage: React.FC = () => {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Feedback Results</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('result.title')}</h1>
           <p className="text-gray-600 mt-1">
-            Created on {new Date(currentSession.createdAt).toLocaleDateString()}
+            {t('result.createdOn', { date: new Date(currentSession.createdAt).toLocaleDateString() })}
           </p>
         </div>
         <div className="flex gap-3">
@@ -56,16 +58,15 @@ export const FeedbackResultPage: React.FC = () => {
               isLoading={isGeneratingSummary}
               variant="outline"
             >
-              Generate AI Summary
+              {t('result.generateSummary')}
             </Button>
           )}
           <Link to="/feedback/new">
-            <Button>New Feedback</Button>
+            <Button>{t('result.newFeedback')}</Button>
           </Link>
         </div>
       </div>
 
-      {/* Input Content Preview */}
       <Card>
         <div className="flex items-start gap-4">
           <div className="flex-shrink-0">
@@ -91,23 +92,21 @@ export const FeedbackResultPage: React.FC = () => {
                 rel="noopener noreferrer"
                 className="text-sm text-primary-600 hover:text-primary-700 mt-2 inline-block"
               >
-                View original source
+                {t('result.viewSource')}
               </a>
             )}
           </div>
         </div>
       </Card>
 
-      {/* Summary */}
       {(currentSession.summary || currentSession.results.length > 0) && (
         <FeedbackSummary session={currentSession} />
       )}
 
-      {/* Individual Feedback Cards */}
       {currentSession.results.length > 0 ? (
         <div>
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            Individual Feedback ({currentSession.results.length})
+            {t('result.individualFeedback', { count: currentSession.results.length })}
           </h2>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {currentSession.results.map((result) => (
@@ -117,7 +116,7 @@ export const FeedbackResultPage: React.FC = () => {
         </div>
       ) : (
         <Card className="text-center py-8">
-          <p className="text-gray-600">No feedback results yet.</p>
+          <p className="text-gray-600">{t('result.noResults')}</p>
         </Card>
       )}
     </div>

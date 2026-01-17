@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { CreatePersonaDto, AgeGroup } from '../../types';
 import { Button, Input, Select } from '../common';
 
@@ -7,16 +8,9 @@ interface PersonaCreateFormProps {
   isLoading?: boolean;
 }
 
-const AGE_GROUPS: { value: AgeGroup; label: string }[] = [
-  { value: '10s', label: '10s' },
-  { value: '20s', label: '20s' },
-  { value: '30s', label: '30s' },
-  { value: '40s', label: '40s' },
-  { value: '50s', label: '50s' },
-  { value: '60+', label: '60+' },
-];
+const AGE_GROUP_KEYS: AgeGroup[] = ['10s', '20s', '30s', '40s', '50s', '60+'];
 
-const PERSONALITY_TRAITS = [
+const PERSONALITY_TRAIT_KEYS = [
   'Analytical',
   'Creative',
   'Curious',
@@ -37,6 +31,7 @@ export const PersonaCreateForm: React.FC<PersonaCreateFormProps> = ({
   onSubmit,
   isLoading,
 }) => {
+  const { t } = useTranslation('persona');
   const [formData, setFormData] = useState<CreatePersonaDto>({
     name: '',
     ageGroup: '20s',
@@ -59,38 +54,43 @@ export const PersonaCreateForm: React.FC<PersonaCreateFormProps> = ({
     }));
   };
 
+  const ageGroupOptions = AGE_GROUP_KEYS.map((key) => ({
+    value: key,
+    label: t(`form.ageGroup.options.${key}`),
+  }));
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <Input
-        label="Name (optional - auto-generated if empty)"
+        label={t('form.name.label')}
         value={formData.name}
         onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
-        placeholder="Enter persona name"
+        placeholder={t('form.name.placeholder')}
       />
 
       <div className="grid grid-cols-2 gap-4">
         <Select
-          label="Age Group"
-          options={AGE_GROUPS}
+          label={t('form.ageGroup.label')}
+          options={ageGroupOptions}
           value={formData.ageGroup}
           onChange={(value) => setFormData((prev) => ({ ...prev, ageGroup: value as AgeGroup }))}
         />
 
         <Input
-          label="Occupation"
+          label={t('form.occupation.label')}
           value={formData.occupation}
           onChange={(e) => setFormData((prev) => ({ ...prev, occupation: e.target.value }))}
-          placeholder="e.g., Student, Engineer"
+          placeholder={t('form.occupation.placeholder')}
           required
         />
       </div>
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Personality Traits
+          {t('form.personalityTraits.label')}
         </label>
         <div className="flex flex-wrap gap-2">
-          {PERSONALITY_TRAITS.map((trait) => (
+          {PERSONALITY_TRAIT_KEYS.map((trait) => (
             <button
               key={trait}
               type="button"
@@ -101,7 +101,7 @@ export const PersonaCreateForm: React.FC<PersonaCreateFormProps> = ({
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               } border`}
             >
-              {trait}
+              {t(`form.personalityTraits.traits.${trait}`)}
             </button>
           ))}
         </div>
@@ -109,19 +109,19 @@ export const PersonaCreateForm: React.FC<PersonaCreateFormProps> = ({
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Description (optional)
+          {t('form.description.label')}
         </label>
         <textarea
           value={formData.description}
           onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
-          placeholder="Additional details about this persona..."
+          placeholder={t('form.description.placeholder')}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           rows={3}
         />
       </div>
 
       <Button type="submit" className="w-full" isLoading={isLoading}>
-        Create Persona
+        {t('form.submitButton')}
       </Button>
     </form>
   );

@@ -1,0 +1,38 @@
+{
+  "nav": {
+    "dashboard": "대시보드",
+    "personas": "페르소나",
+    "newFeedback": "새 피드백",
+    "history": "히스토리",
+    "settings": "설정"
+  },
+  "header": {
+    "credits": "{{count}} 크레딧",
+    "logout": "로그아웃"
+  },
+  "language": {
+    "ko": "한국어",
+    "en": "English"
+  },
+  "button": {
+    "back": "뒤로",
+    "continue": "계속",
+    "cancel": "취소",
+    "confirm": "확인",
+    "delete": "삭제",
+    "save": "저장",
+    "create": "생성",
+    "viewAll": "전체 보기"
+  },
+  "status": {
+    "pending": "대기 중",
+    "processing": "처리 중",
+    "completed": "완료",
+    "failed": "실패"
+  },
+  "inputType": {
+    "text": "텍스트",
+    "file": "파일",
+    "url": "URL"
+  }
+}

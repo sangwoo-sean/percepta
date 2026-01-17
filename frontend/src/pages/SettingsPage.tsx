@@ -1,21 +1,23 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { Card, CardHeader, Button } from '../components/common';
 
 export const SettingsPage: React.FC = () => {
   const { user, logout } = useAuth();
+  const { t } = useTranslation('feedback');
 
   if (!user) return null;
 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-600 mt-1">Manage your account settings</p>
+        <h1 className="text-2xl font-bold text-gray-900">{t('settings.title')}</h1>
+        <p className="text-gray-600 mt-1">{t('settings.subtitle')}</p>
       </div>
 
       <Card>
-        <CardHeader title="Profile" subtitle="Your account information" />
+        <CardHeader title={t('settings.profile.title')} subtitle={t('settings.profile.subtitle')} />
         <div className="flex items-center gap-4 mb-6">
           {user.avatarUrl ? (
             <img
@@ -36,22 +38,22 @@ export const SettingsPage: React.FC = () => {
           </div>
         </div>
         <div className="text-sm text-gray-500">
-          Member since {new Date(user.createdAt).toLocaleDateString()}
+          {t('settings.profile.memberSince', { date: new Date(user.createdAt).toLocaleDateString() })}
         </div>
       </Card>
 
       <Card>
         <CardHeader
-          title="Credits"
-          subtitle="Your current credit balance"
+          title={t('settings.credits.title')}
+          subtitle={t('settings.credits.subtitle')}
         />
         <div className="flex items-center justify-between bg-gray-50 rounded-lg p-4 mb-4">
           <div>
             <p className="text-3xl font-bold text-primary-600">{user.credits}</p>
-            <p className="text-sm text-gray-500">Available credits</p>
+            <p className="text-sm text-gray-500">{t('settings.credits.available')}</p>
           </div>
           <div className="text-right text-sm text-gray-500">
-            <p>1 credit = 1 persona feedback</p>
+            <p>{t('settings.credits.rate')}</p>
           </div>
         </div>
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
@@ -68,10 +70,9 @@ export const SettingsPage: React.FC = () => {
               />
             </svg>
             <div>
-              <p className="font-medium text-yellow-800">MVP Mode</p>
+              <p className="font-medium text-yellow-800">{t('settings.mvpMode.title')}</p>
               <p className="text-sm text-yellow-700 mt-1">
-                Credits are currently managed manually. Contact the administrator
-                to purchase more credits.
+                {t('settings.mvpMode.description')}
               </p>
             </div>
           </div>
@@ -79,9 +80,9 @@ export const SettingsPage: React.FC = () => {
       </Card>
 
       <Card>
-        <CardHeader title="Account Actions" />
+        <CardHeader title={t('settings.accountActions.title')} />
         <Button variant="danger" onClick={logout}>
-          Sign Out
+          {t('settings.accountActions.signOut')}
         </Button>
       </Card>
     </div>

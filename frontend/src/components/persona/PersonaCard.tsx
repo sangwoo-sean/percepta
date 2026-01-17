@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Persona } from '../../types';
 import { Card, Button } from '../common';
 
@@ -17,6 +18,8 @@ export const PersonaCard: React.FC<PersonaCardProps> = ({
   selected,
   onSelect,
 }) => {
+  const { t } = useTranslation('common');
+
   return (
     <Card
       className={`relative ${selectable ? 'cursor-pointer' : ''} ${selected ? 'ring-2 ring-primary-500' : ''}`}
@@ -80,7 +83,7 @@ export const PersonaCard: React.FC<PersonaCardProps> = ({
               onDelete(persona.id);
             }}
           >
-            Delete
+            {t('button.delete')}
           </Button>
         </div>
       )}
