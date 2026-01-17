@@ -95,8 +95,7 @@ export class FeedbackService {
       throw new NotFoundException(`Session with ID ${sessionId} not found`);
     }
 
-    session.status = 'processing';
-    await this.sessionsRepository.save(session);
+    await this.sessionsRepository.update(sessionId, { status: 'processing' });
 
     try {
       const targetPersonaIds = personaIds || [];
@@ -124,13 +123,11 @@ export class FeedbackService {
         results.push(result);
       }
 
-      session.status = 'completed';
-      await this.sessionsRepository.save(session);
+      await this.sessionsRepository.update(sessionId, { status: 'completed' });
 
       return results;
     } catch (error) {
-      session.status = 'failed';
-      await this.sessionsRepository.save(session);
+      await this.sessionsRepository.update(sessionId, { status: 'failed' });
       throw error;
     }
   }
@@ -151,8 +148,7 @@ export class FeedbackService {
       session.results,
     );
 
-    session.summary = summary;
-    await this.sessionsRepository.save(session);
+    await this.sessionsRepository.update(sessionId, { summary });
 
     return summary;
   }
