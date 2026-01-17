@@ -52,7 +52,7 @@ export const FeedbackCard: React.FC<FeedbackCardProps> = ({ result }) => {
             {[...Array(5)].map((_, i) => (
               <svg
                 key={i}
-                className={`w-4 h-4 ${i < Math.round(result.score) ? 'fill-current' : 'stroke-current fill-none'}`}
+                className={`w-4 h-4 ${i < Math.round(Number(result.score)) ? 'fill-current' : 'stroke-current fill-none'}`}
                 viewBox="0 0 24 24"
               >
                 <path
@@ -63,7 +63,7 @@ export const FeedbackCard: React.FC<FeedbackCardProps> = ({ result }) => {
                 />
               </svg>
             ))}
-            <span className="text-sm text-gray-600 ml-1">{result.score.toFixed(1)}</span>
+            <span className="text-sm text-gray-600 ml-1">{Number(result.score).toFixed(1)}</span>
           </div>
         </div>
       </div>
