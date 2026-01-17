@@ -8,7 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { PersonasService } from './personas.service';
-import { CreatePersonaDto, BatchCreatePersonaDto } from './dto/create-persona.dto';
+import { CreatePersonaDto, BatchCreatePersonaDto, GeneratePersonasDto } from './dto/create-persona.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { User } from '../users/entities/user.entity';
@@ -41,6 +41,11 @@ export class PersonasController {
   @Post('batch')
   batchCreate(@CurrentUser() user: User, @Body() dto: BatchCreatePersonaDto) {
     return this.personasService.batchCreate(user.id, dto.personas);
+  }
+
+  @Post('generate')
+  generate(@CurrentUser() user: User, @Body() dto: GeneratePersonasDto) {
+    return this.personasService.generateAndCreate(user.id, dto);
   }
 
   @Delete(':id')

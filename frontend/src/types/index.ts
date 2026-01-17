@@ -8,25 +8,53 @@ export interface User {
 }
 
 export type AgeGroup = '10s' | '20s' | '30s' | '40s' | '50s' | '60+';
+export type Gender = 'male' | 'female';
+
+export interface PersonaData {
+  name: string;
+  avatarUrl?: string;
+  ageGroup: AgeGroup;
+  gender?: Gender;
+  occupation: string;
+  location?: string;
+  education?: string;
+  incomeLevel?: string;
+  personalityTraits: string[];
+  dailyPattern?: string;
+  strengths?: string[];
+  weaknesses?: string[];
+  description?: string;
+}
 
 export interface Persona {
   id: string;
   userId: string;
-  name: string;
-  avatarUrl: string | null;
-  ageGroup: AgeGroup;
-  occupation: string;
-  personalityTraits: string[];
-  description: string | null;
+  data: PersonaData;
+  storageUrl: string | null;
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreatePersonaDto {
-  name?: string;
+  data: {
+    name?: string;
+    ageGroup: AgeGroup;
+    gender?: Gender;
+    occupation: string;
+    location?: string;
+    education?: string;
+    incomeLevel?: string;
+    personalityTraits?: string[];
+    dailyPattern?: string;
+    strengths?: string[];
+    weaknesses?: string[];
+    description?: string;
+  };
+}
+
+export interface GeneratePersonasDto {
   ageGroup: AgeGroup;
-  occupation: string;
-  personalityTraits?: string[];
-  description?: string;
+  count: number;
 }
 
 export type InputType = 'file' | 'url' | 'text';

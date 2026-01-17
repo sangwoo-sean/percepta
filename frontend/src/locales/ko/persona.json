@@ -2,7 +2,7 @@
   "title": "페르소나",
   "subtitle": "AI 피드백 페르소나를 관리하세요",
   "createButton": "페르소나 생성",
-  "quickGenerate": "빠른 생성",
+  "quickGenerate": "AI 생성",
   "stats": {
     "total": "전체 페르소나"
   },
@@ -13,7 +13,10 @@
   },
   "deleteConfirm": "이 페르소나를 삭제하시겠습니까?",
   "batchForm": {
-    "title": "빠른 페르소나 생성"
+    "title": "AI 페르소나 생성",
+    "description": "AI가 선택한 연령대에 맞는 다양한 페르소나를 자동으로 생성합니다. 이름, 직업, 성격 특성 등이 자동으로 설정됩니다.",
+    "count": "생성할 페르소나 수",
+    "generateButton": "{{count}}명 생성"
   },
   "form": {
     "title": "새 페르소나 생성",

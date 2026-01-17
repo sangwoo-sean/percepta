@@ -116,21 +116,21 @@ export const DashboardPage: React.FC = () => {
           <div className="space-y-3">
             {personas.slice(0, 3).map((persona) => (
               <div key={persona.id} className="flex items-center gap-3">
-                {persona.avatarUrl ? (
+                {persona.data.avatarUrl ? (
                   <img
-                    src={persona.avatarUrl}
-                    alt={persona.name}
+                    src={persona.data.avatarUrl}
+                    alt={persona.data.name}
                     className="w-10 h-10 rounded-full"
                   />
                 ) : (
                   <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                    <span className="text-sm font-medium">{persona.name[0]}</span>
+                    <span className="text-sm font-medium">{persona.data.name[0]}</span>
                   </div>
                 )}
                 <div>
-                  <p className="font-medium text-gray-900">{persona.name}</p>
+                  <p className="font-medium text-gray-900">{persona.data.name}</p>
                   <p className="text-sm text-gray-500">
-                    {persona.ageGroup} | {persona.occupation}
+                    {persona.data.ageGroup} | {persona.data.occupation}
                   </p>
                 </div>
               </div>

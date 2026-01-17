@@ -5,12 +5,12 @@ import { useAppDispatch } from '../hooks/useAppDispatch';
 import {
   fetchPersonas,
   createPersona,
-  batchCreatePersonas,
+  generatePersonas,
   deletePersona,
   fetchPersonaStats,
 } from '../store/personaSlice';
 import type { RootState } from '../store';
-import type { CreatePersonaDto } from '../types';
+import type { CreatePersonaDto, GeneratePersonasDto } from '../types';
 import { Card, Button, Modal } from '../components/common';
 import {
   PersonaCard,
@@ -42,10 +42,10 @@ export const PersonasPage: React.FC = () => {
     }
   };
 
-  const handleBatchCreate = async (personas: CreatePersonaDto[]) => {
+  const handleGenerate = async (dto: GeneratePersonasDto) => {
     setIsCreating(true);
     try {
-      await dispatch(batchCreatePersonas(personas)).unwrap();
+      await dispatch(generatePersonas(dto)).unwrap();
       setIsBatchModalOpen(false);
       dispatch(fetchPersonaStats());
     } finally {
@@ -169,7 +169,7 @@ export const PersonasPage: React.FC = () => {
         title={t('batchForm.title')}
       >
         <PersonaBatchCreateForm
-          onSubmit={handleBatchCreate}
+          onSubmit={handleGenerate}
           isLoading={isCreating}
         />
       </Modal>

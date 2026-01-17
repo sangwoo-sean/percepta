@@ -7,13 +7,17 @@ describe('PersonaCard', () => {
   const mockPersona: Persona = {
     id: 'persona-uuid',
     userId: 'user-uuid',
-    name: 'Test Persona',
-    avatarUrl: 'https://example.com/avatar.jpg',
-    ageGroup: '20s',
-    occupation: 'Developer',
-    personalityTraits: ['Analytical', 'Creative', 'Tech-savvy'],
-    description: 'Test description',
+    data: {
+      name: 'Test Persona',
+      avatarUrl: 'https://example.com/avatar.jpg',
+      ageGroup: '20s',
+      occupation: 'Developer',
+      personalityTraits: ['Analytical', 'Creative', 'Tech-savvy'],
+      description: 'Test description',
+    },
+    storageUrl: null,
     createdAt: '2024-01-01T00:00:00.000Z',
+    updatedAt: '2024-01-01T00:00:00.000Z',
   };
 
   it('renders persona name correctly', () => {
@@ -40,7 +44,10 @@ describe('PersonaCard', () => {
   });
 
   it('renders fallback avatar when no avatarUrl', () => {
-    const personaWithoutAvatar = { ...mockPersona, avatarUrl: null };
+    const personaWithoutAvatar: Persona = {
+      ...mockPersona,
+      data: { ...mockPersona.data, avatarUrl: undefined },
+    };
     render(<PersonaCard persona={personaWithoutAvatar} />);
     expect(screen.getByText('T')).toBeInTheDocument(); // First letter of name
   });

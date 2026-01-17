@@ -3,27 +3,40 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { PersonasService } from './personas.service';
-import { Persona } from './entities/persona.entity';
+import { Persona, PersonaData } from './entities/persona.entity';
 import { CreatePersonaDto } from './dto/create-persona.dto';
+import { AI_PROVIDER, AIProvider } from '../ai/ai-provider.interface';
 
 describe('PersonasService', () => {
   let service: PersonasService;
   let repository: jest.Mocked<Repository<Persona>>;
+  let aiProvider: jest.Mocked<AIProvider>;
 
-  const mockPersona: Persona = {
-    id: 'persona-uuid',
-    userId: 'user-uuid',
+  const mockPersonaData: PersonaData = {
     name: '민준',
     avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=test',
     ageGroup: '20s',
     occupation: '대학생',
     personalityTraits: ['호기심이 많은', '분석적인'],
-    description: null,
+    description: undefined,
+  };
+
+  const mockPersona = {
+    id: 'persona-uuid',
+    userId: 'user-uuid',
+    data: mockPersonaData,
+    storageUrl: null,
     createdAt: new Date(),
     updatedAt: new Date(),
     user: {} as any,
     feedbackResults: [],
-  };
+    get name() { return this.data?.name ?? ''; },
+    get avatarUrl() { return this.data?.avatarUrl ?? null; },
+    get ageGroup() { return this.data?.ageGroup ?? '20s'; },
+    get occupation() { return this.data?.occupation ?? ''; },
+    get personalityTraits() { return this.data?.personalityTraits ?? []; },
+    get description() { return this.data?.description ?? null; },
+  } as Persona;
 
   beforeEach(async () => {
     const mockRepository = {
@@ -34,6 +47,12 @@ describe('PersonasService', () => {
       remove: jest.fn(),
     };
 
+    const mockAIProvider = {
+      generateFeedback: jest.fn(),
+      generateSummary: jest.fn(),
+      generatePersonas: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PersonasService,
@@ -41,11 +60,16 @@ describe('PersonasService', () => {
           provide: getRepositoryToken(Persona),
           useValue: mockRepository,
         },
+        {
+          provide: AI_PROVIDER,
+          useValue: mockAIProvider,
+        },
       ],
     }).compile();
 
     service = module.get<PersonasService>(PersonasService);
     repository = module.get(getRepositoryToken(Persona));
+    aiProvider = module.get(AI_PROVIDER);
   });
 
   it('should be defined', () => {
@@ -87,9 +111,11 @@ describe('PersonasService', () => {
   describe('create', () => {
     it('should create a persona with auto-generated name and avatar', async () => {
       const dto: CreatePersonaDto = {
-        ageGroup: '20s',
-        occupation: '대학생',
-        personalityTraits: ['호기심이 많은'],
+        data: {
+          ageGroup: '20s',
+          occupation: '대학생',
+          personalityTraits: ['호기심이 많은'],
+        },
       };
 
       repository.create.mockReturnValue(mockPersona);
@@ -104,12 +130,25 @@ describe('PersonasService', () => {
 
     it('should use provided name if given', async () => {
       const dto: CreatePersonaDto = {
+        data: {
+          name: '커스텀이름',
+          ageGroup: '30s',
+          occupation: '회사원',
+        },
+      };
+
+      const customPersonaData: PersonaData = {
+        ...mockPersonaData,
         name: '커스텀이름',
         ageGroup: '30s',
         occupation: '회사원',
       };
+      const customPersona = {
+        ...mockPersona,
+        data: customPersonaData,
+        get name() { return this.data?.name ?? ''; },
+      } as Persona;
 
-      const customPersona = { ...mockPersona, name: '커스텀이름' };
       repository.create.mockReturnValue(customPersona);
       repository.save.mockResolvedValue(customPersona);
 
@@ -122,8 +161,8 @@ describe('PersonasService', () => {
   describe('batchCreate', () => {
     it('should create multiple personas', async () => {
       const dtos: CreatePersonaDto[] = [
-        { ageGroup: '20s', occupation: '대학생' },
-        { ageGroup: '30s', occupation: '회사원' },
+        { data: { ageGroup: '20s', occupation: '대학생', personalityTraits: [] } },
+        { data: { ageGroup: '30s', occupation: '회사원', personalityTraits: [] } },
       ];
 
       repository.create.mockReturnValue(mockPersona);
@@ -131,6 +170,24 @@ describe('PersonasService', () => {
 
       const result = await service.batchCreate('user-uuid', dtos);
 
+      expect(result).toHaveLength(2);
+    });
+  });
+
+  describe('generateAndCreate', () => {
+    it('should generate personas using AI and save them', async () => {
+      const generatedData: PersonaData[] = [
+        { name: '김민준', ageGroup: '20s', occupation: '개발자', personalityTraits: ['분석적'] },
+        { name: '이서연', ageGroup: '20s', occupation: '디자이너', personalityTraits: ['창의적'] },
+      ];
+
+      aiProvider.generatePersonas.mockResolvedValue(generatedData);
+      repository.create.mockImplementation((data) => ({ ...mockPersona, ...data }) as Persona);
+      repository.save.mockImplementation((entities) => Promise.resolve(entities as any));
+
+      const result = await service.generateAndCreate('user-uuid', { ageGroup: '20s', count: 2 });
+
+      expect(aiProvider.generatePersonas).toHaveBeenCalledWith('20s', 2);
       expect(result).toHaveLength(2);
     });
   });
@@ -155,11 +212,13 @@ describe('PersonasService', () => {
 
   describe('getStats', () => {
     it('should return stats for user personas', async () => {
-      repository.find.mockResolvedValue([
-        { ...mockPersona, ageGroup: '20s', occupation: '대학생' },
-        { ...mockPersona, ageGroup: '20s', occupation: '회사원' },
-        { ...mockPersona, ageGroup: '30s', occupation: '회사원' },
-      ] as Persona[]);
+      const personasWithData = [
+        { ...mockPersona, data: { ...mockPersonaData, ageGroup: '20s' as const, occupation: '대학생' } },
+        { ...mockPersona, data: { ...mockPersonaData, ageGroup: '20s' as const, occupation: '회사원' } },
+        { ...mockPersona, data: { ...mockPersonaData, ageGroup: '30s' as const, occupation: '회사원' } },
+      ] as Persona[];
+
+      repository.find.mockResolvedValue(personasWithData);
 
       const result = await service.getStats('user-uuid');
 

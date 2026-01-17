@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { AIProvider, AIFeedbackResponse } from './ai-provider.interface';
-import { Persona } from '../personas/entities/persona.entity';
+import { Persona, PersonaData, AgeGroup } from '../personas/entities/persona.entity';
 import { FeedbackResult } from '../feedback/entities/feedback-result.entity';
 
 @Injectable()
@@ -48,5 +48,45 @@ export class MockAIService implements AIProvider {
 
 ### 다음 단계 제안
 프로토타입 제작 및 소규모 테스트 그룹 피드백 수집을 권장합니다.`;
+  }
+
+  async generatePersonas(ageGroup: AgeGroup, count: number): Promise<PersonaData[]> {
+    const mockNames = {
+      male: ['김민준', '이서준', '박도윤', '최예준', '정시우', '강하준', '조주원', '윤지호'],
+      female: ['김서연', '이서윤', '박지우', '최서현', '정민서', '강하은', '조하윤', '윤윤서'],
+    };
+
+    const mockOccupations: Record<AgeGroup, string[]> = {
+      '10s': ['고등학생', '대학생', '수험생'],
+      '20s': ['대학생', '취업준비생', '사무직', '개발자', '디자이너'],
+      '30s': ['회사원', '프리랜서', '스타트업 대표', '전문직'],
+      '40s': ['중간관리자', '자영업자', '전문직', '주부'],
+      '50s': ['임원', '자영업자', '공무원', '전문직'],
+      '60+': ['은퇴자', '자영업자', '시간제 근로자'],
+    };
+
+    const mockTraits = ['분석적', '창의적', '사교적', '실용적', '트렌디한', '꼼꼼한', '검소한'];
+    const mockLocations = ['서울시 강남구', '서울시 마포구', '부산시 해운대구', '경기도 성남시'];
+    const mockEducations = ['고등학교 졸업', '대학교 재학', '대학교 졸업', '대학원 졸업'];
+    const mockIncomeLevels = ['하', '중하', '중', '중상', '상'];
+
+    return Array.from({ length: count }, (_, i) => {
+      const gender = i % 2 === 0 ? 'male' : 'female';
+      const names = mockNames[gender];
+      return {
+        name: names[i % names.length],
+        ageGroup,
+        gender,
+        occupation: mockOccupations[ageGroup][i % mockOccupations[ageGroup].length],
+        location: mockLocations[i % mockLocations.length],
+        education: mockEducations[i % mockEducations.length],
+        incomeLevel: mockIncomeLevels[i % mockIncomeLevels.length],
+        personalityTraits: mockTraits.slice(0, 3 + (i % 2)),
+        dailyPattern: '평일에는 업무에 집중하고, 주말에는 취미 활동을 즐깁니다. 온라인 쇼핑을 자주 이용합니다.',
+        strengths: ['빠른 적응력', '논리적 사고', '커뮤니케이션 능력'],
+        weaknesses: ['충동구매 경향', '스트레스 관리 어려움'],
+        description: '품질 좋은 제품에 관심이 많으며, SNS를 통해 트렌드를 파악합니다. 가성비와 품질 사이에서 균형을 찾으려 합니다.',
+      };
+    });
   }
 }

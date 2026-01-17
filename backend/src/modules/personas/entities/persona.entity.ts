@@ -12,6 +12,23 @@ import { User } from '../../users/entities/user.entity';
 import { FeedbackResult } from '../../feedback/entities/feedback-result.entity';
 
 export type AgeGroup = '10s' | '20s' | '30s' | '40s' | '50s' | '60+';
+export type Gender = 'male' | 'female';
+
+export interface PersonaData {
+  name: string;
+  avatarUrl?: string;
+  ageGroup: AgeGroup;
+  gender?: Gender;
+  occupation: string;
+  location?: string;
+  education?: string;
+  incomeLevel?: string;
+  personalityTraits: string[];
+  dailyPattern?: string;
+  strengths?: string[];
+  weaknesses?: string[];
+  description?: string;
+}
 
 @Entity('personas')
 export class Persona {
@@ -25,23 +42,11 @@ export class Persona {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @Column()
-  name: string;
+  @Column({ type: 'jsonb' })
+  data: PersonaData;
 
-  @Column({ name: 'avatar_url', type: 'varchar', nullable: true })
-  avatarUrl: string | null;
-
-  @Column({ name: 'age_group' })
-  ageGroup: AgeGroup;
-
-  @Column()
-  occupation: string;
-
-  @Column({ type: 'jsonb', name: 'personality_traits', default: [] })
-  personalityTraits: string[];
-
-  @Column({ type: 'text', nullable: true })
-  description: string | null;
+  @Column({ name: 'storage_url', type: 'varchar', nullable: true })
+  storageUrl: string | null;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
@@ -51,4 +56,29 @@ export class Persona {
 
   @OneToMany(() => FeedbackResult, (result) => result.persona)
   feedbackResults: FeedbackResult[];
+
+  // Helper getters for backward compatibility and convenience
+  get name(): string {
+    return this.data?.name ?? '';
+  }
+
+  get avatarUrl(): string | null {
+    return this.data?.avatarUrl ?? null;
+  }
+
+  get ageGroup(): AgeGroup {
+    return this.data?.ageGroup ?? '20s';
+  }
+
+  get occupation(): string {
+    return this.data?.occupation ?? '';
+  }
+
+  get personalityTraits(): string[] {
+    return this.data?.personalityTraits ?? [];
+  }
+
+  get description(): string | null {
+    return this.data?.description ?? null;
+  }
 }

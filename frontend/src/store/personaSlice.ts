@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import type { Persona, CreatePersonaDto, PersonaStats } from '../types';
+import type { Persona, CreatePersonaDto, GeneratePersonasDto, PersonaStats } from '../types';
 import { personasApi } from '../api/personas';
 
 interface PersonaState {
@@ -45,6 +45,17 @@ export const batchCreatePersonas = createAsyncThunk(
       return await personasApi.batchCreate(personas);
     } catch (error) {
       return rejectWithValue('Failed to create personas');
+    }
+  }
+);
+
+export const generatePersonas = createAsyncThunk(
+  'persona/generatePersonas',
+  async (dto: GeneratePersonasDto, { rejectWithValue }) => {
+    try {
+      return await personasApi.generate(dto);
+    } catch (error) {
+      return rejectWithValue('Failed to generate personas');
     }
   }
 );
@@ -99,6 +110,18 @@ const personaSlice = createSlice({
       })
       .addCase(batchCreatePersonas.fulfilled, (state, action) => {
         state.personas = [...action.payload, ...state.personas];
+      })
+      .addCase(generatePersonas.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(generatePersonas.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.personas = [...action.payload, ...state.personas];
+      })
+      .addCase(generatePersonas.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
       })
       .addCase(deletePersona.fulfilled, (state, action) => {
         state.personas = state.personas.filter((p) => p.id !== action.payload);

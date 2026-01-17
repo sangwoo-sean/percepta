@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
-import { Persona } from '../personas/entities/persona.entity';
+import { Persona, PersonaData, AgeGroup } from '../personas/entities/persona.entity';
 import { FeedbackResult, Sentiment, PurchaseIntent } from '../feedback/entities/feedback-result.entity';
 import { AIProvider, AIFeedbackResponse } from './ai-provider.interface';
 
@@ -188,6 +188,147 @@ ${JSON.stringify(feedbackSummaries, null, 2)}
 ### 다음 단계 제안
 프로토타입 제작 및 소규모 테스트 그룹 피드백 수집을 권장합니다.`;
     }
+  }
+
+  async generatePersonas(ageGroup: AgeGroup, count: number): Promise<PersonaData[]> {
+    const ageGroupKorean: Record<AgeGroup, string> = {
+      '10s': '10대',
+      '20s': '20대',
+      '30s': '30대',
+      '40s': '40대',
+      '50s': '50대',
+      '60+': '60대 이상',
+    };
+
+    const prompt = `당신은 한국의 다양한 소비자 페르소나를 생성하는 전문가입니다.
+
+다음 조건에 맞는 ${count}명의 페르소나를 생성해주세요:
+- 연령대: ${ageGroupKorean[ageGroup]}
+
+각 페르소나에 대해 다음 정보를 생성해주세요:
+1. name: 한국식 이름 (성 + 이름)
+2. gender: 성별 ("male" 또는 "female")
+3. occupation: 해당 연령대에 적합한 현실적인 직업
+4. location: 거주지역 (시/구 단위, 예: "서울시 강남구")
+5. education: 학력
+6. incomeLevel: 소득수준 ("하", "중하", "중", "중상", "상")
+7. personalityTraits: 3-5개의 성격 특성
+8. dailyPattern: 일상 패턴 2-3문장
+9. strengths: 3-4개의 강점
+10. weaknesses: 2-3개의 약점
+11. description: 소비 성향, 관심사 2-3문장
+
+JSON 배열 형식으로만 응답해주세요.
+예시:
+[
+  {
+    "name": "김민준",
+    "gender": "male",
+    "occupation": "소프트웨어 개발자",
+    "location": "서울시 강남구",
+    "education": "대학교 졸업",
+    "incomeLevel": "중상",
+    "personalityTraits": ["분석적", "트렌디한", "실용적"],
+    "dailyPattern": "평일에는 IT 기업에서 근무하며, 저녁에는 개인 프로젝트를 진행합니다.",
+    "strengths": ["기술에 대한 이해도가 높음", "빠른 의사결정", "논리적 사고"],
+    "weaknesses": ["충동구매 경향", "워라밸 관리 어려움"],
+    "description": "최신 기술과 가젯에 관심이 많으며, 품질 좋은 제품에는 과감히 투자하는 편입니다."
+  }
+]`;
+
+    try {
+      const response = await axios.post(
+        `${this.apiUrl}?key=${this.apiKey}`,
+        {
+          contents: [
+            {
+              parts: [{ text: prompt }],
+            },
+          ],
+          generationConfig: {
+            temperature: 0.9,
+            topK: 40,
+            topP: 0.95,
+            maxOutputTokens: 4096,
+          },
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      const text = response.data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!text) {
+        throw new Error('No response from Gemini API');
+      }
+
+      // Extract JSON array from response
+      const jsonMatch = text.match(/\[[\s\S]*\]/);
+      if (!jsonMatch) {
+        throw new Error('Invalid JSON array response from Gemini API');
+      }
+
+      const parsed = JSON.parse(jsonMatch[0]);
+
+      return parsed.map((item: Record<string, unknown>) => ({
+        name: item.name as string || '무명',
+        ageGroup,
+        gender: (item.gender === 'male' || item.gender === 'female') ? item.gender : undefined,
+        occupation: item.occupation as string || '직장인',
+        location: item.location as string,
+        education: item.education as string,
+        incomeLevel: item.incomeLevel as string,
+        personalityTraits: Array.isArray(item.personalityTraits) ? item.personalityTraits : [],
+        dailyPattern: item.dailyPattern as string,
+        strengths: Array.isArray(item.strengths) ? item.strengths : [],
+        weaknesses: Array.isArray(item.weaknesses) ? item.weaknesses : [],
+        description: item.description as string,
+      }));
+    } catch (error) {
+      console.error('Gemini API error:', error);
+
+      // Return mock personas for development
+      return this.generateMockPersonas(ageGroup, count);
+    }
+  }
+
+  private generateMockPersonas(ageGroup: AgeGroup, count: number): PersonaData[] {
+    const mockNames = {
+      male: ['김민준', '이서준', '박도윤', '최예준', '정시우', '강하준', '조주원', '윤지호'],
+      female: ['김서연', '이서윤', '박지우', '최서현', '정민서', '강하은', '조하윤', '윤윤서'],
+    };
+
+    const mockOccupations: Record<AgeGroup, string[]> = {
+      '10s': ['고등학생', '대학생', '수험생'],
+      '20s': ['대학생', '취업준비생', '사무직', '개발자', '디자이너'],
+      '30s': ['회사원', '프리랜서', '스타트업 대표', '전문직'],
+      '40s': ['중간관리자', '자영업자', '전문직', '주부'],
+      '50s': ['임원', '자영업자', '공무원', '전문직'],
+      '60+': ['은퇴자', '자영업자', '시간제 근로자'],
+    };
+
+    const mockTraits = ['분석적', '창의적', '사교적', '실용적', '트렌디한', '꼼꼼한', '검소한'];
+
+    return Array.from({ length: count }, (_, i) => {
+      const gender = i % 2 === 0 ? 'male' : 'female';
+      const names = mockNames[gender];
+      return {
+        name: names[i % names.length],
+        ageGroup,
+        gender,
+        occupation: mockOccupations[ageGroup][i % mockOccupations[ageGroup].length],
+        location: '서울시 강남구',
+        education: '대학교 졸업',
+        incomeLevel: '중',
+        personalityTraits: mockTraits.slice(0, 3 + (i % 2)),
+        dailyPattern: '평일에는 업무에 집중하고, 주말에는 취미 활동을 즐깁니다.',
+        strengths: ['빠른 적응력', '논리적 사고', '커뮤니케이션 능력'],
+        weaknesses: ['충동구매 경향', '스트레스 관리 어려움'],
+        description: '품질 좋은 제품에 관심이 많으며, SNS를 통해 트렌드를 파악합니다.',
+      };
+    });
   }
 
   private validateSentiment(value: string): Sentiment {

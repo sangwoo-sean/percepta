@@ -19,6 +19,7 @@ export const PersonaCard: React.FC<PersonaCardProps> = ({
   onSelect,
 }) => {
   const { t } = useTranslation('common');
+  const { data } = persona;
 
   return (
     <Card
@@ -40,27 +41,27 @@ export const PersonaCard: React.FC<PersonaCardProps> = ({
       )}
 
       <div className="flex items-start gap-4">
-        {persona.avatarUrl ? (
+        {data.avatarUrl ? (
           <img
-            src={persona.avatarUrl}
-            alt={persona.name}
+            src={data.avatarUrl}
+            alt={data.name}
             className="w-16 h-16 rounded-full"
           />
         ) : (
           <div className="w-16 h-16 rounded-full bg-primary-100 flex items-center justify-center">
-            <span className="text-xl font-bold text-primary-600">{persona.name[0]}</span>
+            <span className="text-xl font-bold text-primary-600">{data.name[0]}</span>
           </div>
         )}
 
         <div className="flex-1">
-          <h3 className="font-semibold text-gray-900">{persona.name}</h3>
+          <h3 className="font-semibold text-gray-900">{data.name}</h3>
           <p className="text-sm text-gray-500 mt-1">
-            {persona.ageGroup} | {persona.occupation}
+            {data.ageGroup} | {data.occupation}
           </p>
 
-          {persona.personalityTraits.length > 0 && (
+          {data.personalityTraits.length > 0 && (
             <div className="flex flex-wrap gap-1 mt-2">
-              {persona.personalityTraits.slice(0, 3).map((trait, index) => (
+              {data.personalityTraits.slice(0, 3).map((trait, index) => (
                 <span
                   key={index}
                   className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full"

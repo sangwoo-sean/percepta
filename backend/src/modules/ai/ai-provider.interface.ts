@@ -1,4 +1,4 @@
-import { Persona } from '../personas/entities/persona.entity';
+import { Persona, PersonaData, AgeGroup } from '../personas/entities/persona.entity';
 import { FeedbackResult, Sentiment, PurchaseIntent } from '../feedback/entities/feedback-result.entity';
 
 export interface AIFeedbackResponse {
@@ -12,6 +12,7 @@ export interface AIFeedbackResponse {
 export interface AIProvider {
   generateFeedback(content: string, persona: Persona): Promise<AIFeedbackResponse>;
   generateSummary(content: string, results: FeedbackResult[]): Promise<string>;
+  generatePersonas(ageGroup: AgeGroup, count: number): Promise<PersonaData[]>;
 }
 
 export const AI_PROVIDER = 'AI_PROVIDER';

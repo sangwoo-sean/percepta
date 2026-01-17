@@ -22,29 +22,30 @@ const intentColors = {
 
 export const FeedbackCard: React.FC<FeedbackCardProps> = ({ result }) => {
   const { t } = useTranslation('feedback');
+  const personaData = result.persona?.data;
 
   return (
     <Card>
       <div className="flex items-start gap-4 mb-4">
-        {result.persona?.avatarUrl ? (
+        {personaData?.avatarUrl ? (
           <img
-            src={result.persona.avatarUrl}
-            alt={result.persona.name}
+            src={personaData.avatarUrl}
+            alt={personaData.name}
             className="w-12 h-12 rounded-full"
           />
         ) : (
           <div className="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center">
             <span className="font-bold text-primary-600">
-              {result.persona?.name?.[0] || '?'}
+              {personaData?.name?.[0] || '?'}
             </span>
           </div>
         )}
         <div className="flex-1">
           <h4 className="font-semibold text-gray-900">
-            {result.persona?.name || t('card.unknownPersona')}
+            {personaData?.name || t('card.unknownPersona')}
           </h4>
           <p className="text-sm text-gray-500">
-            {result.persona?.ageGroup} | {result.persona?.occupation}
+            {personaData?.ageGroup} | {personaData?.occupation}
           </p>
         </div>
         <div className="text-right">

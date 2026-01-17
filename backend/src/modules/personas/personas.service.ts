@@ -1,13 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Persona, AgeGroup } from './entities/persona.entity';
-import { CreatePersonaDto } from './dto/create-persona.dto';
-
-const KOREAN_NAMES = {
-  male: ['민준', '서준', '도윤', '예준', '시우', '하준', '주원', '지호', '지후', '준서'],
-  female: ['서연', '서윤', '지우', '서현', '민서', '하은', '하윤', '윤서', '지민', '채원'],
-};
+import { Persona, AgeGroup, PersonaData } from './entities/persona.entity';
+import { CreatePersonaDto, GeneratePersonasDto } from './dto/create-persona.dto';
+import { AIProvider, AI_PROVIDER } from '../ai/ai-provider.interface';
 
 const AVATAR_STYLES = [
   'adventurer',
@@ -30,11 +26,18 @@ const AVATAR_STYLES = [
   'pixel-art',
 ];
 
+const KOREAN_NAMES = {
+  male: ['민준', '서준', '도윤', '예준', '시우', '하준', '주원', '지호', '지후', '준서'],
+  female: ['서연', '서윤', '지우', '서현', '민서', '하은', '하윤', '윤서', '지민', '채원'],
+};
+
 @Injectable()
 export class PersonasService {
   constructor(
     @InjectRepository(Persona)
     private readonly personasRepository: Repository<Persona>,
+    @Inject(AI_PROVIDER)
+    private readonly aiProvider: AIProvider,
   ) {}
 
   private generateRandomName(): string {
@@ -68,17 +71,20 @@ export class PersonasService {
   }
 
   async create(userId: string, dto: CreatePersonaDto): Promise<Persona> {
-    const name = dto.name || this.generateRandomName();
+    const name = dto.data.name || this.generateRandomName();
     const avatarUrl = this.generateAvatarUrl(name + Date.now());
+
+    const data: PersonaData = {
+      ...dto.data,
+      name,
+      avatarUrl,
+      personalityTraits: dto.data.personalityTraits || [],
+    };
 
     const persona = this.personasRepository.create({
       userId,
-      name,
-      avatarUrl,
-      ageGroup: dto.ageGroup,
-      occupation: dto.occupation,
-      personalityTraits: dto.personalityTraits || [],
-      description: dto.description,
+      data,
+      storageUrl: null,
     });
 
     return this.personasRepository.save(persona);
@@ -89,6 +95,24 @@ export class PersonasService {
       dtos.map((dto) => this.create(userId, dto)),
     );
     return personas;
+  }
+
+  async generateAndCreate(userId: string, dto: GeneratePersonasDto): Promise<Persona[]> {
+    const generatedData = await this.aiProvider.generatePersonas(dto.ageGroup, dto.count);
+
+    const personas = generatedData.map((data) => {
+      const avatarUrl = this.generateAvatarUrl(data.name + Date.now() + Math.random());
+      return this.personasRepository.create({
+        userId,
+        data: {
+          ...data,
+          avatarUrl,
+        },
+        storageUrl: null,
+      });
+    });
+
+    return this.personasRepository.save(personas);
   }
 
   async delete(id: string, userId: string): Promise<void> {

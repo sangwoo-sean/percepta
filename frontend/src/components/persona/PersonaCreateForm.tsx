@@ -32,25 +32,34 @@ export const PersonaCreateForm: React.FC<PersonaCreateFormProps> = ({
   isLoading,
 }) => {
   const { t } = useTranslation('persona');
-  const [formData, setFormData] = useState<CreatePersonaDto>({
+  const [formData, setFormData] = useState({
     name: '',
-    ageGroup: '20s',
+    ageGroup: '20s' as AgeGroup,
     occupation: '',
-    personalityTraits: [],
+    personalityTraits: [] as string[],
     description: '',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    const dto: CreatePersonaDto = {
+      data: {
+        name: formData.name || undefined,
+        ageGroup: formData.ageGroup,
+        occupation: formData.occupation,
+        personalityTraits: formData.personalityTraits,
+        description: formData.description || undefined,
+      },
+    };
+    onSubmit(dto);
   };
 
   const toggleTrait = (trait: string) => {
     setFormData((prev) => ({
       ...prev,
-      personalityTraits: prev.personalityTraits?.includes(trait)
+      personalityTraits: prev.personalityTraits.includes(trait)
         ? prev.personalityTraits.filter((t) => t !== trait)
-        : [...(prev.personalityTraits || []), trait],
+        : [...prev.personalityTraits, trait],
     }));
   };
 
@@ -96,7 +105,7 @@ export const PersonaCreateForm: React.FC<PersonaCreateFormProps> = ({
               type="button"
               onClick={() => toggleTrait(trait)}
               className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
-                formData.personalityTraits?.includes(trait)
+                formData.personalityTraits.includes(trait)
                   ? 'bg-primary-100 text-primary-700 border-primary-300'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               } border`}
