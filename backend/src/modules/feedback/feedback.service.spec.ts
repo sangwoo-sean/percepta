@@ -197,6 +197,58 @@ describe('FeedbackService', () => {
         service.generateFeedback('session-uuid', 'user-uuid', ['persona-uuid']),
       ).rejects.toThrow(NotFoundException);
     });
+
+    it('should continue and return successful results when some personas fail', async () => {
+      sessionsRepository.findOne.mockResolvedValue(mockSession);
+      personasService.findByIdOrFail
+        .mockResolvedValueOnce(mockPersona as any)
+        .mockRejectedValueOnce(new Error('Persona not found'))
+        .mockResolvedValueOnce({ ...mockPersona, id: 'persona-3' } as any);
+      aiProvider.generateFeedback
+        .mockResolvedValueOnce({
+          feedbackText: '첫 번째 피드백',
+          sentiment: 'positive',
+          purchaseIntent: 'high',
+          keyPoints: ['좋음'],
+          score: 4.0,
+        })
+        .mockResolvedValueOnce({
+          feedbackText: '세 번째 피드백',
+          sentiment: 'neutral',
+          purchaseIntent: 'medium',
+          keyPoints: ['보통'],
+          score: 3.0,
+        });
+      resultsRepository.create.mockReturnValue(mockFeedbackResult);
+      resultsRepository.save.mockResolvedValue(mockFeedbackResult);
+
+      const result = await service.generateFeedback(
+        'session-uuid',
+        'user-uuid',
+        ['persona-1', 'persona-2', 'persona-3'],
+      );
+
+      expect(result).toHaveLength(2);
+      expect(sessionsRepository.update).toHaveBeenLastCalledWith('session-uuid', {
+        status: 'completed',
+      });
+    });
+
+    it('should set status to failed when all personas fail', async () => {
+      sessionsRepository.findOne.mockResolvedValue(mockSession);
+      personasService.findByIdOrFail.mockRejectedValue(new Error('Persona not found'));
+
+      const result = await service.generateFeedback(
+        'session-uuid',
+        'user-uuid',
+        ['persona-1', 'persona-2'],
+      );
+
+      expect(result).toHaveLength(0);
+      expect(sessionsRepository.update).toHaveBeenLastCalledWith('session-uuid', {
+        status: 'failed',
+      });
+    });
   });
 
   describe('generateSummary', () => {

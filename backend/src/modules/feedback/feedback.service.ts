@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException, Inject } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Inject, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FeedbackSession } from './entities/feedback-session.entity';
@@ -12,6 +12,8 @@ const CREDITS_PER_PERSONA = 1;
 
 @Injectable()
 export class FeedbackService {
+  private readonly logger = new Logger(FeedbackService.name);
+
   constructor(
     @InjectRepository(FeedbackSession)
     private readonly sessionsRepository: Repository<FeedbackSession>,
@@ -97,11 +99,11 @@ export class FeedbackService {
 
     await this.sessionsRepository.update(sessionId, { status: 'processing' });
 
-    try {
-      const targetPersonaIds = personaIds || [];
-      const results: FeedbackResult[] = [];
+    const targetPersonaIds = personaIds || [];
+    const results: FeedbackResult[] = [];
 
-      for (const personaId of targetPersonaIds) {
+    for (const personaId of targetPersonaIds) {
+      try {
         const persona = await this.personasService.findByIdOrFail(personaId);
 
         const aiResponse = await this.aiProvider.generateFeedback(
@@ -122,15 +124,17 @@ export class FeedbackService {
 
         await this.resultsRepository.save(result);
         results.push(result);
+      } catch (error) {
+        this.logger.error(
+          `Failed to generate feedback for persona ${personaId}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        );
       }
-
-      await this.sessionsRepository.update(sessionId, { status: 'completed' });
-
-      return results;
-    } catch (error) {
-      await this.sessionsRepository.update(sessionId, { status: 'failed' });
-      throw error;
     }
+
+    const finalStatus = results.length > 0 ? 'completed' : 'failed';
+    await this.sessionsRepository.update(sessionId, { status: finalStatus });
+
+    return results;
   }
 
   async generateSummary(sessionId: string, userId: string): Promise<string> {
