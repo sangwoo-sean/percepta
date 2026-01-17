@@ -13,7 +13,7 @@ interface CreditPackage {
 }
 
 const creditPackages: CreditPackage[] = [
-  { name: 'trial', credits: 10, price: 0, pricePerCredit: 0, discount: 0, isFree: true },
+  { name: 'trial', credits: 30, price: 0, pricePerCredit: 0, discount: 0, isFree: true },
   { name: 'small', credits: 50, price: 500, pricePerCredit: 10, discount: 0 },
   { name: 'basic', credits: 200, price: 1800, pricePerCredit: 9, discount: 10, isPopular: true },
   { name: 'large', credits: 500, price: 4000, pricePerCredit: 8, discount: 20 },
@@ -53,42 +53,22 @@ export const PricingPage: React.FC = () => {
           {creditPackages.map((pkg) => (
             <div
               key={pkg.name}
-              className={`relative rounded-lg border-2 p-5 transition-all ${
-                pkg.isPopular
-                  ? 'border-primary-500 bg-primary-50'
-                  : 'border-gray-200 hover:border-gray-300'
-              }`}
+              className={`relative rounded-lg border-2 p-5 transition-all ${pkg.isPopular ? 'border-primary-500 bg-primary-50' : 'border-gray-200 hover:border-gray-300'}`}
             >
               {pkg.isPopular && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
-                  {t('packages.popular')}
-                </span>
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary-500 text-white text-xs font-semibold px-3 py-1 rounded-full">{t('packages.popular')}</span>
               )}
-              {pkg.discount > 0 && (
-                <span className="absolute top-3 right-3 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded">
-                  -{pkg.discount}%
-                </span>
-              )}
+              {pkg.discount > 0 && <span className="absolute top-3 right-3 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded">-{pkg.discount}%</span>}
               <div className="text-center">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  {t(`packages.names.${pkg.name}`)}
-                </h3>
+                <h3 className="text-lg font-semibold text-gray-900">{t(`packages.names.${pkg.name}`)}</h3>
                 <div className="mt-3">
-                  <span className="text-3xl font-bold text-gray-900">
-                    {pkg.isFree ? t('packages.free') : `₩${formatPrice(pkg.price)}`}
-                  </span>
+                  <span className="text-3xl font-bold text-gray-900">{pkg.isFree ? t('packages.free') : `₩${formatPrice(pkg.price)}`}</span>
                 </div>
                 <div className="mt-2 text-gray-500">
-                  <span className="text-xl font-semibold text-primary-600">
-                    {formatPrice(pkg.credits)}
-                  </span>
+                  <span className="text-xl font-semibold text-primary-600">{formatPrice(pkg.credits)}</span>
                   <span className="ml-1">{t('packages.credits')}</span>
                 </div>
-                {!pkg.isFree && (
-                  <p className="mt-2 text-sm text-gray-500">
-                    {t('packages.perCredit', { price: pkg.pricePerCredit })}
-                  </p>
-                )}
+                {!pkg.isFree && <p className="mt-2 text-sm text-gray-500">{t('packages.perCredit', { price: pkg.pricePerCredit })}</p>}
               </div>
             </div>
           ))}
@@ -102,20 +82,14 @@ export const PricingPage: React.FC = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('usage.action')}
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('usage.creditsUsed')}
-                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('usage.action')}</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t('usage.creditsUsed')}</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {creditUsages.map((usage) => (
                 <tr key={usage.action}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {t(`usage.actions.${usage.action}`)}
-                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{t(`usage.actions.${usage.action}`)}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-primary-600">
                     {usage.credits} {t('usage.credit')}
                   </td>
