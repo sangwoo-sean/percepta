@@ -1,0 +1,39 @@
+{
+  "title": "Pricing",
+  "subtitle": "Pay only for what you use with our credit-based system.",
+  "packages": {
+    "title": "Credit Packages",
+    "subtitle": "Get more discounts with larger purchases.",
+    "credits": "credits",
+    "free": "Free",
+    "popular": "Popular",
+    "perCredit": "₩{{price}} per credit",
+    "names": {
+      "trial": "Trial",
+      "small": "Small",
+      "basic": "Basic",
+      "large": "Large",
+      "premium": "Premium",
+      "business": "Business"
+    }
+  },
+  "usage": {
+    "title": "Credit Usage",
+    "subtitle": "Credits consumed per action.",
+    "action": "Action",
+    "creditsUsed": "Credits Used",
+    "credit": "credit",
+    "actions": {
+      "feedback": "1 Feedback (per persona)",
+      "summary": "Generate Summary",
+      "personaGeneration": "Auto-generate 1 Persona"
+    }
+  },
+  "payment": {
+    "title": "Payment Method",
+    "method": "Bank Transfer",
+    "bankName": "Shinhan Bank",
+    "accountHolder": "Park Sangwoo",
+    "notice": "Contact us after transfer to have your credits added."
+  }
+}
