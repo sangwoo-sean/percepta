@@ -53,7 +53,7 @@ export interface CreatePersonaDto {
 }
 
 export interface GeneratePersonasDto {
-  ageGroup: AgeGroup;
+  ageGroups: AgeGroup[];
   count: number;
 }
 

@@ -76,8 +76,9 @@ export class BatchCreatePersonaDto {
 }
 
 export class GeneratePersonasDto {
-  @IsEnum(['10s', '20s', '30s', '40s', '50s', '60+'])
-  ageGroup: AgeGroup;
+  @IsArray()
+  @IsEnum(['10s', '20s', '30s', '40s', '50s', '60+'], { each: true })
+  ageGroups: AgeGroup[];
 
   @IsInt()
   @Min(1)

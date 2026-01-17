@@ -4,3 +4,4 @@ export { Card, CardHeader } from './Card';
 export { Modal } from './Modal';
 export { Select } from './Select';
 export { LanguageSwitcher } from './LanguageSwitcher';
+export { RangeSlider } from './RangeSlider';

@@ -185,9 +185,9 @@ describe('PersonasService', () => {
       repository.create.mockImplementation((data) => ({ ...mockPersona, ...data }) as Persona);
       repository.save.mockImplementation((entities) => Promise.resolve(entities as any));
 
-      const result = await service.generateAndCreate('user-uuid', { ageGroup: '20s', count: 2 });
+      const result = await service.generateAndCreate('user-uuid', { ageGroups: ['20s'], count: 2 });
 
-      expect(aiProvider.generatePersonas).toHaveBeenCalledWith('20s', 2);
+      expect(aiProvider.generatePersonas).toHaveBeenCalledWith(['20s'], 2);
       expect(result).toHaveLength(2);
     });
   });

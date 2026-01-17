@@ -98,7 +98,7 @@ export class PersonasService {
   }
 
   async generateAndCreate(userId: string, dto: GeneratePersonasDto): Promise<Persona[]> {
-    const generatedData = await this.aiProvider.generatePersonas(dto.ageGroup, dto.count);
+    const generatedData = await this.aiProvider.generatePersonas(dto.ageGroups, dto.count);
 
     const personas = generatedData.map((data) => {
       const avatarUrl = this.generateAvatarUrl(data.name + Date.now() + Math.random());

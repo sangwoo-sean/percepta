@@ -190,7 +190,7 @@ ${JSON.stringify(feedbackSummaries, null, 2)}
     }
   }
 
-  async generatePersonas(ageGroup: AgeGroup, count: number): Promise<PersonaData[]> {
+  async generatePersonas(ageGroups: AgeGroup[], count: number): Promise<PersonaData[]> {
     const ageGroupKorean: Record<AgeGroup, string> = {
       '10s': '10대',
       '20s': '20대',
@@ -200,29 +200,33 @@ ${JSON.stringify(feedbackSummaries, null, 2)}
       '60+': '60대 이상',
     };
 
+    const ageGroupsKorean = ageGroups.map((ag) => ageGroupKorean[ag]).join(', ');
+
     const prompt = `당신은 한국의 다양한 소비자 페르소나를 생성하는 전문가입니다.
 
 다음 조건에 맞는 ${count}명의 페르소나를 생성해주세요:
-- 연령대: ${ageGroupKorean[ageGroup]}
+- 연령대: ${ageGroupsKorean} (이 연령대들 중에서 골고루 분배해서 생성해주세요)
 
 각 페르소나에 대해 다음 정보를 생성해주세요:
 1. name: 한국식 이름 (성 + 이름)
-2. gender: 성별 ("male" 또는 "female")
-3. occupation: 해당 연령대에 적합한 현실적인 직업
-4. location: 거주지역 (시/구 단위, 예: "서울시 강남구")
-5. education: 학력
-6. incomeLevel: 소득수준 ("하", "중하", "중", "중상", "상")
-7. personalityTraits: 3-5개의 성격 특성
-8. dailyPattern: 일상 패턴 2-3문장
-9. strengths: 3-4개의 강점
-10. weaknesses: 2-3개의 약점
-11. description: 소비 성향, 관심사 2-3문장
+2. ageGroup: 연령대 ("10s", "20s", "30s", "40s", "50s", "60+" 중 하나)
+3. gender: 성별 ("male" 또는 "female")
+4. occupation: 해당 연령대에 적합한 현실적인 직업
+5. location: 거주지역 (시/구 단위, 예: "서울시 강남구")
+6. education: 학력
+7. incomeLevel: 소득수준 ("하", "중하", "중", "중상", "상")
+8. personalityTraits: 3-5개의 성격 특성
+9. dailyPattern: 일상 패턴 2-3문장
+10. strengths: 3-4개의 강점
+11. weaknesses: 2-3개의 약점
+12. description: 소비 성향, 관심사 2-3문장
 
 JSON 배열 형식으로만 응답해주세요.
 예시:
 [
   {
     "name": "김민준",
+    "ageGroup": "20s",
     "gender": "male",
     "occupation": "소프트웨어 개발자",
     "location": "서울시 강남구",
@@ -272,9 +276,12 @@ JSON 배열 형식으로만 응답해주세요.
 
       const parsed = JSON.parse(jsonMatch[0]);
 
-      return parsed.map((item: Record<string, unknown>) => ({
+      const validAgeGroups: AgeGroup[] = ['10s', '20s', '30s', '40s', '50s', '60+'];
+      return parsed.map((item: Record<string, unknown>, index: number) => ({
         name: item.name as string || '무명',
-        ageGroup,
+        ageGroup: validAgeGroups.includes(item.ageGroup as AgeGroup)
+          ? (item.ageGroup as AgeGroup)
+          : ageGroups[index % ageGroups.length],
         gender: (item.gender === 'male' || item.gender === 'female') ? item.gender : undefined,
         occupation: item.occupation as string || '직장인',
         location: item.location as string,
@@ -290,11 +297,11 @@ JSON 배열 형식으로만 응답해주세요.
       console.error('Gemini API error:', error);
 
       // Return mock personas for development
-      return this.generateMockPersonas(ageGroup, count);
+      return this.generateMockPersonas(ageGroups, count);
     }
   }
 
-  private generateMockPersonas(ageGroup: AgeGroup, count: number): PersonaData[] {
+  private generateMockPersonas(ageGroups: AgeGroup[], count: number): PersonaData[] {
     const mockNames = {
       male: ['김민준', '이서준', '박도윤', '최예준', '정시우', '강하준', '조주원', '윤지호'],
       female: ['김서연', '이서윤', '박지우', '최서현', '정민서', '강하은', '조하윤', '윤윤서'],
@@ -314,6 +321,7 @@ JSON 배열 형식으로만 응답해주세요.
     return Array.from({ length: count }, (_, i) => {
       const gender = i % 2 === 0 ? 'male' : 'female';
       const names = mockNames[gender];
+      const ageGroup = ageGroups[i % ageGroups.length];
       return {
         name: names[i % names.length],
         ageGroup,

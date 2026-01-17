@@ -12,7 +12,7 @@ export interface AIFeedbackResponse {
 export interface AIProvider {
   generateFeedback(content: string, persona: Persona): Promise<AIFeedbackResponse>;
   generateSummary(content: string, results: FeedbackResult[]): Promise<string>;
-  generatePersonas(ageGroup: AgeGroup, count: number): Promise<PersonaData[]>;
+  generatePersonas(ageGroups: AgeGroup[], count: number): Promise<PersonaData[]>;
 }
 
 export const AI_PROVIDER = 'AI_PROVIDER';

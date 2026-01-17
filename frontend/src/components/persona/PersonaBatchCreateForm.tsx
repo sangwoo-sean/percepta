@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { GeneratePersonasDto, AgeGroup } from '../../types';
-import { Button, Select } from '../common';
+import { Button, Select, RangeSlider } from '../common';
 
 interface PersonaBatchCreateFormProps {
   onSubmit: (dto: GeneratePersonasDto) => void;
@@ -20,18 +20,32 @@ export const PersonaBatchCreateForm: React.FC<PersonaBatchCreateFormProps> = ({
   isLoading,
 }) => {
   const { t } = useTranslation('persona');
-  const [ageGroup, setAgeGroup] = useState<AgeGroup>('20s');
+  const [ageRange, setAgeRange] = useState<[number, number]>([0, 5]);
   const [count, setCount] = useState('5');
 
-  const ageGroupOptions = AGE_GROUPS.map((age) => ({
-    value: age,
-    label: t(`form.ageGroup.options.${age}`),
-  }));
+  const ageGroupLabels = useMemo(
+    () => AGE_GROUPS.map((age) => t(`form.ageGroup.options.${age}`)),
+    [t]
+  );
+
+  const selectedAgeGroups = useMemo(
+    () => AGE_GROUPS.slice(ageRange[0], ageRange[1] + 1),
+    [ageRange]
+  );
+
+  const selectedRangeText = useMemo(() => {
+    const startLabel = t(`form.ageGroup.options.${AGE_GROUPS[ageRange[0]]}`);
+    const endLabel = t(`form.ageGroup.options.${AGE_GROUPS[ageRange[1]]}`);
+    if (ageRange[0] === ageRange[1]) {
+      return startLabel;
+    }
+    return `${startLabel} ~ ${endLabel}`;
+  }, [ageRange, t]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit({
-      ageGroup,
+      ageGroups: selectedAgeGroups,
       count: parseInt(count, 10),
     });
   };
@@ -42,12 +56,19 @@ export const PersonaBatchCreateForm: React.FC<PersonaBatchCreateFormProps> = ({
         {t('batchForm.description')}
       </p>
 
-      <Select
-        label={t('form.ageGroup.label')}
-        options={ageGroupOptions}
-        value={ageGroup}
-        onChange={(value) => setAgeGroup(value as AgeGroup)}
-      />
+      <div>
+        <RangeSlider
+          label={t('form.ageGroup.label')}
+          min={0}
+          max={5}
+          value={ageRange}
+          onChange={setAgeRange}
+          labels={ageGroupLabels}
+        />
+        <div className="mt-2 text-sm text-blue-600 font-medium text-center">
+          {selectedRangeText}
+        </div>
+      </div>
 
       <Select
         label={t('batchForm.count')}

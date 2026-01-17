@@ -50,7 +50,7 @@ export class MockAIService implements AIProvider {
 프로토타입 제작 및 소규모 테스트 그룹 피드백 수집을 권장합니다.`;
   }
 
-  async generatePersonas(ageGroup: AgeGroup, count: number): Promise<PersonaData[]> {
+  async generatePersonas(ageGroups: AgeGroup[], count: number): Promise<PersonaData[]> {
     const mockNames = {
       male: ['김민준', '이서준', '박도윤', '최예준', '정시우', '강하준', '조주원', '윤지호'],
       female: ['김서연', '이서윤', '박지우', '최서현', '정민서', '강하은', '조하윤', '윤윤서'],
@@ -73,6 +73,7 @@ export class MockAIService implements AIProvider {
     return Array.from({ length: count }, (_, i) => {
       const gender = i % 2 === 0 ? 'male' : 'female';
       const names = mockNames[gender];
+      const ageGroup = ageGroups[i % ageGroups.length];
       return {
         name: names[i % names.length],
         ageGroup,
