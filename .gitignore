@@ -16,6 +16,7 @@ vitest.config.d.ts.map
 
 # Environment files
 .env
+!frontend/.env
 .env.local
 .env.*.local
 
