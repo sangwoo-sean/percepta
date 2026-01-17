@@ -101,6 +101,7 @@ describe('FeedbackService', () => {
           useValue: {
             findByIdOrFail: jest.fn(),
             deductCredits: jest.fn(),
+            refundCredits: jest.fn(),
           },
         },
       ],
@@ -199,7 +200,8 @@ describe('FeedbackService', () => {
     });
 
     it('should continue and return successful results when some personas fail', async () => {
-      sessionsRepository.findOne.mockResolvedValue(mockSession);
+      const sessionWithCredits = { ...mockSession, creditsUsed: 3 };
+      sessionsRepository.findOne.mockResolvedValue(sessionWithCredits);
       personasService.findByIdOrFail
         .mockResolvedValueOnce(mockPersona as any)
         .mockRejectedValueOnce(new Error('Persona not found'))
@@ -229,13 +231,15 @@ describe('FeedbackService', () => {
       );
 
       expect(result).toHaveLength(2);
-      expect(sessionsRepository.update).toHaveBeenLastCalledWith('session-uuid', {
-        status: 'completed',
+      expect(usersService.refundCredits).toHaveBeenCalledWith('user-uuid', 1);
+      expect(sessionsRepository.update).toHaveBeenCalledWith('session-uuid', {
+        creditsUsed: 2,
       });
     });
 
-    it('should set status to failed when all personas fail', async () => {
-      sessionsRepository.findOne.mockResolvedValue(mockSession);
+    it('should set status to failed and refund all credits when all personas fail', async () => {
+      const sessionWithCredits = { ...mockSession, creditsUsed: 2 };
+      sessionsRepository.findOne.mockResolvedValue(sessionWithCredits);
       personasService.findByIdOrFail.mockRejectedValue(new Error('Persona not found'));
 
       const result = await service.generateFeedback(
@@ -245,6 +249,10 @@ describe('FeedbackService', () => {
       );
 
       expect(result).toHaveLength(0);
+      expect(usersService.refundCredits).toHaveBeenCalledWith('user-uuid', 2);
+      expect(sessionsRepository.update).toHaveBeenCalledWith('session-uuid', {
+        creditsUsed: 0,
+      });
       expect(sessionsRepository.update).toHaveBeenLastCalledWith('session-uuid', {
         status: 'failed',
       });

@@ -101,6 +101,7 @@ export class FeedbackService {
 
     const targetPersonaIds = personaIds || [];
     const results: FeedbackResult[] = [];
+    let failedCount = 0;
 
     for (const personaId of targetPersonaIds) {
       try {
@@ -125,10 +126,21 @@ export class FeedbackService {
         await this.resultsRepository.save(result);
         results.push(result);
       } catch (error) {
+        failedCount++;
         this.logger.error(
           `Failed to generate feedback for persona ${personaId}: ${error instanceof Error ? error.message : 'Unknown error'}`,
         );
       }
+    }
+
+    // Refund credits for failed personas
+    if (failedCount > 0) {
+      const refundAmount = failedCount * CREDITS_PER_PERSONA;
+      await this.usersService.refundCredits(userId, refundAmount);
+      await this.sessionsRepository.update(sessionId, {
+        creditsUsed: session.creditsUsed - refundAmount,
+      });
+      this.logger.log(`Refunded ${refundAmount} credits for ${failedCount} failed persona(s)`);
     }
 
     const finalStatus = results.length > 0 ? 'completed' : 'failed';

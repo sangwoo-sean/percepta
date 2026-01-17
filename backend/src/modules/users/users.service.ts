@@ -59,4 +59,10 @@ export class UsersService {
     user.credits -= amount;
     return this.usersRepository.save(user);
   }
+
+  async refundCredits(userId: string, amount: number): Promise<User> {
+    const user = await this.findByIdOrFail(userId);
+    user.credits += amount;
+    return this.usersRepository.save(user);
+  }
 }

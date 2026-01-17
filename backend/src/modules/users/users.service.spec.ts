@@ -175,4 +175,16 @@ describe('UsersService', () => {
       );
     });
   });
+
+  describe('refundCredits', () => {
+    it('should add credits to user', async () => {
+      const updatedUser = { ...mockUser, credits: 15 };
+      repository.findOne.mockResolvedValue(mockUser);
+      repository.save.mockResolvedValue(updatedUser);
+
+      const result = await service.refundCredits('test-uuid', 5);
+
+      expect(result.credits).toBe(15);
+    });
+  });
 });
