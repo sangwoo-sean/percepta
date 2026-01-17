@@ -22,12 +22,8 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
     LoggerModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
-        const isProduction =
-          configService.get<string>('NODE_ENV') === 'production';
-        const logLevel = configService.get<string>(
-          'LOG_LEVEL',
-          isProduction ? 'info' : 'debug',
-        );
+        const isProduction = configService.get<string>('NODE_ENV') === 'production';
+        const logLevel = configService.get<string>('LOG_LEVEL', isProduction ? 'info' : 'debug');
         const logDir = configService.get<string>('LOG_DIR', 'logs');
 
         return createLoggerConfig(logLevel, logDir, isProduction);
@@ -37,8 +33,7 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
-        const isProduction =
-          configService.get<string>('NODE_ENV') === 'production';
+        const isProduction = configService.get<string>('NODE_ENV') === 'production';
         const useSSL = configService.get<string>('DATABASE_SSL') === 'true';
 
         return {
@@ -46,14 +41,11 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
           host: configService.get<string>('DATABASE_HOST', 'localhost'),
           port: configService.get<number>('DATABASE_PORT', 5432),
           username: configService.get<string>('DATABASE_USERNAME', 'percepta'),
-          password: configService.get<string>(
-            'DATABASE_PASSWORD',
-            'percepta_password',
-          ),
+          password: configService.get<string>('DATABASE_PASSWORD', 'percepta_password'),
           database: configService.get<string>('DATABASE_NAME', 'percepta'),
           entities: [__dirname + '/**/*.entity{.ts,.js}'],
           synchronize: !isProduction,
-          logging: !isProduction,
+          logging: false,
           ssl: useSSL ? { rejectUnauthorized: false } : false,
         };
       },
