@@ -129,3 +129,27 @@ export interface ScrapedContent {
   content: string;
   url: string;
 }
+
+export type TransactionType =
+  | 'deduct_persona_generation'
+  | 'refund_persona_generation'
+  | 'deduct_feedback_session'
+  | 'refund_feedback_partial'
+  | 'admin_add'
+  | 'admin_deduct';
+
+export type ReferenceType = 'feedback_session' | 'persona';
+
+export interface CreditTransaction {
+  id: string;
+  userId: string;
+  transactionType: TransactionType;
+  amount: number;
+  balanceBefore: number;
+  balanceAfter: number;
+  referenceId: string | null;
+  referenceType: ReferenceType | null;
+  description: string | null;
+  metadata: Record<string, unknown>;
+  createdAt: string;
+}

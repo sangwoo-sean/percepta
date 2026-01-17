@@ -20,12 +20,15 @@ export const Header: React.FC = () => {
             <div className="flex items-center gap-4">
               <LanguageSwitcher />
 
-              <div className="flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-full">
+              <Link
+                to="/credits/history"
+                className="flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-full hover:bg-gray-200 transition-colors"
+              >
                 <svg className="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" />
                 </svg>
                 <span className="text-sm font-medium">{t('header.credits', { count: user.credits })}</span>
-              </div>
+              </Link>
 
               <div className="flex items-center gap-3">
                 {user.avatarUrl ? (

@@ -1,0 +1,19 @@
+{
+  "history": {
+    "title": "Credit History",
+    "subtitle": "View your credit usage and top-up history",
+    "balance": "Balance",
+    "empty": {
+      "title": "No transaction history",
+      "description": "Your credit usage history will appear here when you create personas or request feedback."
+    }
+  },
+  "transactionType": {
+    "deduct_persona_generation": "Persona Generation",
+    "refund_persona_generation": "Persona Generation Refund",
+    "deduct_feedback_session": "Feedback Session",
+    "refund_feedback_partial": "Feedback Partial Refund",
+    "admin_add": "Admin Credit Addition",
+    "admin_deduct": "Admin Credit Deduction"
+  }
+}

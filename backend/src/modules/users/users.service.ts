@@ -111,6 +111,13 @@ export class UsersService {
     return this.refundCredits(userId, amount, options);
   }
 
+  async getCreditTransactions(userId: string): Promise<CreditTransaction[]> {
+    return this.creditTransactionRepository.find({
+      where: { userId },
+      order: { createdAt: 'DESC' },
+    });
+  }
+
   private async recordTransaction(
     userId: string,
     amount: number,

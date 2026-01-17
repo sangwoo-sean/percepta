@@ -1,0 +1,19 @@
+{
+  "history": {
+    "title": "크레딧 사용 내역",
+    "subtitle": "크레딧 사용 및 충전 내역을 확인하세요",
+    "balance": "잔액",
+    "empty": {
+      "title": "사용 내역이 없습니다",
+      "description": "페르소나를 생성하거나 피드백을 요청하면 크레딧 사용 내역이 여기에 표시됩니다."
+    }
+  },
+  "transactionType": {
+    "deduct_persona_generation": "페르소나 생성",
+    "refund_persona_generation": "페르소나 생성 환불",
+    "deduct_feedback_session": "피드백 세션",
+    "refund_feedback_partial": "피드백 부분 환불",
+    "admin_add": "관리자 크레딧 추가",
+    "admin_deduct": "관리자 크레딧 차감"
+  }
+}
