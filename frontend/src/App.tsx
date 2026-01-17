@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { store } from './store';
-import { fetchCurrentUser } from './store/authSlice';
+import { fetchCurrentUser, logout } from './store/authSlice';
 import { Layout } from './components/layout';
 import { LoginPage } from './pages/LoginPage';
 import { AuthCallbackPage } from './pages/AuthCallbackPage';
@@ -18,6 +18,8 @@ const AppContent: React.FC = () => {
     const token = localStorage.getItem('token');
     if (token) {
       store.dispatch(fetchCurrentUser());
+    } else {
+      store.dispatch(logout());
     }
   }, []);
 
