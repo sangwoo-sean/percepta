@@ -4,12 +4,16 @@ import {
   Inject,
   Logger,
   InternalServerErrorException,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Persona, AgeGroup, PersonaData } from './entities/persona.entity';
 import { CreatePersonaDto, GeneratePersonasDto, UpdatePersonaDto } from './dto/create-persona.dto';
 import { AIProvider, AI_PROVIDER } from '../ai/ai-provider.interface';
+import { UsersService } from '../users/users.service';
+
+const CREDITS_PER_PERSONA = 1;
 
 const AVATAR_STYLES = [
   'adventurer',
@@ -46,6 +50,7 @@ export class PersonasService {
     private readonly personasRepository: Repository<Persona>,
     @Inject(AI_PROVIDER)
     private readonly aiProvider: AIProvider,
+    private readonly usersService: UsersService,
   ) {}
 
   private generateRandomName(): string {
@@ -106,30 +111,46 @@ export class PersonasService {
   }
 
   async generateAndCreate(userId: string, dto: GeneratePersonasDto): Promise<Persona[]> {
-    let generatedData: PersonaData[];
+    const requiredCredits = dto.count * CREDITS_PER_PERSONA;
 
+    const user = await this.usersService.findByIdOrFail(userId);
+    if (user.credits < requiredCredits) {
+      throw new BadRequestException(
+        `크레딧이 부족합니다. 필요: ${requiredCredits}, 보유: ${user.credits}`,
+      );
+    }
+
+    await this.usersService.deductCredits(userId, requiredCredits);
+
+    let generatedData: PersonaData[];
     try {
       generatedData = await this.aiProvider.generatePersonas(dto.ageGroups, dto.count, { userId });
     } catch (error) {
+      await this.usersService.addCredits(userId, requiredCredits);
       this.logger.error('Failed to generate personas from AI provider', error);
       throw new InternalServerErrorException(
         'AI 페르소나 생성에 실패했습니다. 잠시 후 다시 시도해주세요.',
       );
     }
 
-    const personas = generatedData.map((data) => {
-      const avatarUrl = this.generateAvatarUrl(data.name + Date.now() + Math.random());
-      return this.personasRepository.create({
-        userId,
-        data: {
-          ...data,
-          avatarUrl,
-        },
-        storageUrl: null,
+    try {
+      const personas = generatedData.map((data) => {
+        const avatarUrl = this.generateAvatarUrl(data.name + Date.now() + Math.random());
+        return this.personasRepository.create({
+          userId,
+          data: {
+            ...data,
+            avatarUrl,
+          },
+          storageUrl: null,
+        });
       });
-    });
 
-    return this.personasRepository.save(personas);
+      return await this.personasRepository.save(personas);
+    } catch (error) {
+      await this.usersService.addCredits(userId, requiredCredits);
+      throw error;
+    }
   }
 
   async delete(id: string, userId: string): Promise<void> {

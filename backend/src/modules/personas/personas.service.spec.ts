@@ -1,16 +1,18 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { NotFoundException } from '@nestjs/common';
+import { NotFoundException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { PersonasService } from './personas.service';
 import { Persona, PersonaData } from './entities/persona.entity';
 import { CreatePersonaDto } from './dto/create-persona.dto';
 import { AI_PROVIDER, AIProvider } from '../ai/ai-provider.interface';
+import { UsersService } from '../users/users.service';
 
 describe('PersonasService', () => {
   let service: PersonasService;
   let repository: jest.Mocked<Repository<Persona>>;
   let aiProvider: jest.Mocked<AIProvider>;
+  let usersService: jest.Mocked<UsersService>;
 
   const mockPersonaData: PersonaData = {
     name: '민준',
@@ -53,6 +55,12 @@ describe('PersonasService', () => {
       generatePersonas: jest.fn(),
     };
 
+    const mockUsersService = {
+      findByIdOrFail: jest.fn(),
+      deductCredits: jest.fn(),
+      addCredits: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PersonasService,
@@ -64,12 +72,17 @@ describe('PersonasService', () => {
           provide: AI_PROVIDER,
           useValue: mockAIProvider,
         },
+        {
+          provide: UsersService,
+          useValue: mockUsersService,
+        },
       ],
     }).compile();
 
     service = module.get<PersonasService>(PersonasService);
     repository = module.get(getRepositoryToken(Persona));
     aiProvider = module.get(AI_PROVIDER);
+    usersService = module.get(UsersService);
   });
 
   it('should be defined', () => {
@@ -175,20 +188,66 @@ describe('PersonasService', () => {
   });
 
   describe('generateAndCreate', () => {
-    it('should generate personas using AI and save them', async () => {
-      const generatedData: PersonaData[] = [
-        { name: '김민준', ageGroup: '20s', occupation: '개발자', personalityTraits: ['분석적'] },
-        { name: '이서연', ageGroup: '20s', occupation: '디자이너', personalityTraits: ['창의적'] },
-      ];
+    const mockUser = { id: 'user-uuid', credits: 10 };
+    const generatedData: PersonaData[] = [
+      { name: '김민준', ageGroup: '20s', occupation: '개발자', personalityTraits: ['분석적'] },
+      { name: '이서연', ageGroup: '20s', occupation: '디자이너', personalityTraits: ['창의적'] },
+    ];
 
+    it('should deduct credits and generate personas using AI', async () => {
+      usersService.findByIdOrFail.mockResolvedValue(mockUser as any);
+      usersService.deductCredits.mockResolvedValue({ ...mockUser, credits: 8 } as any);
       aiProvider.generatePersonas.mockResolvedValue(generatedData);
       repository.create.mockImplementation((data) => ({ ...mockPersona, ...data }) as Persona);
       repository.save.mockImplementation((entities) => Promise.resolve(entities as any));
 
       const result = await service.generateAndCreate('user-uuid', { ageGroups: ['20s'], count: 2 });
 
+      expect(usersService.findByIdOrFail).toHaveBeenCalledWith('user-uuid');
+      expect(usersService.deductCredits).toHaveBeenCalledWith('user-uuid', 2);
       expect(aiProvider.generatePersonas).toHaveBeenCalledWith(['20s'], 2, { userId: 'user-uuid' });
       expect(result).toHaveLength(2);
+    });
+
+    it('should throw BadRequestException when credits are insufficient', async () => {
+      usersService.findByIdOrFail.mockResolvedValue({ ...mockUser, credits: 1 } as any);
+
+      await expect(
+        service.generateAndCreate('user-uuid', { ageGroups: ['20s'], count: 2 }),
+      ).rejects.toThrow(BadRequestException);
+
+      expect(usersService.deductCredits).not.toHaveBeenCalled();
+      expect(aiProvider.generatePersonas).not.toHaveBeenCalled();
+    });
+
+    it('should rollback credits when AI generation fails', async () => {
+      usersService.findByIdOrFail.mockResolvedValue(mockUser as any);
+      usersService.deductCredits.mockResolvedValue({ ...mockUser, credits: 8 } as any);
+      usersService.addCredits.mockResolvedValue(mockUser as any);
+      aiProvider.generatePersonas.mockRejectedValue(new Error('AI generation failed'));
+
+      await expect(
+        service.generateAndCreate('user-uuid', { ageGroups: ['20s'], count: 2 }),
+      ).rejects.toThrow(InternalServerErrorException);
+
+      expect(usersService.deductCredits).toHaveBeenCalledWith('user-uuid', 2);
+      expect(usersService.addCredits).toHaveBeenCalledWith('user-uuid', 2);
+    });
+
+    it('should rollback credits when DB save fails', async () => {
+      usersService.findByIdOrFail.mockResolvedValue(mockUser as any);
+      usersService.deductCredits.mockResolvedValue({ ...mockUser, credits: 8 } as any);
+      usersService.addCredits.mockResolvedValue(mockUser as any);
+      aiProvider.generatePersonas.mockResolvedValue(generatedData);
+      repository.create.mockImplementation((data) => ({ ...mockPersona, ...data }) as Persona);
+      repository.save.mockRejectedValue(new Error('DB save failed'));
+
+      await expect(
+        service.generateAndCreate('user-uuid', { ageGroups: ['20s'], count: 2 }),
+      ).rejects.toThrow('DB save failed');
+
+      expect(usersService.deductCredits).toHaveBeenCalledWith('user-uuid', 2);
+      expect(usersService.addCredits).toHaveBeenCalledWith('user-uuid', 2);
     });
   });
 
