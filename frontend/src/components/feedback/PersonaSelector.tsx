@@ -37,12 +37,14 @@ export const PersonaSelector: React.FC<PersonaSelectorProps> = ({
     }
   };
 
+  const maxSelectByCredits = Math.floor((user?.credits || 0) / creditsPerPersona);
+  const selectableCount = Math.min(maxSelectByCredits, personas.length);
+
   const handleSelectAll = () => {
-    if (selectedIds.length === personas.length) {
+    if (selectedIds.length === selectableCount) {
       onSelectionChange([]);
     } else {
-      const maxSelect = Math.floor((user?.credits || 0) / creditsPerPersona);
-      onSelectionChange(personas.slice(0, maxSelect).map((p) => p.id));
+      onSelectionChange(personas.slice(0, selectableCount).map((p) => p.id));
     }
   };
 
@@ -83,9 +85,19 @@ export const PersonaSelector: React.FC<PersonaSelectorProps> = ({
           onClick={handleSelectAll}
           className="text-sm text-primary-600 hover:text-primary-700"
         >
-          {selectedIds.length === personas.length ? t('selector.deselectAll') : t('selector.selectAll')}
+          {selectedIds.length === selectableCount
+            ? t('selector.deselectAll')
+            : selectableCount < personas.length
+              ? t('selector.selectAllLimited', { available: selectableCount, total: personas.length })
+              : t('selector.selectAll')}
         </button>
       </div>
+
+      {selectedIds.length >= selectableCount && selectableCount < personas.length && (
+        <div className="bg-amber-50 text-amber-700 px-4 py-2 rounded-lg text-sm">
+          {t('selector.creditLimitWarning', { count: user?.credits || 0 })}
+        </div>
+      )}
 
       <div className="flex flex-col gap-4">
         {personas.map((persona) => (
