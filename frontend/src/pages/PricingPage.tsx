@@ -127,27 +127,9 @@ export const PricingPage: React.FC = () => {
       </Card>
 
       {/* Payment Info */}
-      <Card>
-        <div className="bg-gray-50 rounded-lg p-6">
-          <div className="flex items-start gap-4">
-            <div className="flex-shrink-0">
-              <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="text-sm font-medium text-gray-900">{t('payment.title')}</h3>
-              <p className="mt-1 text-sm text-gray-500">{t('payment.method')}</p>
-              <div className="mt-3 p-3 bg-white rounded border border-gray-200">
-                <p className="text-sm font-medium text-gray-900">{t('payment.bankName')}</p>
-                <p className="text-sm text-gray-600">{t('payment.accountHolder')}</p>
-                <p className="text-lg font-mono font-semibold text-gray-900 mt-1">110-481-718265</p>
-              </div>
-              <p className="mt-3 text-xs text-gray-500">{t('payment.notice')}</p>
-            </div>
-          </div>
-        </div>
-      </Card>
+      <p className="text-center text-sm text-gray-400">
+        {t('payment.info')}
+      </p>
     </div>
   );
 };

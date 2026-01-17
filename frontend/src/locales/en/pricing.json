@@ -30,10 +30,6 @@
     }
   },
   "payment": {
-    "title": "Payment Method",
-    "method": "Bank Transfer",
-    "bankName": "Shinhan Bank",
-    "accountHolder": "Park Sangwoo",
-    "notice": "Contact us after transfer to have your credits added."
+    "info": "Payment: Bank Transfer (Shinhan 110-481-718265 Park Sangwoo)"
   }
 }
