@@ -40,7 +40,7 @@ export class UsersService {
   async create(createUserDto: CreateUserDto): Promise<User> {
     const user = this.usersRepository.create({
       ...createUserDto,
-      credits: 10,
+      credits: 30,
     });
     return this.usersRepository.save(user);
   }
