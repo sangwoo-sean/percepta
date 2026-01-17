@@ -128,9 +128,9 @@ export const PricingPage: React.FC = () => {
 
       {/* Payment Info */}
       <Card>
-        <p className="text-center text-sm text-gray-500">
-          {t('payment.info')}
-        </p>
+        <CardHeader title={t('payment.title')} />
+        <p className="text-sm text-gray-600">{t('payment.bankTransfer')}</p>
+        <p className="text-sm text-gray-400 mt-2">{t('payment.comingSoon')}</p>
       </Card>
     </div>
   );

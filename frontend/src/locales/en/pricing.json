@@ -30,6 +30,8 @@
     }
   },
   "payment": {
-    "info": "Payment: Bank Transfer (Shinhan 110-481-718265 Park Sangwoo)"
+    "title": "Payment Methods",
+    "bankTransfer": "Bank Transfer: Shinhan Bank 110-481-718265 (Park Sangwoo)",
+    "comingSoon": "More payment options coming soon."
   }
 }
