@@ -13,6 +13,7 @@ import { FeedbackResultPage } from './pages/FeedbackResultPage';
 import { FeedbackHistoryPage } from './pages/FeedbackHistoryPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { PricingPage } from './pages/PricingPage';
+import { GuidePage } from './pages/GuidePage';
 
 const AppContent: React.FC = () => {
   useEffect(() => {
@@ -35,6 +36,7 @@ const AppContent: React.FC = () => {
           <Route path="/feedback/new" element={<NewFeedbackPage />} />
           <Route path="/feedback/history" element={<FeedbackHistoryPage />} />
           <Route path="/feedback/:id" element={<FeedbackResultPage />} />
+          <Route path="/guide" element={<GuidePage />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/settings" element={<SettingsPage />} />
         </Route>

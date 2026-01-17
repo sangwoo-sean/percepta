@@ -1,0 +1,139 @@
+{
+  "title": "Usage Guide",
+  "subtitle": "You can get feedback on these too",
+  "intro": "\"I want feedback, but who should I ask?\" Percepta has the answer.",
+  "cta": {
+    "title": "Get started now",
+    "description": "Create a persona and request your first feedback.",
+    "createPersona": "Create Persona",
+    "requestFeedback": "Request Feedback"
+  },
+  "tips": {
+    "title": "How to get better feedback",
+    "context": {
+      "title": "Provide context",
+      "bad": "What do you think of this?",
+      "good": "This is a finance newsletter for young professionals. Will they drop off after the first paragraph?"
+    },
+    "compare": {
+      "title": "Give comparison options",
+      "description": "Upload A/B versions together to get clearer preference insights."
+    },
+    "variety": {
+      "title": "Try various personas",
+      "description": "The same content can get completely different reactions depending on the persona."
+    }
+  },
+  "useCases": [
+    {
+      "title": "Validate your business idea",
+      "icon": "lightbulb",
+      "situation": "When you have a new business idea but aren't sure if there's real demand",
+      "howTo": "Summarize your idea in 1-2 paragraphs and set up personas matching your target customers.",
+      "insights": [
+        "\"I would actually use this\" vs \"Do I really need this?\"",
+        "Unexpected concerns or improvement ideas",
+        "Compare reactions across different targets"
+      ]
+    },
+    {
+      "title": "Get reactions to your lyrics",
+      "icon": "music",
+      "situation": "When you want to know how people will react before posting your lyrics or song",
+      "howTo": "Enter the full lyrics and set up personas with various ages and tastes.",
+      "insights": [
+        "Which age group it appeals to more",
+        "Emotional resonance and relatability of lyrics",
+        "Specific feedback like \"this part feels awkward\""
+      ]
+    },
+    {
+      "title": "Review before publishing a blog post",
+      "icon": "document",
+      "situation": "When you've put effort into writing but worry if readers will finish it",
+      "howTo": "Enter the full text and set up personas matching your expected readers.",
+      "insights": [
+        "Whether the intro is engaging",
+        "Where it gets boring",
+        "Whether the core message comes through"
+      ]
+    },
+    {
+      "title": "Test ad copy",
+      "icon": "megaphone",
+      "situation": "When you're about to run ads but can't decide which copy works better",
+      "howTo": "Enter 2-3 versions of ad copy and set up target audience personas.",
+      "insights": [
+        "Which copy triggers more purchase intent",
+        "Which expressions feel off-putting",
+        "Compare click-worthiness"
+      ]
+    },
+    {
+      "title": "Get objective feedback on your resume",
+      "icon": "user",
+      "situation": "When job hunting and can't tell if your resume is compelling",
+      "howTo": "Enter your resume content and set up a persona as the hiring manager.",
+      "insights": [
+        "First impression and sense of expertise",
+        "Which experiences stand out",
+        "What seems lacking"
+      ]
+    },
+    {
+      "title": "Rehearse your presentation script",
+      "icon": "presentation",
+      "situation": "When you have an important presentation and worry about audience reaction",
+      "howTo": "Enter your presentation script and set up personas matching your audience.",
+      "insights": [
+        "Whether the logic flow is persuasive",
+        "Where attention might drop",
+        "Parts that raise questions or objections"
+      ]
+    },
+    {
+      "title": "Evaluate product descriptions",
+      "icon": "package",
+      "situation": "When you've written a product description and want to know if it converts",
+      "howTo": "Enter the product description and set up personas of likely buyers.",
+      "insights": [
+        "Whether there's enough info for purchase decision",
+        "Whether it builds trust",
+        "Whether value justifies the price"
+      ]
+    },
+    {
+      "title": "Draft social media posts",
+      "icon": "share",
+      "situation": "When you've written a post and want to predict how it'll perform",
+      "howTo": "Enter the post content and set up personas matching your followers.",
+      "insights": [
+        "Whether it's scroll-stopping",
+        "Whether it's share-worthy",
+        "Whether it invites comments"
+      ]
+    },
+    {
+      "title": "Review email/proposal drafts",
+      "icon": "mail",
+      "situation": "When sending an important email or proposal and worried about the reaction",
+      "howTo": "Enter the email/proposal content and set up a persona of the recipient.",
+      "insights": [
+        "Whether the key message is clear",
+        "Whether it prompts the desired action",
+        "Whether the tone is appropriate"
+      ]
+    },
+    {
+      "title": "Test brand naming/slogans",
+      "icon": "tag",
+      "situation": "When you need to choose a brand name or slogan but can't decide",
+      "howTo": "List your candidate names/slogans and set up target customer personas.",
+      "insights": [
+        "Which name is more memorable",
+        "Whether it fits the brand image",
+        "Whether it's easy to pronounce and familiar"
+      ]
+    }
+  ]
+}

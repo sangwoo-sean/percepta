@@ -8,6 +8,7 @@ import koDashboard from '../locales/ko/dashboard.json';
 import koPersona from '../locales/ko/persona.json';
 import koFeedback from '../locales/ko/feedback.json';
 import koPricing from '../locales/ko/pricing.json';
+import koGuide from '../locales/ko/guide.json';
 
 import enCommon from '../locales/en/common.json';
 import enAuth from '../locales/en/auth.json';
@@ -15,6 +16,7 @@ import enDashboard from '../locales/en/dashboard.json';
 import enPersona from '../locales/en/persona.json';
 import enFeedback from '../locales/en/feedback.json';
 import enPricing from '../locales/en/pricing.json';
+import enGuide from '../locales/en/guide.json';
 
 const resources = {
   ko: {
@@ -24,6 +26,7 @@ const resources = {
     persona: koPersona,
     feedback: koFeedback,
     pricing: koPricing,
+    guide: koGuide,
   },
   en: {
     common: enCommon,
@@ -32,6 +35,7 @@ const resources = {
     persona: enPersona,
     feedback: enFeedback,
     pricing: enPricing,
+    guide: enGuide,
   },
 };
 
@@ -42,7 +46,7 @@ i18n
     resources,
     fallbackLng: 'ko',
     defaultNS: 'common',
-    ns: ['common', 'auth', 'dashboard', 'persona', 'feedback', 'pricing'],
+    ns: ['common', 'auth', 'dashboard', 'persona', 'feedback', 'pricing', 'guide'],
     detection: {
       order: ['localStorage', 'navigator'],
       caches: ['localStorage'],
