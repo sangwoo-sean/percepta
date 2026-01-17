@@ -81,7 +81,13 @@ export class FeedbackService {
     await this.sessionsRepository.save(session);
 
     // Deduct credits
-    await this.usersService.deductCredits(userId, creditsNeeded);
+    await this.usersService.deductCredits(userId, creditsNeeded, {
+      transactionType: 'deduct_feedback_session',
+      referenceId: session.id,
+      referenceType: 'feedback_session',
+      description: `피드백 세션 생성 (페르소나 ${dto.personaIds.length}개)`,
+      metadata: { personaIds: dto.personaIds },
+    });
 
     return session;
   }
@@ -136,7 +142,13 @@ export class FeedbackService {
     // Refund credits for failed personas
     if (failedCount > 0) {
       const refundAmount = failedCount * CREDITS_PER_PERSONA;
-      await this.usersService.refundCredits(userId, refundAmount);
+      await this.usersService.refundCredits(userId, refundAmount, {
+        transactionType: 'refund_feedback_partial',
+        referenceId: sessionId,
+        referenceType: 'feedback_session',
+        description: `피드백 생성 실패 환불 (페르소나 ${failedCount}개)`,
+        metadata: { failedCount, totalPersonas: targetPersonaIds.length },
+      });
       await this.sessionsRepository.update(sessionId, {
         creditsUsed: session.creditsUsed - refundAmount,
       });

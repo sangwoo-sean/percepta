@@ -146,7 +146,10 @@ describe('FeedbackService', () => {
       const result = await service.createSession('user-uuid', dto);
 
       expect(result).toEqual(mockSession);
-      expect(usersService.deductCredits).toHaveBeenCalledWith('user-uuid', 1);
+      expect(usersService.deductCredits).toHaveBeenCalledWith('user-uuid', 1, expect.objectContaining({
+        transactionType: 'deduct_feedback_session',
+        referenceType: 'feedback_session',
+      }));
     });
 
     it('should throw BadRequestException when insufficient credits', async () => {
@@ -232,7 +235,10 @@ describe('FeedbackService', () => {
       );
 
       expect(result).toHaveLength(2);
-      expect(usersService.refundCredits).toHaveBeenCalledWith('user-uuid', 1);
+      expect(usersService.refundCredits).toHaveBeenCalledWith('user-uuid', 1, expect.objectContaining({
+        transactionType: 'refund_feedback_partial',
+        referenceType: 'feedback_session',
+      }));
       expect(sessionsRepository.update).toHaveBeenCalledWith('session-uuid', {
         creditsUsed: 2,
       });
@@ -250,7 +256,10 @@ describe('FeedbackService', () => {
       );
 
       expect(result).toHaveLength(0);
-      expect(usersService.refundCredits).toHaveBeenCalledWith('user-uuid', 2);
+      expect(usersService.refundCredits).toHaveBeenCalledWith('user-uuid', 2, expect.objectContaining({
+        transactionType: 'refund_feedback_partial',
+        referenceType: 'feedback_session',
+      }));
       expect(sessionsRepository.update).toHaveBeenCalledWith('session-uuid', {
         creditsUsed: 0,
       });

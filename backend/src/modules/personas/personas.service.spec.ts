@@ -204,7 +204,9 @@ describe('PersonasService', () => {
       const result = await service.generateAndCreate('user-uuid', { ageGroups: ['20s'], count: 2 });
 
       expect(usersService.findByIdOrFail).toHaveBeenCalledWith('user-uuid');
-      expect(usersService.deductCredits).toHaveBeenCalledWith('user-uuid', 2);
+      expect(usersService.deductCredits).toHaveBeenCalledWith('user-uuid', 2, expect.objectContaining({
+        transactionType: 'deduct_persona_generation',
+      }));
       expect(aiProvider.generatePersonas).toHaveBeenCalledWith(['20s'], 2, { userId: 'user-uuid' });
       expect(result).toHaveLength(2);
     });
@@ -230,8 +232,12 @@ describe('PersonasService', () => {
         service.generateAndCreate('user-uuid', { ageGroups: ['20s'], count: 2 }),
       ).rejects.toThrow(InternalServerErrorException);
 
-      expect(usersService.deductCredits).toHaveBeenCalledWith('user-uuid', 2);
-      expect(usersService.addCredits).toHaveBeenCalledWith('user-uuid', 2);
+      expect(usersService.deductCredits).toHaveBeenCalledWith('user-uuid', 2, expect.objectContaining({
+        transactionType: 'deduct_persona_generation',
+      }));
+      expect(usersService.addCredits).toHaveBeenCalledWith('user-uuid', 2, expect.objectContaining({
+        transactionType: 'refund_persona_generation',
+      }));
     });
 
     it('should rollback credits when DB save fails', async () => {
@@ -246,8 +252,12 @@ describe('PersonasService', () => {
         service.generateAndCreate('user-uuid', { ageGroups: ['20s'], count: 2 }),
       ).rejects.toThrow('DB save failed');
 
-      expect(usersService.deductCredits).toHaveBeenCalledWith('user-uuid', 2);
-      expect(usersService.addCredits).toHaveBeenCalledWith('user-uuid', 2);
+      expect(usersService.deductCredits).toHaveBeenCalledWith('user-uuid', 2, expect.objectContaining({
+        transactionType: 'deduct_persona_generation',
+      }));
+      expect(usersService.addCredits).toHaveBeenCalledWith('user-uuid', 2, expect.objectContaining({
+        transactionType: 'refund_persona_generation',
+      }));
     });
   });
 

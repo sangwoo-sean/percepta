@@ -4,10 +4,12 @@ import { Repository } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { UsersService, CreateUserDto } from './users.service';
 import { User } from './entities/user.entity';
+import { CreditTransaction } from './entities/credit-transaction.entity';
 
 describe('UsersService', () => {
   let service: UsersService;
   let repository: jest.Mocked<Repository<User>>;
+  let creditTransactionRepository: jest.Mocked<Repository<CreditTransaction>>;
 
   const mockUser: User = {
     id: 'test-uuid',
@@ -29,6 +31,11 @@ describe('UsersService', () => {
       save: jest.fn(),
     };
 
+    const mockCreditTransactionRepository = {
+      create: jest.fn(),
+      save: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UsersService,
@@ -36,11 +43,16 @@ describe('UsersService', () => {
           provide: getRepositoryToken(User),
           useValue: mockRepository,
         },
+        {
+          provide: getRepositoryToken(CreditTransaction),
+          useValue: mockCreditTransactionRepository,
+        },
       ],
     }).compile();
 
     service = module.get<UsersService>(UsersService);
     repository = module.get(getRepositoryToken(User));
+    creditTransactionRepository = module.get(getRepositoryToken(CreditTransaction));
   });
 
   it('should be defined', () => {

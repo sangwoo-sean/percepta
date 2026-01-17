@@ -120,13 +120,21 @@ export class PersonasService {
       );
     }
 
-    await this.usersService.deductCredits(userId, requiredCredits);
+    await this.usersService.deductCredits(userId, requiredCredits, {
+      transactionType: 'deduct_persona_generation',
+      description: `AI 페르소나 ${dto.count}개 생성`,
+      metadata: { ageGroups: dto.ageGroups, count: dto.count },
+    });
 
     let generatedData: PersonaData[];
     try {
       generatedData = await this.aiProvider.generatePersonas(dto.ageGroups, dto.count, { userId });
     } catch (error) {
-      await this.usersService.addCredits(userId, requiredCredits);
+      await this.usersService.addCredits(userId, requiredCredits, {
+        transactionType: 'refund_persona_generation',
+        description: `AI 페르소나 생성 실패 환불`,
+        metadata: { reason: 'ai_generation_failed' },
+      });
       this.logger.error('Failed to generate personas from AI provider', error);
       throw new InternalServerErrorException(
         'AI 페르소나 생성에 실패했습니다. 잠시 후 다시 시도해주세요.',
@@ -148,7 +156,11 @@ export class PersonasService {
 
       return await this.personasRepository.save(personas);
     } catch (error) {
-      await this.usersService.addCredits(userId, requiredCredits);
+      await this.usersService.addCredits(userId, requiredCredits, {
+        transactionType: 'refund_persona_generation',
+        description: `페르소나 저장 실패 환불`,
+        metadata: { reason: 'db_save_failed' },
+      });
       throw error;
     }
   }
