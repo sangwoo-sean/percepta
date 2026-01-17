@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { AIProvider, AIFeedbackResponse } from './ai-provider.interface';
+import { AIProvider, AIFeedbackResponse, AICallContext } from './ai-provider.interface';
 import { Persona, PersonaData, AgeGroup } from '../personas/entities/persona.entity';
 import { FeedbackResult } from '../feedback/entities/feedback-result.entity';
 
@@ -8,6 +8,7 @@ export class MockAIService implements AIProvider {
   async generateFeedback(
     content: string,
     persona: Persona,
+    _context?: AICallContext,
   ): Promise<AIFeedbackResponse> {
     // Fixed mock response for local development
     return {
@@ -22,6 +23,7 @@ export class MockAIService implements AIProvider {
   async generateSummary(
     content: string,
     results: FeedbackResult[],
+    _context?: AICallContext,
   ): Promise<string> {
     const avgScore =
       results.length > 0
@@ -50,7 +52,7 @@ export class MockAIService implements AIProvider {
 프로토타입 제작 및 소규모 테스트 그룹 피드백 수집을 권장합니다.`;
   }
 
-  async generatePersonas(ageGroups: AgeGroup[], count: number): Promise<PersonaData[]> {
+  async generatePersonas(ageGroups: AgeGroup[], count: number, _context?: AICallContext): Promise<PersonaData[]> {
     const mockNames = {
       male: ['김민준', '이서준', '박도윤', '최예준', '정시우', '강하준', '조주원', '윤지호'],
       female: ['김서연', '이서윤', '박지우', '최서현', '정민서', '강하은', '조하윤', '윤윤서'],

@@ -9,10 +9,15 @@ export interface AIFeedbackResponse {
   score: number;
 }
 
+export interface AICallContext {
+  userId?: string;
+  sessionId?: string;
+}
+
 export interface AIProvider {
-  generateFeedback(content: string, persona: Persona): Promise<AIFeedbackResponse>;
-  generateSummary(content: string, results: FeedbackResult[]): Promise<string>;
-  generatePersonas(ageGroups: AgeGroup[], count: number): Promise<PersonaData[]>;
+  generateFeedback(content: string, persona: Persona, context?: AICallContext): Promise<AIFeedbackResponse>;
+  generateSummary(content: string, results: FeedbackResult[], context?: AICallContext): Promise<string>;
+  generatePersonas(ageGroups: AgeGroup[], count: number, context?: AICallContext): Promise<PersonaData[]>;
 }
 
 export const AI_PROVIDER = 'AI_PROVIDER';

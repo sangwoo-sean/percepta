@@ -107,6 +107,7 @@ export class FeedbackService {
         const aiResponse = await this.aiProvider.generateFeedback(
           session.inputContent,
           persona,
+          { userId, sessionId },
         );
 
         const result = this.resultsRepository.create({
@@ -146,6 +147,7 @@ export class FeedbackService {
     const summary = await this.aiProvider.generateSummary(
       session.inputContent,
       session.results,
+      { userId, sessionId },
     );
 
     await this.sessionsRepository.update(sessionId, { summary });

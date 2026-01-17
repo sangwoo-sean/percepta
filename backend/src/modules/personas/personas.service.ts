@@ -109,7 +109,7 @@ export class PersonasService {
     let generatedData: PersonaData[];
 
     try {
-      generatedData = await this.aiProvider.generatePersonas(dto.ageGroups, dto.count);
+      generatedData = await this.aiProvider.generatePersonas(dto.ageGroups, dto.count, { userId });
     } catch (error) {
       this.logger.error('Failed to generate personas from AI provider', error);
       throw new InternalServerErrorException(

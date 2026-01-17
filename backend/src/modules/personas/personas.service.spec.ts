@@ -187,7 +187,7 @@ describe('PersonasService', () => {
 
       const result = await service.generateAndCreate('user-uuid', { ageGroups: ['20s'], count: 2 });
 
-      expect(aiProvider.generatePersonas).toHaveBeenCalledWith(['20s'], 2);
+      expect(aiProvider.generatePersonas).toHaveBeenCalledWith(['20s'], 2, { userId: 'user-uuid' });
       expect(result).toHaveLength(2);
     });
   });
@@ -212,11 +212,31 @@ describe('PersonasService', () => {
 
   describe('getStats', () => {
     it('should return stats for user personas', async () => {
+      const createMockPersona = (ageGroup: '20s' | '30s', occupation: string) => {
+        const data = { ...mockPersonaData, ageGroup, occupation };
+        return {
+          id: 'persona-uuid',
+          userId: 'user-uuid',
+          data,
+          storageUrl: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          user: {} as any,
+          feedbackResults: [],
+          get name() { return data.name; },
+          get avatarUrl() { return data.avatarUrl ?? null; },
+          get ageGroup() { return data.ageGroup; },
+          get occupation() { return data.occupation; },
+          get personalityTraits() { return data.personalityTraits; },
+          get description() { return data.description ?? null; },
+        } as Persona;
+      };
+
       const personasWithData = [
-        { ...mockPersona, data: { ...mockPersonaData, ageGroup: '20s' as const, occupation: '대학생' } },
-        { ...mockPersona, data: { ...mockPersonaData, ageGroup: '20s' as const, occupation: '회사원' } },
-        { ...mockPersona, data: { ...mockPersonaData, ageGroup: '30s' as const, occupation: '회사원' } },
-      ] as Persona[];
+        createMockPersona('20s', '대학생'),
+        createMockPersona('20s', '회사원'),
+        createMockPersona('30s', '회사원'),
+      ];
 
       repository.find.mockResolvedValue(personasWithData);
 

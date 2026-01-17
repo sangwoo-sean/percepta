@@ -3,14 +3,19 @@ import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import { Persona, PersonaData, AgeGroup } from '../personas/entities/persona.entity';
 import { FeedbackResult, Sentiment, PurchaseIntent } from '../feedback/entities/feedback-result.entity';
-import { AIProvider, AIFeedbackResponse } from './ai-provider.interface';
+import { AIProvider, AIFeedbackResponse, AICallContext } from './ai-provider.interface';
+import { AiLogService } from './ai-log.service';
 
 @Injectable()
 export class GeminiService implements AIProvider {
   private apiKey: string;
   private apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent';
+  private modelName = 'gemini-3-flash-preview';
 
-  constructor(private configService: ConfigService) {
+  constructor(
+    private configService: ConfigService,
+    private aiLogService: AiLogService,
+  ) {
     this.apiKey = this.configService.get<string>('GEMINI_API_KEY', '');
   }
 
@@ -25,7 +30,8 @@ ${persona.description ? `- 추가 설명: ${persona.description}` : ''}
 이 페르소나의 관점에서 주어진 콘텐츠에 대한 피드백을 제공해주세요.`;
   }
 
-  async generateFeedback(content: string, persona: Persona): Promise<AIFeedbackResponse> {
+  async generateFeedback(content: string, persona: Persona, context?: AICallContext): Promise<AIFeedbackResponse> {
+    const startTime = Date.now();
     const personaPrompt = this.buildPersonaPrompt(persona);
 
     const prompt = `${personaPrompt}
@@ -83,20 +89,59 @@ JSON만 출력하고 다른 텍스트는 포함하지 마세요.`;
 
       const parsed = JSON.parse(jsonMatch[0]);
 
-      return {
+      const result: AIFeedbackResponse = {
         feedbackText: parsed.feedbackText || '',
         sentiment: this.validateSentiment(parsed.sentiment),
         purchaseIntent: this.validatePurchaseIntent(parsed.purchaseIntent),
         keyPoints: Array.isArray(parsed.keyPoints) ? parsed.keyPoints : [],
         score: Math.min(5, Math.max(1, Number(parsed.score) || 3)),
       };
+
+      await this.aiLogService.log({
+        userId: context?.userId,
+        operationType: 'feedback',
+        model: this.modelName,
+        inputPrompt: prompt,
+        outputResponse: text,
+        parsedResult: result as unknown as Record<string, unknown>,
+        metadata: {
+          sessionId: context?.sessionId,
+          personaId: persona.id,
+          personaName: persona.name,
+          contentPreview: content.substring(0, 200),
+        },
+        status: 'success',
+        responseTimeMs: Date.now() - startTime,
+      });
+
+      return result;
     } catch (error) {
+      const responseTimeMs = Date.now() - startTime;
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+
+      await this.aiLogService.log({
+        userId: context?.userId,
+        operationType: 'feedback',
+        model: this.modelName,
+        inputPrompt: prompt,
+        metadata: {
+          sessionId: context?.sessionId,
+          personaId: persona.id,
+          personaName: persona.name,
+          contentPreview: content.substring(0, 200),
+        },
+        status: 'error',
+        errorMessage,
+        responseTimeMs,
+      });
+
       console.error('Gemini API error:', error);
       throw new Error('AI 서비스에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.');
     }
   }
 
-  async generateSummary(content: string, results: FeedbackResult[]): Promise<string> {
+  async generateSummary(content: string, results: FeedbackResult[], context?: AICallContext): Promise<string> {
+    const startTime = Date.now();
     const feedbackSummaries = results.map((r) => ({
       persona: r.persona?.name || 'Unknown',
       sentiment: r.sentiment,
@@ -146,14 +191,50 @@ ${JSON.stringify(feedbackSummaries, null, 2)}
       );
 
       const text = response.data.candidates?.[0]?.content?.parts?.[0]?.text;
-      return text || '요약을 생성할 수 없습니다.';
+      const summary = text || '요약을 생성할 수 없습니다.';
+
+      await this.aiLogService.log({
+        userId: context?.userId,
+        operationType: 'summary',
+        model: this.modelName,
+        inputPrompt: prompt,
+        outputResponse: text,
+        metadata: {
+          sessionId: context?.sessionId,
+          resultCount: results.length,
+          contentPreview: content.substring(0, 200),
+        },
+        status: 'success',
+        responseTimeMs: Date.now() - startTime,
+      });
+
+      return summary;
     } catch (error) {
+      const responseTimeMs = Date.now() - startTime;
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+
+      await this.aiLogService.log({
+        userId: context?.userId,
+        operationType: 'summary',
+        model: this.modelName,
+        inputPrompt: prompt,
+        metadata: {
+          sessionId: context?.sessionId,
+          resultCount: results.length,
+          contentPreview: content.substring(0, 200),
+        },
+        status: 'error',
+        errorMessage,
+        responseTimeMs,
+      });
+
       console.error('Gemini API error:', error);
       throw new Error('AI 서비스에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.');
     }
   }
 
-  async generatePersonas(ageGroups: AgeGroup[], count: number): Promise<PersonaData[]> {
+  async generatePersonas(ageGroups: AgeGroup[], count: number, context?: AICallContext): Promise<PersonaData[]> {
+    const startTime = Date.now();
     const ageGroupKorean: Record<AgeGroup, string> = {
       '10s': '10대',
       '20s': '20대',
@@ -240,7 +321,7 @@ JSON 배열 형식으로만 응답해주세요.
       const parsed = JSON.parse(jsonMatch[0]);
 
       const validAgeGroups: AgeGroup[] = ['10s', '20s', '30s', '40s', '50s', '60+'];
-      return parsed.map((item: Record<string, unknown>, index: number) => ({
+      const result = parsed.map((item: Record<string, unknown>, index: number) => ({
         name: (item.name as string) || '무명',
         ageGroup: validAgeGroups.includes(item.ageGroup as AgeGroup) ? (item.ageGroup as AgeGroup) : ageGroups[index % ageGroups.length],
         gender: item.gender === 'male' || item.gender === 'female' ? item.gender : undefined,
@@ -254,7 +335,42 @@ JSON 배열 형식으로만 응답해주세요.
         weaknesses: Array.isArray(item.weaknesses) ? item.weaknesses : [],
         description: item.description as string,
       }));
+
+      await this.aiLogService.log({
+        userId: context?.userId,
+        operationType: 'persona_generation',
+        model: this.modelName,
+        inputPrompt: prompt,
+        outputResponse: text,
+        parsedResult: { personas: result },
+        metadata: {
+          ageGroups,
+          requestedCount: count,
+          generatedCount: result.length,
+        },
+        status: 'success',
+        responseTimeMs: Date.now() - startTime,
+      });
+
+      return result;
     } catch (error) {
+      const responseTimeMs = Date.now() - startTime;
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+
+      await this.aiLogService.log({
+        userId: context?.userId,
+        operationType: 'persona_generation',
+        model: this.modelName,
+        inputPrompt: prompt,
+        metadata: {
+          ageGroups,
+          requestedCount: count,
+        },
+        status: 'error',
+        errorMessage,
+        responseTimeMs,
+      });
+
       console.error('Gemini API error:', error);
       throw new Error('AI 서비스에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.');
     }

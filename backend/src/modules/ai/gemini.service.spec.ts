@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { GeminiService } from './gemini.service';
+import { AiLogService } from './ai-log.service';
 import { Persona } from '../personas/entities/persona.entity';
 
 // Mock axios
@@ -10,6 +11,7 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('GeminiService', () => {
   let service: GeminiService;
+  let mockAiLogService: jest.Mocked<AiLogService>;
 
   const mockPersona: Partial<Persona> = {
     id: 'persona-uuid',
@@ -21,6 +23,10 @@ describe('GeminiService', () => {
   };
 
   beforeEach(async () => {
+    mockAiLogService = {
+      log: jest.fn().mockResolvedValue({}),
+    } as unknown as jest.Mocked<AiLogService>;
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         GeminiService,
@@ -29,6 +35,10 @@ describe('GeminiService', () => {
           useValue: {
             get: jest.fn().mockReturnValue('test-api-key'),
           },
+        },
+        {
+          provide: AiLogService,
+          useValue: mockAiLogService,
         },
       ],
     }).compile();
@@ -77,16 +87,54 @@ describe('GeminiService', () => {
       expect(result.score).toBe(4.5);
     });
 
-    it('should return mock response on API error', async () => {
+    it('should throw error and log on API failure', async () => {
       mockedAxios.post.mockRejectedValue(new Error('API Error'));
 
-      const result = await service.generateFeedback(
-        '새로운 앱 아이디어입니다',
-        mockPersona as Persona,
-      );
+      await expect(
+        service.generateFeedback('새로운 앱 아이디어입니다', mockPersona as Persona),
+      ).rejects.toThrow('AI 서비스에 일시적인 문제가 발생했습니다');
 
-      expect(result.feedbackText).toContain(mockPersona.name);
-      expect(result.sentiment).toBe('neutral');
+      expect(mockAiLogService.log).toHaveBeenCalledWith(
+        expect.objectContaining({
+          operationType: 'feedback',
+          status: 'error',
+        }),
+      );
+    });
+
+    it('should log successful feedback generation', async () => {
+      const mockResponse = {
+        data: {
+          candidates: [
+            {
+              content: {
+                parts: [
+                  {
+                    text: JSON.stringify({
+                      feedbackText: '좋은 아이디어입니다',
+                      sentiment: 'positive',
+                      purchaseIntent: 'high',
+                      keyPoints: ['혁신적', '실용적'],
+                      score: 4.5,
+                    }),
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      };
+
+      mockedAxios.post.mockResolvedValue(mockResponse);
+
+      await service.generateFeedback('새로운 앱 아이디어입니다', mockPersona as Persona);
+
+      expect(mockAiLogService.log).toHaveBeenCalledWith(
+        expect.objectContaining({
+          operationType: 'feedback',
+          status: 'success',
+        }),
+      );
     });
   });
 
@@ -124,7 +172,7 @@ describe('GeminiService', () => {
       expect(result).toBe('종합 분석 결과입니다.');
     });
 
-    it('should return mock summary on API error', async () => {
+    it('should throw error and log on API failure', async () => {
       mockedAxios.post.mockRejectedValue(new Error('API Error'));
 
       const mockResults = [
@@ -137,12 +185,16 @@ describe('GeminiService', () => {
         },
       ];
 
-      const result = await service.generateSummary(
-        '콘텐츠 내용',
-        mockResults as any,
+      await expect(service.generateSummary('콘텐츠 내용', mockResults as any)).rejects.toThrow(
+        'AI 서비스에 일시적인 문제가 발생했습니다',
       );
 
-      expect(result).toContain('종합 분석 요약');
+      expect(mockAiLogService.log).toHaveBeenCalledWith(
+        expect.objectContaining({
+          operationType: 'summary',
+          status: 'error',
+        }),
+      );
     });
   });
 });
