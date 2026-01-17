@@ -10,6 +10,10 @@ interface FileUploadProps {
 
 type InputMode = 'text' | 'file' | 'url';
 
+// TODO: 파일/URL 기능 안정화 후 활성화
+// 활성화하려면 해당 모드를 배열에 추가: ['text', 'file', 'url']
+const ENABLED_MODES: InputMode[] = ['text'];
+
 export const FileUpload: React.FC<FileUploadProps> = ({ onContentReady }) => {
   const { t } = useTranslation('feedback');
   const [mode, setMode] = useState<InputMode>('text');
@@ -79,7 +83,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onContentReady }) => {
   return (
     <div className="space-y-6">
       <div className="flex gap-2">
-        {(['text', 'file', 'url'] as InputMode[]).map((m) => (
+        {ENABLED_MODES.map((m) => (
           <button
             key={m}
             onClick={() => setMode(m)}
