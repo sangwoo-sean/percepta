@@ -111,8 +111,8 @@ export class FeedbackService {
         );
 
         const result = this.resultsRepository.create({
-          sessionId,
-          personaId,
+          session,
+          persona,
           feedbackText: aiResponse.feedbackText,
           sentiment: aiResponse.sentiment,
           purchaseIntent: aiResponse.purchaseIntent,
