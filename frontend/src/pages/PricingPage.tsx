@@ -127,9 +127,9 @@ export const PricingPage: React.FC = () => {
       </Card>
 
       {/* Payment Info */}
-      <p className="text-center text-sm text-gray-400">
+      <div className="text-center text-sm text-gray-500 bg-gray-50 rounded-lg py-3">
         {t('payment.info')}
-      </p>
+      </div>
     </div>
   );
 };
