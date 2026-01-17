@@ -8,7 +8,7 @@ import { AIProvider, AIFeedbackResponse } from './ai-provider.interface';
 @Injectable()
 export class GeminiService implements AIProvider {
   private apiKey: string;
-  private apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+  private apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent';
 
   constructor(private configService: ConfigService) {
     this.apiKey = this.configService.get<string>('GEMINI_API_KEY', '');
@@ -25,10 +25,7 @@ ${persona.description ? `- 추가 설명: ${persona.description}` : ''}
 이 페르소나의 관점에서 주어진 콘텐츠에 대한 피드백을 제공해주세요.`;
   }
 
-  async generateFeedback(
-    content: string,
-    persona: Persona,
-  ): Promise<AIFeedbackResponse> {
+  async generateFeedback(content: string, persona: Persona): Promise<AIFeedbackResponse> {
     const personaPrompt = this.buildPersonaPrompt(persona);
 
     const prompt = `${personaPrompt}
@@ -70,7 +67,7 @@ JSON만 출력하고 다른 텍스트는 포함하지 마세요.`;
           headers: {
             'Content-Type': 'application/json',
           },
-        },
+        }
       );
 
       const text = response.data.candidates?.[0]?.content?.parts?.[0]?.text;
@@ -99,10 +96,7 @@ JSON만 출력하고 다른 텍스트는 포함하지 마세요.`;
     }
   }
 
-  async generateSummary(
-    content: string,
-    results: FeedbackResult[],
-  ): Promise<string> {
+  async generateSummary(content: string, results: FeedbackResult[]): Promise<string> {
     const feedbackSummaries = results.map((r) => ({
       persona: r.persona?.name || 'Unknown',
       sentiment: r.sentiment,
@@ -148,7 +142,7 @@ ${JSON.stringify(feedbackSummaries, null, 2)}
           headers: {
             'Content-Type': 'application/json',
           },
-        },
+        }
       );
 
       const text = response.data.candidates?.[0]?.content?.parts?.[0]?.text;
@@ -229,7 +223,7 @@ JSON 배열 형식으로만 응답해주세요.
           headers: {
             'Content-Type': 'application/json',
           },
-        },
+        }
       );
 
       const text = response.data.candidates?.[0]?.content?.parts?.[0]?.text;
@@ -247,12 +241,10 @@ JSON 배열 형식으로만 응답해주세요.
 
       const validAgeGroups: AgeGroup[] = ['10s', '20s', '30s', '40s', '50s', '60+'];
       return parsed.map((item: Record<string, unknown>, index: number) => ({
-        name: item.name as string || '무명',
-        ageGroup: validAgeGroups.includes(item.ageGroup as AgeGroup)
-          ? (item.ageGroup as AgeGroup)
-          : ageGroups[index % ageGroups.length],
-        gender: (item.gender === 'male' || item.gender === 'female') ? item.gender : undefined,
-        occupation: item.occupation as string || '직장인',
+        name: (item.name as string) || '무명',
+        ageGroup: validAgeGroups.includes(item.ageGroup as AgeGroup) ? (item.ageGroup as AgeGroup) : ageGroups[index % ageGroups.length],
+        gender: item.gender === 'male' || item.gender === 'female' ? item.gender : undefined,
+        occupation: (item.occupation as string) || '직장인',
         location: item.location as string,
         education: item.education as string,
         incomeLevel: item.incomeLevel as string,
@@ -313,8 +305,6 @@ JSON 배열 형식으로만 응답해주세요.
 
   private validatePurchaseIntent(value: string): PurchaseIntent {
     const valid: PurchaseIntent[] = ['high', 'medium', 'low', 'none'];
-    return valid.includes(value as PurchaseIntent)
-      ? (value as PurchaseIntent)
-      : 'medium';
+    return valid.includes(value as PurchaseIntent) ? (value as PurchaseIntent) : 'medium';
   }
 }
