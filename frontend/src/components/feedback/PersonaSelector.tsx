@@ -2,10 +2,11 @@ import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch } from '../../hooks/useAppDispatch';
+import { usePersonaFilter } from '../../hooks/usePersonaFilter';
 import { fetchPersonas } from '../../store/personaSlice';
 import type { RootState } from '../../store';
 import { PersonaCard } from '../persona/PersonaCard';
-import { Button } from '../common';
+import { Button, PersonaFilter } from '../common';
 
 interface PersonaSelectorProps {
   selectedIds: string[];
@@ -24,6 +25,14 @@ export const PersonaSelector: React.FC<PersonaSelectorProps> = ({
   const { personas, isLoading } = useSelector((state: RootState) => state.persona);
   const { user } = useSelector((state: RootState) => state.auth);
   const { t } = useTranslation('feedback');
+  const {
+    filter,
+    setAgeGroups,
+    setGenders,
+    resetFilter,
+    filteredPersonas,
+    hasActiveFilter,
+  } = usePersonaFilter(personas);
 
   useEffect(() => {
     dispatch(fetchPersonas());
@@ -38,13 +47,18 @@ export const PersonaSelector: React.FC<PersonaSelectorProps> = ({
   };
 
   const maxSelectByCredits = Math.floor((user?.credits || 0) / creditsPerPersona);
-  const selectableCount = Math.min(maxSelectByCredits, personas.length);
+  const selectableCount = Math.min(maxSelectByCredits, filteredPersonas.length);
 
   const handleSelectAll = () => {
-    if (selectedIds.length === selectableCount) {
-      onSelectionChange([]);
+    const filteredSelectedIds = selectedIds.filter((id) =>
+      filteredPersonas.some((p) => p.id === id)
+    );
+    if (filteredSelectedIds.length === selectableCount) {
+      onSelectionChange(selectedIds.filter((id) => !filteredPersonas.some((p) => p.id === id)));
     } else {
-      onSelectionChange(personas.slice(0, selectableCount).map((p) => p.id));
+      const newIds = filteredPersonas.slice(0, selectableCount).map((p) => p.id);
+      const otherSelectedIds = selectedIds.filter((id) => !filteredPersonas.some((p) => p.id === id));
+      onSelectionChange([...otherSelectedIds, ...newIds]);
     }
   };
 
@@ -72,6 +86,10 @@ export const PersonaSelector: React.FC<PersonaSelectorProps> = ({
     );
   }
 
+  const filteredSelectedCount = selectedIds.filter((id) =>
+    filteredPersonas.some((p) => p.id === id)
+  ).length;
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -85,22 +103,30 @@ export const PersonaSelector: React.FC<PersonaSelectorProps> = ({
           onClick={handleSelectAll}
           className="text-sm text-primary-600 hover:text-primary-700"
         >
-          {selectedIds.length === selectableCount
+          {filteredSelectedCount === selectableCount
             ? t('selector.deselectAll')
-            : selectableCount < personas.length
-              ? t('selector.selectAllLimited', { available: selectableCount, total: personas.length })
+            : selectableCount < filteredPersonas.length
+              ? t('selector.selectAllLimited', { available: selectableCount, total: filteredPersonas.length })
               : t('selector.selectAll')}
         </button>
       </div>
 
-      {selectedIds.length >= selectableCount && selectableCount < personas.length && (
+      <PersonaFilter
+        filter={filter}
+        onAgeGroupsChange={setAgeGroups}
+        onGendersChange={setGenders}
+        onReset={resetFilter}
+        hasActiveFilter={hasActiveFilter}
+      />
+
+      {filteredSelectedCount >= selectableCount && selectableCount < filteredPersonas.length && (
         <div className="bg-amber-50 text-amber-700 px-4 py-2 rounded-lg text-sm">
           {t('selector.creditLimitWarning', { count: user?.credits || 0 })}
         </div>
       )}
 
       <div className="flex flex-col gap-4">
-        {personas.map((persona) => (
+        {filteredPersonas.map((persona) => (
           <PersonaCard
             key={persona.id}
             persona={persona}

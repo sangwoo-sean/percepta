@@ -6,3 +6,4 @@ export { Select } from './Select';
 export { LanguageSwitcher } from './LanguageSwitcher';
 export { RangeSlider } from './RangeSlider';
 export { TagInput } from './TagInput';
+export { PersonaFilter } from './PersonaFilter';

@@ -32,6 +32,11 @@
     "createButton": "Create Your First Persona"
   },
   "deleteConfirm": "Are you sure you want to delete this persona?",
+  "filter": {
+    "ageGroup": "Age Group",
+    "gender": "Gender",
+    "reset": "Reset Filter"
+  },
   "batchForm": {
     "title": "AI Persona Generation",
     "description": "AI will automatically generate diverse personas matching the selected age group. Names, occupations, and personality traits will be auto-generated.",

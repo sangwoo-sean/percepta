@@ -153,3 +153,8 @@ export interface CreditTransaction {
   metadata: Record<string, unknown>;
   createdAt: string;
 }
+
+export interface PersonaFilterState {
+  ageGroups: AgeGroup[];
+  genders: Gender[];
+}

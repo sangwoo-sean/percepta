@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch } from '../hooks/useAppDispatch';
+import { usePersonaFilter } from '../hooks/usePersonaFilter';
 import {
   fetchPersonas,
   createPersona,
@@ -12,7 +13,7 @@ import {
 } from '../store/personaSlice';
 import type { RootState } from '../store';
 import type { CreatePersonaDto, UpdatePersonaDto, GeneratePersonasDto, Persona } from '../types';
-import { Card, Button, Modal } from '../components/common';
+import { Card, Button, Modal, PersonaFilter } from '../components/common';
 import {
   PersonaCard,
   PersonaForm,
@@ -22,6 +23,14 @@ import {
 export const PersonasPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const { personas, stats, isLoading } = useSelector((state: RootState) => state.persona);
+  const {
+    filter,
+    setAgeGroups,
+    setGenders,
+    resetFilter,
+    filteredPersonas,
+    hasActiveFilter,
+  } = usePersonaFilter(personas);
   const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
   const [isBatchModalOpen, setIsBatchModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -165,6 +174,16 @@ export const PersonasPage: React.FC = () => {
         </div>
       )}
 
+      {personas.length > 0 && (
+        <PersonaFilter
+          filter={filter}
+          onAgeGroupsChange={setAgeGroups}
+          onGendersChange={setGenders}
+          onReset={resetFilter}
+          hasActiveFilter={hasActiveFilter}
+        />
+      )}
+
       {isLoading ? (
         <div className="flex justify-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600" />
@@ -199,7 +218,7 @@ export const PersonasPage: React.FC = () => {
         </Card>
       ) : (
         <div className="flex flex-col gap-4">
-          {personas.map((persona) => (
+          {filteredPersonas.map((persona) => (
             <PersonaCard key={persona.id} persona={persona} onEdit={handleEdit} onDelete={handleDelete} />
           ))}
         </div>

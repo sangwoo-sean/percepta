@@ -32,6 +32,11 @@
     "createButton": "첫 번째 페르소나 만들기"
   },
   "deleteConfirm": "이 페르소나를 삭제하시겠습니까?",
+  "filter": {
+    "ageGroup": "연령대",
+    "gender": "성별",
+    "reset": "필터 초기화"
+  },
   "batchForm": {
     "title": "AI 페르소나 생성",
     "description": "AI가 선택한 연령대에 맞는 다양한 페르소나를 자동으로 생성합니다. 이름, 직업, 성격 특성 등이 자동으로 설정됩니다.",
