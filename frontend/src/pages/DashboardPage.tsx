@@ -86,8 +86,8 @@ export const DashboardPage: React.FC = () => {
             title={t('quickActions.title')}
             subtitle={t('quickActions.subtitle')}
           />
-          <div className="space-y-3">
-            <Link to="/feedback/new">
+          <div className="flex flex-col gap-4">
+            <Link to="/feedback/new" className="block">
               <Button className="w-full">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -95,7 +95,7 @@ export const DashboardPage: React.FC = () => {
                 {t('quickActions.newSession')}
               </Button>
             </Link>
-            <Link to="/personas">
+            <Link to="/personas" className="block">
               <Button variant="outline" className="w-full">
                 {t('quickActions.managePersonas')}
               </Button>

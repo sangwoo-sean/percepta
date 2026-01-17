@@ -68,7 +68,7 @@ export const FeedbackHistoryPage: React.FC = () => {
           </Link>
         </Card>
       ) : (
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           {sessions.map((session) => {
             const avgScore = session.results?.length
               ? session.results.reduce((sum, r) => sum + Number(r.score), 0) /
@@ -76,8 +76,8 @@ export const FeedbackHistoryPage: React.FC = () => {
               : null;
 
             return (
-              <Link key={session.id} to={`/feedback/${session.id}`}>
-                <Card className="hover:shadow-lg transition-shadow">
+              <Link key={session.id} to={`/feedback/${session.id}`} className="block">
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
