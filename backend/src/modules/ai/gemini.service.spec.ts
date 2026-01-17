@@ -4,10 +4,15 @@ import { GeminiService } from './gemini.service';
 import { AiLogService } from './ai-log.service';
 import { Persona } from '../personas/entities/persona.entity';
 
-// Mock axios
-jest.mock('axios');
-import axios from 'axios';
-const mockedAxios = axios as jest.Mocked<typeof axios>;
+// Mock @google/genai
+const mockGenerateContent = jest.fn();
+jest.mock('@google/genai', () => ({
+  GoogleGenAI: jest.fn().mockImplementation(() => ({
+    models: {
+      generateContent: mockGenerateContent,
+    },
+  })),
+}));
 
 describe('GeminiService', () => {
   let service: GeminiService;
@@ -23,6 +28,7 @@ describe('GeminiService', () => {
   };
 
   beforeEach(async () => {
+    mockGenerateContent.mockClear();
     mockAiLogService = {
       log: jest.fn().mockResolvedValue({}),
     } as unknown as jest.Mocked<AiLogService>;
@@ -53,28 +59,16 @@ describe('GeminiService', () => {
   describe('generateFeedback', () => {
     it('should generate feedback from Gemini API', async () => {
       const mockResponse = {
-        data: {
-          candidates: [
-            {
-              content: {
-                parts: [
-                  {
-                    text: JSON.stringify({
-                      feedbackText: '좋은 아이디어입니다',
-                      sentiment: 'positive',
-                      purchaseIntent: 'high',
-                      keyPoints: ['혁신적', '실용적'],
-                      score: 4.5,
-                    }),
-                  },
-                ],
-              },
-            },
-          ],
-        },
+        text: JSON.stringify({
+          feedbackText: '좋은 아이디어입니다',
+          sentiment: 'positive',
+          purchaseIntent: 'high',
+          keyPoints: ['혁신적', '실용적'],
+          score: 4.5,
+        }),
       };
 
-      mockedAxios.post.mockResolvedValue(mockResponse);
+      mockGenerateContent.mockResolvedValue(mockResponse);
 
       const result = await service.generateFeedback(
         '새로운 앱 아이디어입니다',
@@ -88,7 +82,7 @@ describe('GeminiService', () => {
     });
 
     it('should throw error and log on API failure', async () => {
-      mockedAxios.post.mockRejectedValue(new Error('API Error'));
+      mockGenerateContent.mockRejectedValue(new Error('API Error'));
 
       await expect(
         service.generateFeedback('새로운 앱 아이디어입니다', mockPersona as Persona),
@@ -104,28 +98,16 @@ describe('GeminiService', () => {
 
     it('should log successful feedback generation', async () => {
       const mockResponse = {
-        data: {
-          candidates: [
-            {
-              content: {
-                parts: [
-                  {
-                    text: JSON.stringify({
-                      feedbackText: '좋은 아이디어입니다',
-                      sentiment: 'positive',
-                      purchaseIntent: 'high',
-                      keyPoints: ['혁신적', '실용적'],
-                      score: 4.5,
-                    }),
-                  },
-                ],
-              },
-            },
-          ],
-        },
+        text: JSON.stringify({
+          feedbackText: '좋은 아이디어입니다',
+          sentiment: 'positive',
+          purchaseIntent: 'high',
+          keyPoints: ['혁신적', '실용적'],
+          score: 4.5,
+        }),
       };
 
-      mockedAxios.post.mockResolvedValue(mockResponse);
+      mockGenerateContent.mockResolvedValue(mockResponse);
 
       await service.generateFeedback('새로운 앱 아이디어입니다', mockPersona as Persona);
 
@@ -141,18 +123,10 @@ describe('GeminiService', () => {
   describe('generateSummary', () => {
     it('should generate summary from Gemini API', async () => {
       const mockResponse = {
-        data: {
-          candidates: [
-            {
-              content: {
-                parts: [{ text: '종합 분석 결과입니다.' }],
-              },
-            },
-          ],
-        },
+        text: '종합 분석 결과입니다.',
       };
 
-      mockedAxios.post.mockResolvedValue(mockResponse);
+      mockGenerateContent.mockResolvedValue(mockResponse);
 
       const mockResults = [
         {
@@ -173,7 +147,7 @@ describe('GeminiService', () => {
     });
 
     it('should throw error and log on API failure', async () => {
-      mockedAxios.post.mockRejectedValue(new Error('API Error'));
+      mockGenerateContent.mockRejectedValue(new Error('API Error'));
 
       const mockResults = [
         {
@@ -193,6 +167,79 @@ describe('GeminiService', () => {
         expect.objectContaining({
           operationType: 'summary',
           status: 'error',
+        }),
+      );
+    });
+  });
+
+  describe('generatePersonas', () => {
+    it('should generate personas from Gemini API', async () => {
+      const mockResponse = {
+        text: JSON.stringify([
+          {
+            name: '김민준',
+            ageGroup: '20s',
+            gender: 'male',
+            occupation: '소프트웨어 개발자',
+            location: '서울시 강남구',
+            education: '대학교 졸업',
+            incomeLevel: '중상',
+            personalityTraits: ['분석적', '트렌디한', '실용적'],
+            dailyPattern: '평일에는 IT 기업에서 근무합니다.',
+            strengths: ['기술에 대한 이해도가 높음'],
+            weaknesses: ['충동구매 경향'],
+            description: '최신 기술에 관심이 많습니다.',
+          },
+        ]),
+      };
+
+      mockGenerateContent.mockResolvedValue(mockResponse);
+
+      const result = await service.generatePersonas(['20s', '30s'], 1);
+
+      expect(result).toHaveLength(1);
+      expect(result[0].name).toBe('김민준');
+      expect(result[0].ageGroup).toBe('20s');
+      expect(result[0].occupation).toBe('소프트웨어 개발자');
+    });
+
+    it('should throw error and log on API failure', async () => {
+      mockGenerateContent.mockRejectedValue(new Error('API Error'));
+
+      await expect(service.generatePersonas(['20s'], 1)).rejects.toThrow(
+        'AI 서비스에 일시적인 문제가 발생했습니다',
+      );
+
+      expect(mockAiLogService.log).toHaveBeenCalledWith(
+        expect.objectContaining({
+          operationType: 'persona_generation',
+          status: 'error',
+        }),
+      );
+    });
+
+    it('should log successful persona generation', async () => {
+      const mockResponse = {
+        text: JSON.stringify([
+          {
+            name: '김민준',
+            ageGroup: '20s',
+            gender: 'male',
+            occupation: '소프트웨어 개발자',
+            personalityTraits: ['분석적'],
+            description: '테스트 페르소나',
+          },
+        ]),
+      };
+
+      mockGenerateContent.mockResolvedValue(mockResponse);
+
+      await service.generatePersonas(['20s'], 1);
+
+      expect(mockAiLogService.log).toHaveBeenCalledWith(
+        expect.objectContaining({
+          operationType: 'persona_generation',
+          status: 'success',
         }),
       );
     });

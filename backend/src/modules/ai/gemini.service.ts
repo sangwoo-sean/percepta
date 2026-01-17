@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import axios from 'axios';
+import { GoogleGenAI } from '@google/genai';
 import { Persona, PersonaData, AgeGroup } from '../personas/entities/persona.entity';
 import { FeedbackResult, Sentiment, PurchaseIntent } from '../feedback/entities/feedback-result.entity';
 import { AIProvider, AIFeedbackResponse, AICallContext } from './ai-provider.interface';
@@ -8,15 +8,15 @@ import { AiLogService } from './ai-log.service';
 
 @Injectable()
 export class GeminiService implements AIProvider {
-  private apiKey: string;
-  private apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent';
+  private ai: GoogleGenAI;
   private modelName = 'gemini-3-flash-preview';
 
   constructor(
     private configService: ConfigService,
     private aiLogService: AiLogService,
   ) {
-    this.apiKey = this.configService.get<string>('GEMINI_API_KEY', '');
+    const apiKey = this.configService.get<string>('GEMINI_API_KEY', '');
+    this.ai = new GoogleGenAI({ apiKey });
   }
 
   private buildPersonaPrompt(persona: Persona): string {
@@ -54,29 +54,18 @@ ${content}
 JSON만 출력하고 다른 텍스트는 포함하지 마세요.`;
 
     try {
-      const response = await axios.post(
-        `${this.apiUrl}?key=${this.apiKey}`,
-        {
-          contents: [
-            {
-              parts: [{ text: prompt }],
-            },
-          ],
-          generationConfig: {
-            temperature: 0.7,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 1024,
-          },
+      const response = await this.ai.models.generateContent({
+        model: this.modelName,
+        contents: prompt,
+        config: {
+          temperature: 0.7,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 1024,
         },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      });
 
-      const text = response.data.candidates?.[0]?.content?.parts?.[0]?.text;
+      const text = response.text;
       if (!text) {
         throw new Error('No response from Gemini API');
       }
@@ -168,29 +157,18 @@ ${JSON.stringify(feedbackSummaries, null, 2)}
 500-800자 내외로 작성해주세요.`;
 
     try {
-      const response = await axios.post(
-        `${this.apiUrl}?key=${this.apiKey}`,
-        {
-          contents: [
-            {
-              parts: [{ text: prompt }],
-            },
-          ],
-          generationConfig: {
-            temperature: 0.7,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 1024,
-          },
+      const response = await this.ai.models.generateContent({
+        model: this.modelName,
+        contents: prompt,
+        config: {
+          temperature: 0.7,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 1024,
         },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      });
 
-      const text = response.data.candidates?.[0]?.content?.parts?.[0]?.text;
+      const text = response.text;
       const summary = text || '요약을 생성할 수 없습니다.';
 
       await this.aiLogService.log({
@@ -285,29 +263,18 @@ JSON 배열 형식으로만 응답해주세요.
 ]`;
 
     try {
-      const response = await axios.post(
-        `${this.apiUrl}?key=${this.apiKey}`,
-        {
-          contents: [
-            {
-              parts: [{ text: prompt }],
-            },
-          ],
-          generationConfig: {
-            temperature: 0.9,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 4096,
-          },
+      const response = await this.ai.models.generateContent({
+        model: this.modelName,
+        contents: prompt,
+        config: {
+          temperature: 0.9,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 4096,
         },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      });
 
-      const text = response.data.candidates?.[0]?.content?.parts?.[0]?.text;
+      const text = response.text;
       if (!text) {
         throw new Error('No response from Gemini API');
       }
@@ -374,44 +341,6 @@ JSON 배열 형식으로만 응답해주세요.
       console.error('Gemini API error:', error);
       throw new Error('AI 서비스에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.');
     }
-  }
-
-  private generateMockPersonas(ageGroups: AgeGroup[], count: number): PersonaData[] {
-    const mockNames = {
-      male: ['김민준', '이서준', '박도윤', '최예준', '정시우', '강하준', '조주원', '윤지호'],
-      female: ['김서연', '이서윤', '박지우', '최서현', '정민서', '강하은', '조하윤', '윤윤서'],
-    };
-
-    const mockOccupations: Record<AgeGroup, string[]> = {
-      '10s': ['고등학생', '대학생', '수험생'],
-      '20s': ['대학생', '취업준비생', '사무직', '개발자', '디자이너'],
-      '30s': ['회사원', '프리랜서', '스타트업 대표', '전문직'],
-      '40s': ['중간관리자', '자영업자', '전문직', '주부'],
-      '50s': ['임원', '자영업자', '공무원', '전문직'],
-      '60+': ['은퇴자', '자영업자', '시간제 근로자'],
-    };
-
-    const mockTraits = ['분석적', '창의적', '사교적', '실용적', '트렌디한', '꼼꼼한', '검소한'];
-
-    return Array.from({ length: count }, (_, i) => {
-      const gender = i % 2 === 0 ? 'male' : 'female';
-      const names = mockNames[gender];
-      const ageGroup = ageGroups[i % ageGroups.length];
-      return {
-        name: names[i % names.length],
-        ageGroup,
-        gender,
-        occupation: mockOccupations[ageGroup][i % mockOccupations[ageGroup].length],
-        location: '서울시 강남구',
-        education: '대학교 졸업',
-        incomeLevel: '중',
-        personalityTraits: mockTraits.slice(0, 3 + (i % 2)),
-        dailyPattern: '평일에는 업무에 집중하고, 주말에는 취미 활동을 즐깁니다.',
-        strengths: ['빠른 적응력', '논리적 사고', '커뮤니케이션 능력'],
-        weaknesses: ['충동구매 경향', '스트레스 관리 어려움'],
-        description: '품질 좋은 제품에 관심이 많으며, SNS를 통해 트렌드를 파악합니다.',
-      };
-    });
   }
 
   private validateSentiment(value: string): Sentiment {
