@@ -71,7 +71,12 @@
     "newFeedback": "New Feedback",
     "viewSource": "View original source",
     "individualFeedback": "Individual Feedback ({{count}})",
-    "noResults": "No feedback results yet."
+    "noResults": "No feedback results yet.",
+    "failed": {
+      "title": "Feedback Generation Failed",
+      "description": "We couldn't generate feedback due to a temporary issue with the AI service.",
+      "retry": "Try Again"
+    }
   },
   "history": {
     "title": "Feedback History",

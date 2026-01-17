@@ -71,7 +71,12 @@
     "newFeedback": "새 피드백",
     "viewSource": "원본 보기",
     "individualFeedback": "개별 피드백 ({{count}}개)",
-    "noResults": "아직 피드백 결과가 없습니다."
+    "noResults": "아직 피드백 결과가 없습니다.",
+    "failed": {
+      "title": "피드백 생성 실패",
+      "description": "AI 서비스에 일시적인 문제가 발생하여 피드백을 생성하지 못했습니다.",
+      "retry": "다시 시도"
+    }
   },
   "history": {
     "title": "피드백 히스토리",

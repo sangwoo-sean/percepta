@@ -95,15 +95,7 @@ JSON만 출력하고 다른 텍스트는 포함하지 마세요.`;
       };
     } catch (error) {
       console.error('Gemini API error:', error);
-
-      // Return mock response for development/testing
-      return {
-        feedbackText: `[${persona.name}의 피드백] 이 콘텐츠에 대해 ${persona.ageGroup} ${persona.occupation}의 관점에서 평가하자면, 전반적으로 흥미로운 아이디어입니다. ${persona.personalityTraits.join(', ')}한 성향을 고려했을 때, 실용성과 접근성 측면에서 개선의 여지가 있어 보입니다.`,
-        sentiment: 'neutral',
-        purchaseIntent: 'medium',
-        keyPoints: ['흥미로운 아이디어', '실용성 개선 필요', '타겟 고객 명확화 필요'],
-        score: 3.5,
-      };
+      throw new Error('AI 서비스에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.');
     }
   }
 
@@ -163,30 +155,7 @@ ${JSON.stringify(feedbackSummaries, null, 2)}
       return text || '요약을 생성할 수 없습니다.';
     } catch (error) {
       console.error('Gemini API error:', error);
-
-      // Return mock summary for development
-      const avgScore = results.reduce((sum, r) => sum + Number(r.score), 0) / results.length;
-      const sentiments = results.map((r) => r.sentiment);
-      const positiveCount = sentiments.filter((s) => s === 'positive').length;
-
-      return `## 종합 분석 요약
-
-### 전반적인 평가
-총 ${results.length}명의 페르소나로부터 피드백을 수집했습니다. 평균 점수는 ${avgScore.toFixed(1)}점이며, ${positiveCount}명이 긍정적인 반응을 보였습니다.
-
-### 긍정적 요소
-- 혁신적인 아이디어
-- 시장 니즈에 대한 이해
-
-### 개선 필요 사항
-- 타겟 고객 명확화
-- 가격 정책 재검토
-
-### 추천 타겟 고객층
-20-30대 얼리어답터
-
-### 다음 단계 제안
-프로토타입 제작 및 소규모 테스트 그룹 피드백 수집을 권장합니다.`;
+      throw new Error('AI 서비스에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.');
     }
   }
 
@@ -295,9 +264,7 @@ JSON 배열 형식으로만 응답해주세요.
       }));
     } catch (error) {
       console.error('Gemini API error:', error);
-
-      // Return mock personas for development
-      return this.generateMockPersonas(ageGroups, count);
+      throw new Error('AI 서비스에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.');
     }
   }
 
