@@ -5,18 +5,24 @@ import { useAppDispatch } from '../hooks/useAppDispatch';
 import {
   fetchPersonas,
   createPersona,
+  batchCreatePersonas,
   deletePersona,
   fetchPersonaStats,
 } from '../store/personaSlice';
 import type { RootState } from '../store';
 import type { CreatePersonaDto } from '../types';
 import { Card, Button, Modal } from '../components/common';
-import { PersonaCard, PersonaCreateForm } from '../components/persona';
+import {
+  PersonaCard,
+  PersonaCreateForm,
+  PersonaBatchCreateForm,
+} from '../components/persona';
 
 export const PersonasPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const { personas, stats, isLoading } = useSelector((state: RootState) => state.persona);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
+  const [isBatchModalOpen, setIsBatchModalOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const { t } = useTranslation('persona');
 
@@ -29,7 +35,18 @@ export const PersonasPage: React.FC = () => {
     setIsCreating(true);
     try {
       await dispatch(createPersona(data)).unwrap();
-      setIsModalOpen(false);
+      setIsCustomModalOpen(false);
+      dispatch(fetchPersonaStats());
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  const handleBatchCreate = async (personas: CreatePersonaDto[]) => {
+    setIsCreating(true);
+    try {
+      await dispatch(batchCreatePersonas(personas)).unwrap();
+      setIsBatchModalOpen(false);
       dispatch(fetchPersonaStats());
     } finally {
       setIsCreating(false);
@@ -52,12 +69,40 @@ export const PersonasPage: React.FC = () => {
             {t('subtitle')}
           </p>
         </div>
-        <Button onClick={() => setIsModalOpen(true)}>
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          {t('createButton')}
-        </Button>
+        <div className="flex gap-3">
+          <Button onClick={() => setIsBatchModalOpen(true)}>
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+            </svg>
+            {t('quickGenerate')}
+          </Button>
+          <Button variant="secondary" onClick={() => setIsCustomModalOpen(true)}>
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            {t('createButton')}
+          </Button>
+        </div>
       </div>
 
       {stats && (
@@ -101,7 +146,14 @@ export const PersonasPage: React.FC = () => {
           <p className="text-gray-500 mb-4">
             {t('empty.description')}
           </p>
-          <Button onClick={() => setIsModalOpen(true)}>{t('empty.createButton')}</Button>
+          <div className="flex justify-center gap-3">
+            <Button onClick={() => setIsBatchModalOpen(true)}>
+              {t('quickGenerate')}
+            </Button>
+            <Button variant="secondary" onClick={() => setIsCustomModalOpen(true)}>
+              {t('empty.createButton')}
+            </Button>
+          </div>
         </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -112,8 +164,19 @@ export const PersonasPage: React.FC = () => {
       )}
 
       <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        isOpen={isBatchModalOpen}
+        onClose={() => setIsBatchModalOpen(false)}
+        title={t('batchForm.title')}
+      >
+        <PersonaBatchCreateForm
+          onSubmit={handleBatchCreate}
+          isLoading={isCreating}
+        />
+      </Modal>
+
+      <Modal
+        isOpen={isCustomModalOpen}
+        onClose={() => setIsCustomModalOpen(false)}
         title={t('form.title')}
         size="lg"
       >

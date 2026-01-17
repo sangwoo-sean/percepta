@@ -2,6 +2,7 @@
   "title": "Personas",
   "subtitle": "Manage your AI feedback personas",
   "createButton": "Create Persona",
+  "quickGenerate": "Quick Generate",
   "stats": {
     "total": "Total Personas"
   },
@@ -11,6 +12,9 @@
     "createButton": "Create Your First Persona"
   },
   "deleteConfirm": "Are you sure you want to delete this persona?",
+  "batchForm": {
+    "title": "Quick Generate Personas"
+  },
   "form": {
     "title": "Create New Persona",
     "name": {

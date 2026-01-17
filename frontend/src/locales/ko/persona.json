@@ -2,6 +2,7 @@
   "title": "페르소나",
   "subtitle": "AI 피드백 페르소나를 관리하세요",
   "createButton": "페르소나 생성",
+  "quickGenerate": "빠른 생성",
   "stats": {
     "total": "전체 페르소나"
   },
@@ -11,6 +12,9 @@
     "createButton": "첫 번째 페르소나 만들기"
   },
   "deleteConfirm": "이 페르소나를 삭제하시겠습니까?",
+  "batchForm": {
+    "title": "빠른 페르소나 생성"
+  },
   "form": {
     "title": "새 페르소나 생성",
     "name": {
