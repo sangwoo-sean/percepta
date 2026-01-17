@@ -28,6 +28,7 @@ export const PersonasPage: React.FC = () => {
   const [editingPersona, setEditingPersona] = useState<Persona | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { t } = useTranslation('persona');
 
   useEffect(() => {
@@ -37,10 +38,14 @@ export const PersonasPage: React.FC = () => {
 
   const handleCreate = async (data: CreatePersonaDto | UpdatePersonaDto) => {
     setIsCreating(true);
+    setError(null);
     try {
       await dispatch(createPersona(data as CreatePersonaDto)).unwrap();
       setIsCustomModalOpen(false);
       dispatch(fetchPersonaStats());
+    } catch {
+      setIsCustomModalOpen(false);
+      setError(t('error.create'));
     } finally {
       setIsCreating(false);
     }
@@ -48,10 +53,14 @@ export const PersonasPage: React.FC = () => {
 
   const handleGenerate = async (dto: GeneratePersonasDto) => {
     setIsCreating(true);
+    setError(null);
     try {
       await dispatch(generatePersonas(dto)).unwrap();
       setIsBatchModalOpen(false);
       dispatch(fetchPersonaStats());
+    } catch {
+      setIsBatchModalOpen(false);
+      setError(t('error.generate'));
     } finally {
       setIsCreating(false);
     }
@@ -73,10 +82,15 @@ export const PersonasPage: React.FC = () => {
     if (!editingPersona) return;
 
     setIsUpdating(true);
+    setError(null);
     try {
       await dispatch(updatePersona({ id: editingPersona.id, dto: data as UpdatePersonaDto })).unwrap();
       setIsEditModalOpen(false);
       setEditingPersona(null);
+    } catch {
+      setIsEditModalOpen(false);
+      setEditingPersona(null);
+      setError(t('error.update'));
     } finally {
       setIsUpdating(false);
     }
@@ -126,6 +140,12 @@ export const PersonasPage: React.FC = () => {
           </Button>
         </div>
       </div>
+
+      {error && (
+        <div className="bg-red-50 text-red-700 px-4 py-3 rounded-lg">
+          {error}
+        </div>
+      )}
 
       {stats && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

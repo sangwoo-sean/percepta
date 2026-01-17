@@ -1,4 +1,9 @@
 {
+  "error": {
+    "create": "Failed to create persona. Please try again later.",
+    "generate": "Failed to generate AI personas. Please try again later.",
+    "update": "Failed to update persona. Please try again later."
+  },
   "title": "Personas",
   "subtitle": "Manage your AI feedback personas",
   "createButton": "Create Persona",

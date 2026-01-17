@@ -1,4 +1,10 @@
-import { Injectable, NotFoundException, Inject } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  Inject,
+  Logger,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Persona, AgeGroup, PersonaData } from './entities/persona.entity';
@@ -33,6 +39,8 @@ const KOREAN_NAMES = {
 
 @Injectable()
 export class PersonasService {
+  private readonly logger = new Logger(PersonasService.name);
+
   constructor(
     @InjectRepository(Persona)
     private readonly personasRepository: Repository<Persona>,
@@ -98,7 +106,16 @@ export class PersonasService {
   }
 
   async generateAndCreate(userId: string, dto: GeneratePersonasDto): Promise<Persona[]> {
-    const generatedData = await this.aiProvider.generatePersonas(dto.ageGroups, dto.count);
+    let generatedData: PersonaData[];
+
+    try {
+      generatedData = await this.aiProvider.generatePersonas(dto.ageGroups, dto.count);
+    } catch (error) {
+      this.logger.error('Failed to generate personas from AI provider', error);
+      throw new InternalServerErrorException(
+        'AI 페르소나 생성에 실패했습니다. 잠시 후 다시 시도해주세요.',
+      );
+    }
 
     const personas = generatedData.map((data) => {
       const avatarUrl = this.generateAvatarUrl(data.name + Date.now() + Math.random());
