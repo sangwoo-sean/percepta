@@ -127,9 +127,11 @@ export const PricingPage: React.FC = () => {
       </Card>
 
       {/* Payment Info */}
-      <div className="text-center text-sm text-gray-500 bg-gray-50 rounded-lg py-3">
-        {t('payment.info')}
-      </div>
+      <Card>
+        <p className="text-center text-sm text-gray-500">
+          {t('payment.info')}
+        </p>
+      </Card>
     </div>
   );
 };
