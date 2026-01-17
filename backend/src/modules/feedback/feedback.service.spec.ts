@@ -102,6 +102,7 @@ describe('FeedbackService', () => {
             findByIdOrFail: jest.fn(),
             deductCredits: jest.fn(),
             refundCredits: jest.fn(),
+            addCredits: jest.fn(),
           },
         },
       ],

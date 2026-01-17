@@ -65,4 +65,8 @@ export class UsersService {
     user.credits += amount;
     return this.usersRepository.save(user);
   }
+
+  async addCredits(userId: string, amount: number): Promise<User> {
+    return this.refundCredits(userId, amount);
+  }
 }

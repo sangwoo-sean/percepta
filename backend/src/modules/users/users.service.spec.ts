@@ -186,5 +186,25 @@ describe('UsersService', () => {
 
       expect(result.credits).toBe(15);
     });
+
+    it('should throw NotFoundException when user not found', async () => {
+      repository.findOne.mockResolvedValue(null);
+
+      await expect(service.refundCredits('non-existent', 5)).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+  });
+
+  describe('addCredits', () => {
+    it('should add credits to user (alias for refundCredits)', async () => {
+      const updatedUser = { ...mockUser, credits: 15 };
+      repository.findOne.mockResolvedValue(mockUser);
+      repository.save.mockResolvedValue(updatedUser);
+
+      const result = await service.addCredits('test-uuid', 5);
+
+      expect(result.credits).toBe(15);
+    });
   });
 });
