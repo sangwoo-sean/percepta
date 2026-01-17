@@ -6,7 +6,11 @@ settings:
 
 importers:
 
-  .: {}
+  .:
+    devDependencies:
+      prettier:
+        specifier: ^3.4.2
+        version: 3.8.0
 
   backend:
     dependencies:
@@ -192,6 +196,12 @@ importers:
       eslint:
         specifier: ^9.18.0
         version: 9.39.2(jiti@1.21.7)
+      eslint-config-prettier:
+        specifier: ^9.1.0
+        version: 9.1.2(eslint@9.39.2(jiti@1.21.7))
+      eslint-plugin-prettier:
+        specifier: ^5.2.2
+        version: 5.5.5(@types/eslint@9.6.1)(eslint-config-prettier@9.1.2(eslint@9.39.2(jiti@1.21.7)))(eslint@9.39.2(jiti@1.21.7))(prettier@3.8.0)
       eslint-plugin-react-hooks:
         specifier: ^5.1.0
         version: 5.2.0(eslint@9.39.2(jiti@1.21.7))
@@ -207,6 +217,9 @@ importers:
       postcss:
         specifier: ^8.4.49
         version: 8.5.6
+      prettier:
+        specifier: ^3.4.2
+        version: 3.8.0
       tailwindcss:
         specifier: ^3.4.17
         version: 3.4.19
