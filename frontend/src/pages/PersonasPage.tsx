@@ -7,14 +7,15 @@ import {
   createPersona,
   generatePersonas,
   deletePersona,
+  updatePersona,
   fetchPersonaStats,
 } from '../store/personaSlice';
 import type { RootState } from '../store';
-import type { CreatePersonaDto, GeneratePersonasDto } from '../types';
+import type { CreatePersonaDto, UpdatePersonaDto, GeneratePersonasDto, Persona } from '../types';
 import { Card, Button, Modal } from '../components/common';
 import {
   PersonaCard,
-  PersonaCreateForm,
+  PersonaForm,
   PersonaBatchCreateForm,
 } from '../components/persona';
 
@@ -23,7 +24,10 @@ export const PersonasPage: React.FC = () => {
   const { personas, stats, isLoading } = useSelector((state: RootState) => state.persona);
   const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
   const [isBatchModalOpen, setIsBatchModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingPersona, setEditingPersona] = useState<Persona | null>(null);
   const [isCreating, setIsCreating] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const { t } = useTranslation('persona');
 
   useEffect(() => {
@@ -31,10 +35,10 @@ export const PersonasPage: React.FC = () => {
     dispatch(fetchPersonaStats());
   }, [dispatch]);
 
-  const handleCreate = async (data: CreatePersonaDto) => {
+  const handleCreate = async (data: CreatePersonaDto | UpdatePersonaDto) => {
     setIsCreating(true);
     try {
-      await dispatch(createPersona(data)).unwrap();
+      await dispatch(createPersona(data as CreatePersonaDto)).unwrap();
       setIsCustomModalOpen(false);
       dispatch(fetchPersonaStats());
     } finally {
@@ -57,6 +61,24 @@ export const PersonasPage: React.FC = () => {
     if (window.confirm(t('deleteConfirm'))) {
       await dispatch(deletePersona(id));
       dispatch(fetchPersonaStats());
+    }
+  };
+
+  const handleEdit = (persona: Persona) => {
+    setEditingPersona(persona);
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdate = async (data: CreatePersonaDto | UpdatePersonaDto) => {
+    if (!editingPersona) return;
+
+    setIsUpdating(true);
+    try {
+      await dispatch(updatePersona({ id: editingPersona.id, dto: data as UpdatePersonaDto })).unwrap();
+      setIsEditModalOpen(false);
+      setEditingPersona(null);
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -158,7 +180,7 @@ export const PersonasPage: React.FC = () => {
       ) : (
         <div className="flex flex-col gap-4">
           {personas.map((persona) => (
-            <PersonaCard key={persona.id} persona={persona} onDelete={handleDelete} />
+            <PersonaCard key={persona.id} persona={persona} onEdit={handleEdit} onDelete={handleDelete} />
           ))}
         </div>
       )}
@@ -180,7 +202,30 @@ export const PersonasPage: React.FC = () => {
         title={t('form.title')}
         size="lg"
       >
-        <PersonaCreateForm onSubmit={handleCreate} isLoading={isCreating} />
+        <PersonaForm mode="create" onSubmit={handleCreate} isLoading={isCreating} />
+      </Modal>
+
+      <Modal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setEditingPersona(null);
+        }}
+        title={t('form.editTitle')}
+        size="lg"
+      >
+        {editingPersona && (
+          <PersonaForm
+            mode="edit"
+            initialData={editingPersona}
+            onSubmit={handleUpdate}
+            onCancel={() => {
+              setIsEditModalOpen(false);
+              setEditingPersona(null);
+            }}
+            isLoading={isUpdating}
+          />
+        )}
       </Modal>
     </div>
   );

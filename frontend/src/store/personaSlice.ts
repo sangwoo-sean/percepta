@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import type { Persona, CreatePersonaDto, GeneratePersonasDto, PersonaStats } from '../types';
+import type { Persona, CreatePersonaDto, GeneratePersonasDto, UpdatePersonaDto, PersonaStats } from '../types';
 import { personasApi } from '../api/personas';
 
 interface PersonaState {
@@ -72,6 +72,17 @@ export const deletePersona = createAsyncThunk(
   }
 );
 
+export const updatePersona = createAsyncThunk(
+  'persona/updatePersona',
+  async ({ id, dto }: { id: string; dto: UpdatePersonaDto }, { rejectWithValue }) => {
+    try {
+      return await personasApi.update(id, dto);
+    } catch (error) {
+      return rejectWithValue('Failed to update persona');
+    }
+  }
+);
+
 export const fetchPersonaStats = createAsyncThunk(
   'persona/fetchStats',
   async (_, { rejectWithValue }) => {
@@ -125,6 +136,12 @@ const personaSlice = createSlice({
       })
       .addCase(deletePersona.fulfilled, (state, action) => {
         state.personas = state.personas.filter((p) => p.id !== action.payload);
+      })
+      .addCase(updatePersona.fulfilled, (state, action) => {
+        const index = state.personas.findIndex((p) => p.id === action.payload.id);
+        if (index !== -1) {
+          state.personas[index] = action.payload;
+        }
       })
       .addCase(fetchPersonaStats.fulfilled, (state, action) => {
         state.stats = action.payload;

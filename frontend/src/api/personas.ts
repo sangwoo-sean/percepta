@@ -1,5 +1,5 @@
 import apiClient from './client';
-import type { Persona, CreatePersonaDto, GeneratePersonasDto, PersonaStats } from '../types';
+import type { Persona, CreatePersonaDto, GeneratePersonasDto, UpdatePersonaDto, PersonaStats } from '../types';
 
 export const personasApi = {
   getAll: async (): Promise<Persona[]> => {
@@ -24,6 +24,11 @@ export const personasApi = {
 
   generate: async (dto: GeneratePersonasDto): Promise<Persona[]> => {
     const response = await apiClient.post<Persona[]>('/personas/generate', dto);
+    return response.data;
+  },
+
+  update: async (id: string, dto: UpdatePersonaDto): Promise<Persona> => {
+    const response = await apiClient.put<Persona>(`/personas/${id}`, dto);
     return response.data;
   },
 

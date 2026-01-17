@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Persona, AgeGroup, PersonaData } from './entities/persona.entity';
-import { CreatePersonaDto, GeneratePersonasDto } from './dto/create-persona.dto';
+import { CreatePersonaDto, GeneratePersonasDto, UpdatePersonaDto } from './dto/create-persona.dto';
 import { AIProvider, AI_PROVIDER } from '../ai/ai-provider.interface';
 
 const AVATAR_STYLES = [
@@ -121,6 +121,24 @@ export class PersonasService {
       throw new NotFoundException(`Persona with ID ${id} not found`);
     }
     await this.personasRepository.remove(persona);
+  }
+
+  async update(id: string, userId: string, dto: UpdatePersonaDto): Promise<Persona> {
+    const persona = await this.findByIdOrFail(id);
+    if (persona.userId !== userId) {
+      throw new NotFoundException(`Persona with ID ${id} not found`);
+    }
+
+    const updatedData: PersonaData = {
+      ...persona.data,
+      ...dto.data,
+      personalityTraits: dto.data.personalityTraits ?? persona.data.personalityTraits,
+      strengths: dto.data.strengths ?? persona.data.strengths,
+      weaknesses: dto.data.weaknesses ?? persona.data.weaknesses,
+    };
+
+    persona.data = updatedData;
+    return this.personasRepository.save(persona);
   }
 
   async getStats(userId: string): Promise<{

@@ -35,6 +35,12 @@
   },
   "form": {
     "title": "Create New Persona",
+    "editTitle": "Edit Persona",
+    "section": {
+      "basic": "Basic Info",
+      "demographics": "Demographics",
+      "traits": "Traits"
+    },
     "name": {
       "label": "Name (optional - auto-generated if empty)",
       "placeholder": "Enter persona name"
@@ -50,9 +56,33 @@
         "60+": "60+"
       }
     },
+    "gender": {
+      "label": "Gender",
+      "placeholder": "Select",
+      "options": {
+        "male": "Male",
+        "female": "Female"
+      }
+    },
     "occupation": {
       "label": "Occupation",
       "placeholder": "e.g., Student, Engineer"
+    },
+    "location": {
+      "label": "Location",
+      "placeholder": "e.g., Seoul, New York"
+    },
+    "education": {
+      "label": "Education",
+      "placeholder": "e.g., Bachelor's, Master's"
+    },
+    "incomeLevel": {
+      "label": "Income Level",
+      "placeholder": "e.g., Middle, High"
+    },
+    "dailyPattern": {
+      "label": "Daily Pattern",
+      "placeholder": "e.g., Morning person, Works late"
     },
     "personalityTraits": {
       "label": "Personality Traits",
@@ -73,10 +103,19 @@
         "Value-driven": "Value-driven"
       }
     },
+    "strengths": {
+      "label": "Strengths",
+      "placeholder": "Press Enter or comma to add"
+    },
+    "weaknesses": {
+      "label": "Weaknesses",
+      "placeholder": "Press Enter or comma to add"
+    },
     "description": {
       "label": "Description (optional)",
       "placeholder": "Additional details about this persona..."
     },
-    "submitButton": "Create Persona"
+    "submitButton": "Create Persona",
+    "updateButton": "Save"
   }
 }

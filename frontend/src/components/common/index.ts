@@ -5,3 +5,4 @@ export { Modal } from './Modal';
 export { Select } from './Select';
 export { LanguageSwitcher } from './LanguageSwitcher';
 export { RangeSlider } from './RangeSlider';
+export { TagInput } from './TagInput';

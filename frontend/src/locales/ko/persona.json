@@ -35,6 +35,12 @@
   },
   "form": {
     "title": "새 페르소나 생성",
+    "editTitle": "페르소나 수정",
+    "section": {
+      "basic": "기본 정보",
+      "demographics": "인구통계",
+      "traits": "특성"
+    },
     "name": {
       "label": "이름 (선택 - 비워두면 자동 생성)",
       "placeholder": "페르소나 이름을 입력하세요"
@@ -50,9 +56,33 @@
         "60+": "60대 이상"
       }
     },
+    "gender": {
+      "label": "성별",
+      "placeholder": "선택",
+      "options": {
+        "male": "남성",
+        "female": "여성"
+      }
+    },
     "occupation": {
       "label": "직업",
       "placeholder": "예: 학생, 엔지니어"
+    },
+    "location": {
+      "label": "거주지",
+      "placeholder": "예: 서울, 부산"
+    },
+    "education": {
+      "label": "학력",
+      "placeholder": "예: 대졸, 석사"
+    },
+    "incomeLevel": {
+      "label": "소득 수준",
+      "placeholder": "예: 중간, 상위"
+    },
+    "dailyPattern": {
+      "label": "일상 패턴",
+      "placeholder": "예: 아침형 인간, 야근 많음"
     },
     "personalityTraits": {
       "label": "성격 특성",
@@ -73,10 +103,19 @@
         "Value-driven": "가치 중심"
       }
     },
+    "strengths": {
+      "label": "강점",
+      "placeholder": "Enter 또는 쉼표로 추가"
+    },
+    "weaknesses": {
+      "label": "약점",
+      "placeholder": "Enter 또는 쉼표로 추가"
+    },
     "description": {
       "label": "설명 (선택)",
       "placeholder": "이 페르소나에 대한 추가 정보..."
     },
-    "submitButton": "페르소나 생성"
+    "submitButton": "페르소나 생성",
+    "updateButton": "저장"
   }
 }

@@ -85,3 +85,62 @@ export class GeneratePersonasDto {
   @Max(10)
   count: number;
 }
+
+export class UpdatePersonaDataDto {
+  @IsString()
+  @IsOptional()
+  name?: string;
+
+  @IsEnum(['10s', '20s', '30s', '40s', '50s', '60+'])
+  @IsOptional()
+  ageGroup?: AgeGroup;
+
+  @IsEnum(['male', 'female'])
+  @IsOptional()
+  gender?: Gender;
+
+  @IsString()
+  @IsOptional()
+  occupation?: string;
+
+  @IsString()
+  @IsOptional()
+  location?: string;
+
+  @IsString()
+  @IsOptional()
+  education?: string;
+
+  @IsString()
+  @IsOptional()
+  incomeLevel?: string;
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  personalityTraits?: string[];
+
+  @IsString()
+  @IsOptional()
+  dailyPattern?: string;
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  strengths?: string[];
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  weaknesses?: string[];
+
+  @IsString()
+  @IsOptional()
+  description?: string;
+}
+
+export class UpdatePersonaDto {
+  @ValidateNested()
+  @Type(() => UpdatePersonaDataDto)
+  data: UpdatePersonaDataDto;
+}

@@ -57,6 +57,23 @@ export interface GeneratePersonasDto {
   count: number;
 }
 
+export interface UpdatePersonaDto {
+  data: {
+    name?: string;
+    ageGroup?: AgeGroup;
+    gender?: Gender;
+    occupation?: string;
+    location?: string;
+    education?: string;
+    incomeLevel?: string;
+    personalityTraits?: string[];
+    dailyPattern?: string;
+    strengths?: string[];
+    weaknesses?: string[];
+    description?: string;
+  };
+}
+
 export type InputType = 'file' | 'url' | 'text';
 export type SessionStatus = 'pending' | 'processing' | 'completed' | 'failed';
 export type Sentiment = 'positive' | 'neutral' | 'negative';

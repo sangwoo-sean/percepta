@@ -5,6 +5,7 @@ import { Card, Button } from '../common';
 
 interface PersonaCardProps {
   persona: Persona;
+  onEdit?: (persona: Persona) => void;
   onDelete?: (id: string) => void;
   selectable?: boolean;
   selected?: boolean;
@@ -28,6 +29,7 @@ const InfoRow: React.FC<InfoRowProps> = ({ label, value }) => {
 
 export const PersonaCard: React.FC<PersonaCardProps> = ({
   persona,
+  onEdit,
   onDelete,
   selectable,
   selected,
@@ -142,18 +144,32 @@ export const PersonaCard: React.FC<PersonaCardProps> = ({
           )}
         </div>
 
-        {onDelete && !selectable && (
-          <div className="flex-shrink-0">
-            <Button
-              variant="danger"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(persona.id);
-              }}
-            >
-              {tCommon('button.delete')}
-            </Button>
+        {(onEdit || onDelete) && !selectable && (
+          <div className="flex-shrink-0 flex flex-col gap-2">
+            {onEdit && (
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit(persona);
+                }}
+              >
+                {tCommon('button.edit')}
+              </Button>
+            )}
+            {onDelete && (
+              <Button
+                variant="danger"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(persona.id);
+                }}
+              >
+                {tCommon('button.delete')}
+              </Button>
+            )}
           </div>
         )}
       </div>
