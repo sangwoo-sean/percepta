@@ -63,7 +63,7 @@ export const PricingPage: React.FC = () => {
               {pkg.isPopular && (
                 <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary-500 text-white text-xs font-semibold px-3 py-1 rounded-full">{t('packages.popular')}</span>
               )}
-              {pkg.discount > 0 && <span className="absolute top-3 right-3 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded">-{pkg.discount}%</span>}
+              {pkg.discount > 0 && <span className="absolute top-3 right-3 bg-emerald-500 text-white text-xs font-semibold px-2 py-1 rounded">-{pkg.discount}%</span>}
               <div className="text-center">
                 <h3 className="text-lg font-semibold text-gray-900">{t(`packages.names.${pkg.name}`)}</h3>
                 <div className="mt-3">
