@@ -12,11 +12,9 @@
     "perCredit": "₩{{price}} per credit",
     "names": {
       "trial": "Trial",
-      "small": "Small",
       "basic": "Basic",
       "large": "Large",
-      "premium": "Premium",
-      "business": "Business"
+      "premium": "Premium"
     }
   },
   "usage": {

@@ -12,11 +12,9 @@
     "perCredit": "크레딧당 ₩{{price}}",
     "names": {
       "trial": "체험",
-      "small": "소량",
       "basic": "기본",
       "large": "대량",
-      "premium": "프리미엄",
-      "business": "비즈니스"
+      "premium": "프리미엄"
     }
   },
   "usage": {

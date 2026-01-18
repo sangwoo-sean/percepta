@@ -16,11 +16,9 @@ interface CreditPackage {
 
 const creditPackages: CreditPackage[] = [
   { name: 'trial', credits: 50, price: 0, pricePerCredit: 0, discount: 0, isFree: true, originalCredits: 30, isPromotion: true },
-  { name: 'small', credits: 50, price: 500, pricePerCredit: 10, discount: 0 },
   { name: 'basic', credits: 200, price: 1800, pricePerCredit: 9, discount: 10, isPopular: true },
   { name: 'large', credits: 500, price: 4000, pricePerCredit: 8, discount: 20 },
   { name: 'premium', credits: 1000, price: 7000, pricePerCredit: 7, discount: 30 },
-  { name: 'business', credits: 5000, price: 30000, pricePerCredit: 6, discount: 40 },
 ];
 
 interface CreditUsage {
