@@ -15,27 +15,6 @@ import { UsersService } from '../users/users.service';
 
 const CREDITS_PER_PERSONA = 1;
 
-const AVATAR_STYLES = [
-  'adventurer',
-  'adventurer-neutral',
-  'avataaars',
-  'big-ears',
-  'big-smile',
-  'bottts',
-  'croodles',
-  'fun-emoji',
-  'icons',
-  'identicon',
-  'initials',
-  'lorelei',
-  'micah',
-  'miniavs',
-  'notionists',
-  'open-peeps',
-  'personas',
-  'pixel-art',
-];
-
 const KOREAN_NAMES = {
   male: ['민준', '서준', '도윤', '예준', '시우', '하준', '주원', '지호', '지후', '준서'],
   female: ['서연', '서윤', '지우', '서현', '민서', '하은', '하윤', '윤서', '지민', '채원'],
@@ -59,11 +38,6 @@ export class PersonasService {
     return names[Math.floor(Math.random() * names.length)];
   }
 
-  private generateAvatarUrl(seed: string): string {
-    const style = AVATAR_STYLES[Math.floor(Math.random() * AVATAR_STYLES.length)];
-    return `https://api.dicebear.com/7.x/${style}/svg?seed=${seed}`;
-  }
-
   async findByUserId(userId: string): Promise<Persona[]> {
     return this.personasRepository.find({
       where: { userId },
@@ -85,12 +59,10 @@ export class PersonasService {
 
   async create(userId: string, dto: CreatePersonaDto): Promise<Persona> {
     const name = dto.data.name || this.generateRandomName();
-    const avatarUrl = this.generateAvatarUrl(name + Date.now());
 
     const data: PersonaData = {
       ...dto.data,
       name,
-      avatarUrl,
       personalityTraits: dto.data.personalityTraits || [],
     };
 
@@ -142,17 +114,13 @@ export class PersonasService {
     }
 
     try {
-      const personas = generatedData.map((data) => {
-        const avatarUrl = this.generateAvatarUrl(data.name + Date.now() + Math.random());
-        return this.personasRepository.create({
+      const personas = generatedData.map((data) =>
+        this.personasRepository.create({
           userId,
-          data: {
-            ...data,
-            avatarUrl,
-          },
+          data,
           storageUrl: null,
-        });
-      });
+        }),
+      );
 
       return await this.personasRepository.save(personas);
     } catch (error) {

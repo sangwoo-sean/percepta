@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Persona } from '../../types';
 import { Card, Button } from '../common';
+import { getAvatarColor, getInitial } from '../../utils/avatar';
 
 interface PersonaCardProps {
   persona: Persona;
@@ -60,17 +61,14 @@ export const PersonaCard: React.FC<PersonaCardProps> = ({
 
       <div className="flex gap-6">
         <div className="flex-shrink-0">
-          {data.avatarUrl ? (
-            <img
-              src={data.avatarUrl}
-              alt={data.name}
-              className="w-20 h-20 rounded-full"
-            />
-          ) : (
-            <div className="w-20 h-20 rounded-full bg-primary-100 flex items-center justify-center">
-              <span className="text-2xl font-bold text-primary-600">{data.name[0]}</span>
-            </div>
-          )}
+          <div
+            className="w-20 h-20 rounded-full flex items-center justify-center"
+            style={{ backgroundColor: getAvatarColor(persona.id) }}
+          >
+            <span className="text-2xl font-bold text-white">
+              {getInitial(data.name)}
+            </span>
+          </div>
         </div>
 
         <div className="flex-1 min-w-0">

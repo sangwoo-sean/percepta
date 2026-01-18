@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { FeedbackResult } from '../../types';
 import { Card } from '../common';
+import { getAvatarColor, getInitial } from '../../utils/avatar';
 
 interface FeedbackCardProps {
   result: FeedbackResult;
@@ -27,19 +28,14 @@ export const FeedbackCard: React.FC<FeedbackCardProps> = ({ result }) => {
   return (
     <Card>
       <div className="flex items-start gap-4 mb-4">
-        {personaData?.avatarUrl ? (
-          <img
-            src={personaData.avatarUrl}
-            alt={personaData.name}
-            className="w-12 h-12 rounded-full"
-          />
-        ) : (
-          <div className="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center">
-            <span className="font-bold text-primary-600">
-              {personaData?.name?.[0] || '?'}
-            </span>
-          </div>
-        )}
+        <div
+          className="w-12 h-12 rounded-full flex items-center justify-center"
+          style={{ backgroundColor: getAvatarColor(result.persona?.id || result.personaId) }}
+        >
+          <span className="text-lg font-bold text-white">
+            {getInitial(personaData?.name || '')}
+          </span>
+        </div>
         <div className="flex-1">
           <h4 className="font-semibold text-gray-900">
             {personaData?.name || t('card.unknownPersona')}

@@ -8,6 +8,7 @@ import { fetchPersonas, fetchPersonaStats } from '../store/personaSlice';
 import { fetchSessions } from '../store/feedbackSlice';
 import type { RootState } from '../store';
 import { Card, CardHeader, Button } from '../components/common';
+import { getAvatarColor, getInitial } from '../utils/avatar';
 
 export const DashboardPage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -116,17 +117,14 @@ export const DashboardPage: React.FC = () => {
           <div className="space-y-3">
             {personas.slice(0, 3).map((persona) => (
               <div key={persona.id} className="flex items-center gap-3">
-                {persona.data.avatarUrl ? (
-                  <img
-                    src={persona.data.avatarUrl}
-                    alt={persona.data.name}
-                    className="w-10 h-10 rounded-full"
-                  />
-                ) : (
-                  <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                    <span className="text-sm font-medium">{persona.data.name[0]}</span>
-                  </div>
-                )}
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: getAvatarColor(persona.id) }}
+                >
+                  <span className="text-sm font-bold text-white">
+                    {getInitial(persona.data.name)}
+                  </span>
+                </div>
                 <div>
                   <p className="font-medium text-gray-900">{persona.data.name}</p>
                   <p className="text-sm text-gray-500">
