@@ -121,6 +121,16 @@ export const PricingPage: React.FC = () => {
         <p className="text-sm text-gray-600">{t('payment.bankTransfer')}</p>
         <p className="text-sm text-gray-400 mt-2">{t('payment.comingSoon')}</p>
       </Card>
+
+      {/* Customer Support */}
+      <div className="text-center text-sm text-gray-500">
+        <p>
+          {t('support.question')}{' '}
+          <a href="mailto:tkddn3367@gmail.com" className="text-primary-600 hover:underline">
+            tkddn3367@gmail.com
+          </a>
+        </p>
+      </div>
     </div>
   );
 };
