@@ -115,6 +115,7 @@ export interface CreateSessionDto {
 export interface PersonaStats {
   total: number;
   byAgeGroup: Record<AgeGroup, number>;
+  byGender: Record<'male' | 'female' | 'unknown', number>;
   byOccupation: Record<string, number>;
 }
 

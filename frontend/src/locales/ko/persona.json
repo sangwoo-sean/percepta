@@ -9,7 +9,10 @@
   "createButton": "페르소나 생성",
   "quickGenerate": "AI 생성",
   "stats": {
-    "total": "전체 페르소나"
+    "total": "전체 페르소나",
+    "byAgeGroup": "연령대별 분포",
+    "byGender": "성별 분포",
+    "unknown": "미지정"
   },
   "card": {
     "gender": "성별",

@@ -162,6 +162,7 @@ export class PersonasService {
   async getStats(userId: string): Promise<{
     total: number;
     byAgeGroup: Record<AgeGroup, number>;
+    byGender: Record<'male' | 'female' | 'unknown', number>;
     byOccupation: Record<string, number>;
   }> {
     const personas = await this.findByUserId(userId);
@@ -175,16 +176,29 @@ export class PersonasService {
       '60+': 0,
     };
 
+    const byGender: Record<'male' | 'female' | 'unknown', number> = {
+      male: 0,
+      female: 0,
+      unknown: 0,
+    };
+
     const byOccupation: Record<string, number> = {};
 
     personas.forEach((persona) => {
       byAgeGroup[persona.ageGroup]++;
+      const gender = persona.data.gender;
+      if (gender === 'male' || gender === 'female') {
+        byGender[gender]++;
+      } else {
+        byGender.unknown++;
+      }
       byOccupation[persona.occupation] = (byOccupation[persona.occupation] || 0) + 1;
     });
 
     return {
       total: personas.length,
       byAgeGroup,
+      byGender,
       byOccupation,
     };
   }

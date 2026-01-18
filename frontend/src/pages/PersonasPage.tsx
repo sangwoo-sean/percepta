@@ -18,6 +18,7 @@ import {
   PersonaCard,
   PersonaForm,
   PersonaBatchCreateForm,
+  PersonaStatsCharts,
 } from '../components/persona';
 
 export const PersonasPage: React.FC = () => {
@@ -156,23 +157,7 @@ export const PersonasPage: React.FC = () => {
         </div>
       )}
 
-      {stats && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card className="text-center">
-            <p className="text-3xl font-bold text-primary-600">{stats.total}</p>
-            <p className="text-sm text-gray-500">{t('stats.total')}</p>
-          </Card>
-          {Object.entries(stats.byAgeGroup)
-            .filter(([, count]) => count > 0)
-            .slice(0, 3)
-            .map(([ageGroup, count]) => (
-              <Card key={ageGroup} className="text-center">
-                <p className="text-3xl font-bold text-gray-700">{count}</p>
-                <p className="text-sm text-gray-500">{t(`form.ageGroup.options.${ageGroup}`, { defaultValue: ageGroup })}</p>
-              </Card>
-            ))}
-        </div>
-      )}
+      {stats && <PersonaStatsCharts stats={stats} />}
 
       {personas.length > 0 && (
         <PersonaFilter

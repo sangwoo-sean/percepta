@@ -9,7 +9,10 @@
   "createButton": "Create Persona",
   "quickGenerate": "AI Generate",
   "stats": {
-    "total": "Total Personas"
+    "total": "Total Personas",
+    "byAgeGroup": "Age Group Distribution",
+    "byGender": "Gender Distribution",
+    "unknown": "Not Specified"
   },
   "card": {
     "gender": "Gender",
