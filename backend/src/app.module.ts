@@ -10,6 +10,7 @@ import { FeedbackModule } from './modules/feedback/feedback.module';
 import { UploadModule } from './modules/upload/upload.module';
 import { AiModule } from './modules/ai/ai.module';
 import { ActionLogsModule } from './modules/action-logs/action-logs.module';
+import { PaymentsModule } from './modules/payments/payments.module';
 import { createLoggerConfig } from './config/logger.config';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
@@ -59,6 +60,7 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
     UploadModule,
     AiModule,
     ActionLogsModule,
+    PaymentsModule,
   ],
   providers: [
     {

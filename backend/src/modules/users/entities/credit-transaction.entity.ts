@@ -14,9 +14,10 @@ export type TransactionType =
   | 'deduct_feedback_session'
   | 'refund_feedback_partial'
   | 'admin_add'
-  | 'admin_deduct';
+  | 'admin_deduct'
+  | 'purchase_credits';
 
-export type ReferenceType = 'feedback_session' | 'persona';
+export type ReferenceType = 'feedback_session' | 'persona' | 'payment_record';
 
 @Entity('credit_transactions')
 export class CreditTransaction {

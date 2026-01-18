@@ -15,7 +15,9 @@
       "basic": "Basic",
       "large": "Large",
       "premium": "Premium"
-    }
+    },
+    "purchase": "Purchase",
+    "processing": "Processing..."
   },
   "usage": {
     "title": "Credit Usage",

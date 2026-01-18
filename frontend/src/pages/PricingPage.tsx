@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Card, CardHeader } from '../components/common';
+import { Card, CardHeader, Button } from '../components/common';
+import { useAuth } from '../hooks/useAuth';
+import { paymentsApi } from '../api/payments';
 
 interface CreditPackage {
   name: string;
@@ -14,13 +17,14 @@ interface CreditPackage {
   isPopular?: boolean;
   originalCredits?: number;
   isPromotion?: boolean;
+  isPurchasable?: boolean;
 }
 
 const creditPackages: CreditPackage[] = [
   { name: 'trial', credits: 50, price: 0, priceUSD: 0, pricePerCredit: 0, pricePerCreditUSD: 0, discount: 0, isFree: true, originalCredits: 30, isPromotion: true },
-  { name: 'basic', credits: 200, price: 2000, priceUSD: 1.49, pricePerCredit: 10, pricePerCreditUSD: 0.0075, discount: 0, isPopular: true },
-  { name: 'large', credits: 500, price: 4500, priceUSD: 2.99, pricePerCredit: 9, pricePerCreditUSD: 0.006, discount: 10 },
-  { name: 'premium', credits: 1000, price: 8000, priceUSD: 4.99, pricePerCredit: 8, pricePerCreditUSD: 0.005, discount: 20 },
+  { name: 'basic', credits: 200, price: 2000, priceUSD: 1.49, pricePerCredit: 10, pricePerCreditUSD: 0.0075, discount: 0, isPopular: true, isPurchasable: true },
+  { name: 'large', credits: 500, price: 4500, priceUSD: 2.99, pricePerCredit: 9, pricePerCreditUSD: 0.006, discount: 10, isPurchasable: true },
+  { name: 'premium', credits: 1000, price: 8000, priceUSD: 4.99, pricePerCredit: 8, pricePerCreditUSD: 0.005, discount: 20, isPurchasable: true },
 ];
 
 interface CreditUsage {
@@ -37,6 +41,9 @@ const creditUsages: CreditUsage[] = [
 export const PricingPage: React.FC = () => {
   const { t, i18n } = useTranslation('pricing');
   const isEnglish = i18n.language === 'en';
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const [loadingPackage, setLoadingPackage] = useState<string | null>(null);
 
   const formatPrice = (price: number) => {
     return isEnglish
@@ -47,6 +54,22 @@ export const PricingPage: React.FC = () => {
   const getCurrencySymbol = () => (isEnglish ? '$' : '₩');
   const getPrice = (pkg: CreditPackage) => (isEnglish ? pkg.priceUSD : pkg.price);
   const getPricePerCredit = (pkg: CreditPackage) => (isEnglish ? pkg.pricePerCreditUSD : pkg.pricePerCredit);
+
+  const handlePurchase = async (packageName: string) => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
+    setLoadingPackage(packageName);
+    try {
+      const response = await paymentsApi.createCheckout(packageName);
+      window.location.href = response.data.checkoutUrl;
+    } catch (error) {
+      console.error('Failed to create checkout:', error);
+      setLoadingPackage(null);
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -93,6 +116,16 @@ export const PricingPage: React.FC = () => {
                   <p className="mt-2 text-xs text-amber-600 font-medium">{t('packages.openBetaNote')}</p>
                 )}
                 {!pkg.isFree && <p className="mt-2 text-sm text-gray-500">{t('packages.perCredit', { price: formatPrice(getPricePerCredit(pkg)) })}</p>}
+                {pkg.isPurchasable && (
+                  <Button
+                    className="mt-4 w-full"
+                    variant={pkg.isPopular ? 'primary' : 'outline'}
+                    onClick={() => handlePurchase(pkg.name)}
+                    disabled={loadingPackage !== null}
+                  >
+                    {loadingPackage === pkg.name ? t('packages.processing') : t('packages.purchase')}
+                  </Button>
+                )}
               </div>
             </div>
           ))}

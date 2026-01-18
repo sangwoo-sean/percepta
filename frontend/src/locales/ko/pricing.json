@@ -15,7 +15,9 @@
       "basic": "기본",
       "large": "대량",
       "premium": "프리미엄"
-    }
+    },
+    "purchase": "구매하기",
+    "processing": "처리중..."
   },
   "usage": {
     "title": "크레딧 소모 기준",

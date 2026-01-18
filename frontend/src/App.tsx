@@ -15,6 +15,8 @@ import { SettingsPage } from './pages/SettingsPage';
 import { PricingPage } from './pages/PricingPage';
 import { GuidePage } from './pages/GuidePage';
 import { CreditHistoryPage } from './pages/CreditHistoryPage';
+import { PaymentSuccessPage } from './pages/PaymentSuccessPage';
+import { PaymentCancelPage } from './pages/PaymentCancelPage';
 
 const AppContent: React.FC = () => {
   useEffect(() => {
@@ -41,6 +43,8 @@ const AppContent: React.FC = () => {
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/credits/history" element={<CreditHistoryPage />} />
+          <Route path="/payment/success" element={<PaymentSuccessPage />} />
+          <Route path="/payment/cancel" element={<PaymentCancelPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

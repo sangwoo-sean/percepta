@@ -139,9 +139,10 @@ export type TransactionType =
   | 'deduct_feedback_session'
   | 'refund_feedback_partial'
   | 'admin_add'
-  | 'admin_deduct';
+  | 'admin_deduct'
+  | 'purchase_credits';
 
-export type ReferenceType = 'feedback_session' | 'persona';
+export type ReferenceType = 'feedback_session' | 'persona' | 'payment_record';
 
 export interface CreditTransaction {
   id: string;
@@ -160,4 +161,21 @@ export interface CreditTransaction {
 export interface PersonaFilterState {
   ageGroups: AgeGroup[];
   genders: Gender[];
+}
+
+export type PaymentStatus = 'completed' | 'refunded';
+export type PackageName = 'basic' | 'large' | 'premium';
+
+export interface PaymentRecord {
+  id: string;
+  userId: string;
+  lemonSqueezyOrderId: string;
+  variantId: string;
+  packageName: PackageName;
+  creditsAmount: number;
+  amountPaid: number;
+  currency: string;
+  status: PaymentStatus;
+  metadata: Record<string, unknown>;
+  createdAt: string;
 }
