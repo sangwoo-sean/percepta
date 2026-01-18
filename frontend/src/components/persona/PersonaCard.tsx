@@ -62,10 +62,10 @@ export const PersonaCard: React.FC<PersonaCardProps> = ({
       <div className="flex gap-6">
         <div className="flex-shrink-0">
           <div
-            className="w-20 h-20 rounded-full flex items-center justify-center"
+            className="w-12 h-12 rounded-full flex items-center justify-center"
             style={{ backgroundColor: getAvatarColor(persona.id) }}
           >
-            <span className="text-2xl font-bold text-white">
+            <span className="text-lg font-bold text-white">
               {getInitial(data.name)}
             </span>
           </div>
