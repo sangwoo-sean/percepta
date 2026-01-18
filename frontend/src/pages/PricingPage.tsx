@@ -124,12 +124,7 @@ export const PricingPage: React.FC = () => {
 
       {/* Customer Support */}
       <div className="text-center text-sm text-gray-500">
-        <p>
-          {t('support.question')}{' '}
-          <a href="mailto:tkddn3367@gmail.com" className="text-primary-600 hover:underline">
-            tkddn3367@gmail.com
-          </a>
-        </p>
+        <p>{t('support.contact')}: tkddn3367@gmail.com</p>
       </div>
     </div>
   );
