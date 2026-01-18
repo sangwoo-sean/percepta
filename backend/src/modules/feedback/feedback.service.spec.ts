@@ -39,6 +39,7 @@ describe('FeedbackService', () => {
     inputType: 'text',
     inputContent: '새로운 모바일 앱 아이디어입니다',
     inputUrl: null,
+    inputImageUrls: [],
     status: 'pending',
     summary: null,
     creditsUsed: 1,

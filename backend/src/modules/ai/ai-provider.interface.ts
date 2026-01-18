@@ -12,6 +12,7 @@ export interface AIFeedbackResponse {
 export interface AICallContext {
   userId?: string;
   sessionId?: string;
+  imageUrls?: string[];
 }
 
 export interface AIProvider {

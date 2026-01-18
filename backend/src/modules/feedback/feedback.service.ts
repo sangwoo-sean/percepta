@@ -74,6 +74,7 @@ export class FeedbackService {
       inputType: dto.inputType,
       inputContent: dto.inputContent,
       inputUrl: dto.inputUrl,
+      inputImageUrls: dto.inputImageUrls || [],
       status: 'pending',
       creditsUsed: creditsNeeded,
     });
@@ -116,7 +117,7 @@ export class FeedbackService {
         const aiResponse = await this.aiProvider.generateFeedback(
           session.inputContent,
           persona,
-          { userId, sessionId },
+          { userId, sessionId, imageUrls: session.inputImageUrls || [] },
         );
 
         const result = this.resultsRepository.create({

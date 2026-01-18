@@ -14,7 +14,8 @@
     "step2": {
       "title": "Step 2: Select Personas",
       "subtitle": "Choose which personas should review your content",
-      "contentPreview": "Content preview:"
+      "contentPreview": "Content preview:",
+      "imagePreview": "Attached images ({{count}}):"
     },
     "generating": {
       "title": "Generating Feedback...",
@@ -45,6 +46,17 @@
       "fetchButton": "Fetch",
       "description": "Enter a URL to scrape content from. We'll extract the main text content for analysis.",
       "error": "Failed to fetch URL. Please check the URL and try again."
+    },
+    "image": {
+      "title": "Attach screenshots/images (optional)",
+      "dropzone": "Drag and drop images here, or click to select",
+      "dropzoneActive": "Drop your images here",
+      "limits": "Max {{maxFiles}} files, {{maxSize}} each",
+      "maxFilesError": "You can only upload up to {{max}} images",
+      "typeError": "Only image files are allowed",
+      "sizeError": "File size exceeds {{max}} limit",
+      "totalSizeError": "Total file size exceeds {{max}} limit",
+      "uploadError": "Failed to upload images. Please try again."
     }
   },
   "selector": {

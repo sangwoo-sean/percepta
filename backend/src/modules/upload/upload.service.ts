@@ -94,6 +94,89 @@ export class UploadService {
     };
   }
 
+  async uploadImages(
+    files: Express.Multer.File[],
+    userId: string,
+  ): Promise<UploadResult[]> {
+    const MAX_FILES = 3;
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB per file
+    const MAX_TOTAL_SIZE = 15 * 1024 * 1024; // 15MB total
+
+    if (files.length === 0) {
+      throw new BadRequestException('No files provided');
+    }
+
+    if (files.length > MAX_FILES) {
+      throw new BadRequestException(`Maximum ${MAX_FILES} images allowed`);
+    }
+
+    const imageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    let totalSize = 0;
+
+    for (const file of files) {
+      if (!imageTypes.includes(file.mimetype)) {
+        throw new BadRequestException(`Invalid file type: ${file.originalname}. Only images are allowed.`);
+      }
+      if (file.size > MAX_FILE_SIZE) {
+        throw new BadRequestException(`File ${file.originalname} exceeds 5MB limit`);
+      }
+      totalSize += file.size;
+    }
+
+    if (totalSize > MAX_TOTAL_SIZE) {
+      throw new BadRequestException('Total file size exceeds 15MB limit');
+    }
+
+    const results: UploadResult[] = [];
+    for (const file of files) {
+      const result = await this.uploadSingleImage(file, userId);
+      results.push(result);
+    }
+
+    return results;
+  }
+
+  private async uploadSingleImage(
+    file: Express.Multer.File,
+    userId: string,
+  ): Promise<UploadResult> {
+    const ext = file.originalname.split('.').pop();
+    const filename = `${uuidv4()}.${ext}`;
+    const path = `${userId}/images/${filename}`;
+
+    if (this.mockStorage) {
+      return {
+        url: `http://localhost:3000/mock-uploads/${path}`,
+        path,
+        filename: file.originalname,
+      };
+    }
+
+    if (!this.supabase) {
+      throw new BadRequestException('Storage not configured. Set MOCK_STORAGE=true for local development.');
+    }
+
+    const { error } = await this.supabase.storage
+      .from(this.bucket)
+      .upload(path, file.buffer, {
+        contentType: file.mimetype,
+      });
+
+    if (error) {
+      throw new BadRequestException(`Upload failed: ${error.message}`);
+    }
+
+    const { data: urlData } = this.supabase.storage
+      .from(this.bucket)
+      .getPublicUrl(path);
+
+    return {
+      url: urlData.publicUrl,
+      path,
+      filename: file.originalname,
+    };
+  }
+
   async scrapeUrl(url: string): Promise<ScrapedContent> {
     try {
       const response = await axios.get(url, {

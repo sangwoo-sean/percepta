@@ -11,7 +11,7 @@ import {
 import { User } from '../../users/entities/user.entity';
 import { FeedbackResult } from './feedback-result.entity';
 
-export type InputType = 'file' | 'url' | 'text';
+export type InputType = 'file' | 'url' | 'text' | 'image';
 export type SessionStatus = 'pending' | 'processing' | 'completed' | 'failed';
 
 @Entity('feedback_sessions')
@@ -34,6 +34,9 @@ export class FeedbackSession {
 
   @Column({ name: 'input_url', type: 'varchar', nullable: true })
   inputUrl: string | null;
+
+  @Column({ name: 'input_image_urls', type: 'jsonb', nullable: true, default: [] })
+  inputImageUrls: string[];
 
   @Column({ default: 'pending' })
   status: SessionStatus;

@@ -74,7 +74,7 @@ export interface UpdatePersonaDto {
   };
 }
 
-export type InputType = 'file' | 'url' | 'text';
+export type InputType = 'file' | 'url' | 'text' | 'image';
 export type SessionStatus = 'pending' | 'processing' | 'completed' | 'failed';
 export type Sentiment = 'positive' | 'neutral' | 'negative';
 export type PurchaseIntent = 'high' | 'medium' | 'low' | 'none';
@@ -85,6 +85,7 @@ export interface FeedbackSession {
   inputType: InputType;
   inputContent: string;
   inputUrl: string | null;
+  inputImageUrls: string[];
   status: SessionStatus;
   summary: string | null;
   creditsUsed: number;
@@ -109,6 +110,7 @@ export interface CreateSessionDto {
   inputType: InputType;
   inputContent: string;
   inputUrl?: string;
+  inputImageUrls?: string[];
   personaIds: string[];
 }
 

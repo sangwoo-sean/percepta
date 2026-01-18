@@ -5,8 +5,9 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
+  UploadedFiles,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { UploadService } from './upload.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
@@ -28,6 +29,15 @@ export class UploadController {
     @UploadedFile() file: Express.Multer.File,
   ) {
     return this.uploadService.uploadFile(file, user.id);
+  }
+
+  @Post('images')
+  @UseInterceptors(FilesInterceptor('images', 3))
+  uploadImages(
+    @CurrentUser() user: User,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
+    return this.uploadService.uploadImages(files, user.id);
   }
 
   @Post('url')

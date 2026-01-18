@@ -8,14 +8,23 @@ export class MockAIService implements AIProvider {
   async generateFeedback(
     content: string,
     persona: Persona,
-    _context?: AICallContext,
+    context?: AICallContext,
   ): Promise<AIFeedbackResponse> {
-    // Fixed mock response for local development
+    const imageUrls = context?.imageUrls || [];
+    const hasImages = imageUrls.length > 0;
+
+    // Include image analysis mention in mock response
+    const imageAnalysis = hasImages
+      ? ` 첨부된 ${imageUrls.length}개의 이미지를 분석한 결과, 시각적 요소들이 잘 구성되어 있으며 전반적인 디자인 품질이 양호합니다.`
+      : '';
+
     return {
-      feedbackText: `[${persona.name}의 피드백] 이 콘텐츠에 대해 ${persona.ageGroup} ${persona.occupation}의 관점에서 평가하자면, 전반적으로 흥미로운 아이디어입니다. ${persona.personalityTraits.join(', ')}한 성향을 고려했을 때, 실용성과 접근성 측면에서 개선의 여지가 있어 보입니다.`,
+      feedbackText: `[${persona.name}의 피드백] 이 콘텐츠에 대해 ${persona.ageGroup} ${persona.occupation}의 관점에서 평가하자면, 전반적으로 흥미로운 아이디어입니다. ${persona.personalityTraits.join(', ')}한 성향을 고려했을 때, 실용성과 접근성 측면에서 개선의 여지가 있어 보입니다.${imageAnalysis}`,
       sentiment: 'neutral',
       purchaseIntent: 'medium',
-      keyPoints: ['흥미로운 아이디어', '실용성 개선 필요', '타겟 고객 명확화 필요'],
+      keyPoints: hasImages
+        ? ['흥미로운 아이디어', '시각적 디자인 양호', '실용성 개선 필요', '타겟 고객 명확화 필요']
+        : ['흥미로운 아이디어', '실용성 개선 필요', '타겟 고객 명확화 필요'],
       score: 3.5,
     };
   }

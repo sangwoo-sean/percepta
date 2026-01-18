@@ -19,13 +19,15 @@ export const NewFeedbackPage: React.FC = () => {
   const [content, setContent] = useState('');
   const [inputType, setInputType] = useState<InputType>('text');
   const [inputUrl, setInputUrl] = useState<string | undefined>();
+  const [inputImageUrls, setInputImageUrls] = useState<string[]>([]);
   const [selectedPersonaIds, setSelectedPersonaIds] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  const handleContentReady = (newContent: string, type: InputType, url?: string) => {
+  const handleContentReady = (newContent: string, type: InputType, url?: string, imageUrls?: string[]) => {
     setContent(newContent);
     setInputType(type);
     setInputUrl(url);
+    setInputImageUrls(imageUrls || []);
     setStep('personas');
   };
 
@@ -39,6 +41,7 @@ export const NewFeedbackPage: React.FC = () => {
           inputType,
           inputContent: content,
           inputUrl,
+          inputImageUrls: inputImageUrls.length > 0 ? inputImageUrls : undefined,
           personaIds: selectedPersonaIds,
         })
       ).unwrap();
@@ -135,10 +138,29 @@ export const NewFeedbackPage: React.FC = () => {
               }
             />
             <div className="mb-4 p-4 bg-gray-50 rounded-lg">
-              <p className="text-sm text-gray-600">
-                <strong>{t('new.step2.contentPreview')}</strong> {content.substring(0, 200)}
-                {content.length > 200 && '...'}
-              </p>
+              {content && (
+                <p className="text-sm text-gray-600 mb-2">
+                  <strong>{t('new.step2.contentPreview')}</strong> {content.substring(0, 200)}
+                  {content.length > 200 && '...'}
+                </p>
+              )}
+              {inputImageUrls.length > 0 && (
+                <div>
+                  <p className="text-sm text-gray-600 mb-2">
+                    <strong>{t('new.step2.imagePreview', { count: inputImageUrls.length })}</strong>
+                  </p>
+                  <div className="flex gap-2 flex-wrap">
+                    {inputImageUrls.map((url, index) => (
+                      <img
+                        key={url}
+                        src={url}
+                        alt={`Image ${index + 1}`}
+                        className="w-16 h-16 object-cover rounded border border-gray-200"
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
             <PersonaSelector
               selectedIds={selectedPersonaIds}

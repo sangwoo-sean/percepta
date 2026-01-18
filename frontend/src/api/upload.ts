@@ -14,6 +14,20 @@ export const uploadApi = {
     return response.data;
   },
 
+  uploadImages: async (files: File[]): Promise<UploadResult[]> => {
+    const formData = new FormData();
+    files.forEach((file) => {
+      formData.append('images', file);
+    });
+
+    const response = await apiClient.post<UploadResult[]>('/upload/images', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+
   scrapeUrl: async (url: string): Promise<ScrapedContent> => {
     const response = await apiClient.post<ScrapedContent>('/upload/url', { url });
     return response.data;

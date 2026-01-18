@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { GoogleGenAI, Schema, Type } from '@google/genai';
+import { GoogleGenAI, Schema, Type, Part } from '@google/genai';
+import axios from 'axios';
 import { Persona, PersonaData, AgeGroup } from '../personas/entities/persona.entity';
 import { FeedbackResult, Sentiment, PurchaseIntent } from '../feedback/entities/feedback-result.entity';
 import { AIProvider, AIFeedbackResponse, AICallContext } from './ai-provider.interface';
@@ -68,6 +69,12 @@ ${persona.description ? `- 추가 설명: ${persona.description}` : ''}
     const startTime = Date.now();
     const personaPrompt = this.buildPersonaPrompt(persona);
     let responseText: string | undefined;
+    const imageUrls = context?.imageUrls || [];
+    const hasImages = imageUrls.length > 0;
+
+    const imageInstruction = hasImages
+      ? `\n\n첨부된 ${imageUrls.length}개의 이미지도 함께 분석해주세요. 이미지의 디자인, 내용, 사용성 등을 종합적으로 평가해주세요.`
+      : '';
 
     const prompt = `${personaPrompt}
 
@@ -75,14 +82,33 @@ ${persona.description ? `- 추가 설명: ${persona.description}` : ''}
 
 ---
 ${content}
----
+---${imageInstruction}
 
 200-500자 분량의 상세한 피드백과 함께 감정(긍정/중립/부정), 구매 의향, 핵심 포인트 3개, 1-5점 점수를 제공해주세요.`;
 
     try {
+      // Build content parts for multimodal request
+      const contentParts: Part[] = [{ text: prompt }];
+
+      if (hasImages) {
+        for (const imageUrl of imageUrls) {
+          try {
+            const imageData = await this.fetchImageAsBase64(imageUrl);
+            contentParts.push({
+              inlineData: {
+                data: imageData.data,
+                mimeType: imageData.mimeType,
+              },
+            });
+          } catch (error) {
+            console.warn(`Skipping image ${imageUrl} due to fetch error`);
+          }
+        }
+      }
+
       const response = await this.ai.models.generateContent({
         model: this.modelName,
-        contents: prompt,
+        contents: contentParts,
         config: {
           temperature: 0.7,
           topK: 40,
@@ -122,6 +148,7 @@ ${content}
           personaId: persona.id,
           personaName: persona.name,
           contentPreview: content.substring(0, 200),
+          imageCount: imageUrls.length,
         },
         status: 'success',
         responseTimeMs: Date.now() - startTime,
@@ -143,6 +170,7 @@ ${content}
           personaId: persona.id,
           personaName: persona.name,
           contentPreview: content.substring(0, 200),
+          imageCount: imageUrls.length,
         },
         status: 'error',
         errorMessage,
@@ -347,5 +375,38 @@ ${JSON.stringify(feedbackSummaries, null, 2)}
   private validatePurchaseIntent(value: string): PurchaseIntent {
     const valid: PurchaseIntent[] = ['high', 'medium', 'low', 'none'];
     return valid.includes(value as PurchaseIntent) ? (value as PurchaseIntent) : 'medium';
+  }
+
+  private async fetchImageAsBase64(url: string): Promise<{ data: string; mimeType: string }> {
+    try {
+      const response = await axios.get(url, {
+        responseType: 'arraybuffer',
+        timeout: 30000,
+      });
+
+      const buffer = Buffer.from(response.data);
+      const base64 = buffer.toString('base64');
+      const contentType = response.headers['content-type'] || this.getMimeTypeFromUrl(url);
+
+      return {
+        data: base64,
+        mimeType: contentType,
+      };
+    } catch (error) {
+      console.error(`Failed to fetch image from ${url}:`, error);
+      throw new Error(`Failed to fetch image: ${url}`);
+    }
+  }
+
+  private getMimeTypeFromUrl(url: string): string {
+    const ext = url.split('.').pop()?.toLowerCase();
+    const mimeTypes: Record<string, string> = {
+      jpg: 'image/jpeg',
+      jpeg: 'image/jpeg',
+      png: 'image/png',
+      gif: 'image/gif',
+      webp: 'image/webp',
+    };
+    return mimeTypes[ext || ''] || 'image/jpeg';
   }
 }
