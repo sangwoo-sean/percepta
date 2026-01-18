@@ -41,12 +41,9 @@ function HeroSection() {
           당신의 제품을 실제 고객처럼 평가해드립니다.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <button className="px-8 py-4 bg-violet-500 hover:bg-violet-600 rounded-xl font-semibold text-lg transition-all hover:scale-105">
+          <a href="https://perceptaai.vercel.app/" className="px-8 py-4 bg-violet-500 hover:bg-violet-600 rounded-xl font-semibold text-lg transition-all hover:scale-105">
             무료로 시작하기
-          </button>
-          <button className="px-8 py-4 bg-white/10 hover:bg-white/20 rounded-xl font-semibold text-lg transition-all backdrop-blur-sm">
-            데모 보기
-          </button>
+          </a>
         </div>
       </div>
       <div className="absolute bottom-10 animate-bounce">
@@ -215,9 +212,9 @@ function CTASection() {
         <p className="text-white/80 text-lg mb-10">
           지금 바로 무료로 시작하고, AI 페르소나의 솔직한 피드백을 받아보세요.
         </p>
-        <button className="px-10 py-4 bg-white text-violet-600 rounded-xl font-bold text-lg hover:bg-slate-100 transition-all hover:scale-105">
+        <a href="https://perceptaai.vercel.app/" className="inline-block px-10 py-4 bg-white text-violet-600 rounded-xl font-bold text-lg hover:bg-slate-100 transition-all hover:scale-105">
           무료로 시작하기
-        </button>
+        </a>
       </div>
     </section>
   )
