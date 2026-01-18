@@ -33,6 +33,7 @@ ${persona.description ? `- 추가 설명: ${persona.description}` : ''}
   async generateFeedback(content: string, persona: Persona, context?: AICallContext): Promise<AIFeedbackResponse> {
     const startTime = Date.now();
     const personaPrompt = this.buildPersonaPrompt(persona);
+    let responseText: string | undefined;
 
     const prompt = `${personaPrompt}
 
@@ -66,6 +67,8 @@ JSON만 출력하고 다른 텍스트는 포함하지 마세요.`;
       });
 
       const text = response.text;
+      responseText = text;
+
       if (!text) {
         throw new Error('No response from Gemini API');
       }
@@ -73,7 +76,7 @@ JSON만 출력하고 다른 텍스트는 포함하지 마세요.`;
       // Extract JSON from response
       const jsonMatch = text.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
-        throw new Error('Invalid JSON response from Gemini API');
+        throw new Error(`Invalid JSON response from Gemini API: ${text.substring(0, 500)}`);
       }
 
       const parsed = JSON.parse(jsonMatch[0]);
@@ -113,6 +116,7 @@ JSON만 출력하고 다른 텍스트는 포함하지 마세요.`;
         operationType: 'feedback',
         model: this.modelName,
         inputPrompt: prompt,
+        outputResponse: responseText,
         metadata: {
           sessionId: context?.sessionId,
           personaId: persona.id,
@@ -131,6 +135,7 @@ JSON만 출력하고 다른 텍스트는 포함하지 마세요.`;
 
   async generateSummary(content: string, results: FeedbackResult[], context?: AICallContext): Promise<string> {
     const startTime = Date.now();
+    let responseText: string | undefined;
     const feedbackSummaries = results.map((r) => ({
       persona: r.persona?.name || 'Unknown',
       sentiment: r.sentiment,
@@ -169,6 +174,7 @@ ${JSON.stringify(feedbackSummaries, null, 2)}
       });
 
       const text = response.text;
+      responseText = text;
       const summary = text || '요약을 생성할 수 없습니다.';
 
       await this.aiLogService.log({
@@ -196,6 +202,7 @@ ${JSON.stringify(feedbackSummaries, null, 2)}
         operationType: 'summary',
         model: this.modelName,
         inputPrompt: prompt,
+        outputResponse: responseText,
         metadata: {
           sessionId: context?.sessionId,
           resultCount: results.length,
@@ -213,6 +220,7 @@ ${JSON.stringify(feedbackSummaries, null, 2)}
 
   async generatePersonas(ageGroups: AgeGroup[], count: number, context?: AICallContext): Promise<PersonaData[]> {
     const startTime = Date.now();
+    let responseText: string | undefined;
     const ageGroupKorean: Record<AgeGroup, string> = {
       '10s': '10대',
       '20s': '20대',
@@ -275,6 +283,8 @@ JSON 배열 형식으로만 응답해주세요.
       });
 
       const text = response.text;
+      responseText = text;
+
       if (!text) {
         throw new Error('No response from Gemini API');
       }
@@ -282,7 +292,7 @@ JSON 배열 형식으로만 응답해주세요.
       // Extract JSON array from response
       const jsonMatch = text.match(/\[[\s\S]*\]/);
       if (!jsonMatch) {
-        throw new Error('Invalid JSON array response from Gemini API');
+        throw new Error(`Invalid JSON array response from Gemini API: ${text.substring(0, 500)}`);
       }
 
       const parsed = JSON.parse(jsonMatch[0]);
@@ -329,6 +339,7 @@ JSON 배열 형식으로만 응답해주세요.
         operationType: 'persona_generation',
         model: this.modelName,
         inputPrompt: prompt,
+        outputResponse: responseText,
         metadata: {
           ageGroups,
           requestedCount: count,
