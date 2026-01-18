@@ -87,7 +87,7 @@ ${content}
           temperature: 0.7,
           topK: 40,
           topP: 0.95,
-          maxOutputTokens: 1024,
+          maxOutputTokens: 8192,
           responseMimeType: 'application/json',
           responseSchema: FEEDBACK_SCHEMA,
         },
@@ -190,7 +190,7 @@ ${JSON.stringify(feedbackSummaries, null, 2)}
           temperature: 0.7,
           topK: 40,
           topP: 0.95,
-          maxOutputTokens: 1024,
+          maxOutputTokens: 8192,
         },
       });
 
@@ -267,7 +267,7 @@ ${JSON.stringify(feedbackSummaries, null, 2)}
           temperature: 0.9,
           topK: 40,
           topP: 0.95,
-          maxOutputTokens: 4096,
+          maxOutputTokens: 8192,
           responseMimeType: 'application/json',
           responseSchema: PERSONA_SCHEMA,
         },
