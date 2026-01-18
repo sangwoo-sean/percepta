@@ -55,7 +55,7 @@ export class UsersService {
   async create(createUserDto: CreateUserDto): Promise<User> {
     const user = this.usersRepository.create({
       ...createUserDto,
-      credits: 30,
+      credits: 50, // 오픈베타 프로모션
     });
     return this.usersRepository.save(user);
   }

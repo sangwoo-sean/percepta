@@ -148,7 +148,7 @@ describe('UsersService', () => {
 
       expect(repository.create).toHaveBeenCalledWith({
         ...createUserDto,
-        credits: 30,
+        credits: 50,
       });
       expect(repository.save).toHaveBeenCalled();
       expect(result).toEqual(newUser);
