@@ -1,13 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
 import { authApi } from '../api/auth';
 import { Button, LanguageSwitcher } from '../components/common';
+import { actionLogger } from '../services/actionLogger';
 
 export const LoginPage: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth();
   const { t } = useTranslation('auth');
+
+  useEffect(() => {
+    actionLogger.pageView('/login');
+  }, []);
 
   if (isLoading) {
     return (
@@ -22,6 +27,7 @@ export const LoginPage: React.FC = () => {
   }
 
   const handleGoogleLogin = () => {
+    actionLogger.authEvent('auth_login_start');
     window.location.href = authApi.getGoogleAuthUrl();
   };
 

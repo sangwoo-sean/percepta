@@ -1,11 +1,13 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { actionLogger } from '../../services/actionLogger';
 
 export const LanguageSwitcher: React.FC = () => {
   const { i18n, t } = useTranslation();
 
   const toggleLanguage = () => {
     const newLang = i18n.language === 'ko' ? 'en' : 'ko';
+    actionLogger.navEvent('nav_language_change', { from: i18n.language, to: newLang });
     i18n.changeLanguage(newLang);
   };
 

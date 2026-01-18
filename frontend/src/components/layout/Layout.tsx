@@ -1,11 +1,13 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { usePageLogger } from '../../hooks/usePageLogger';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
 
 export const Layout: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth();
+  usePageLogger();
 
   if (isLoading) {
     return (

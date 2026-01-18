@@ -3,10 +3,16 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hooks/useAuth';
 import { LanguageSwitcher } from '../common';
+import { actionLogger } from '../../services/actionLogger';
 
 export const Header: React.FC = () => {
   const { user, logout } = useAuth();
   const { t } = useTranslation();
+
+  const handleLogout = () => {
+    actionLogger.authEvent('auth_logout');
+    logout();
+  };
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
@@ -40,7 +46,7 @@ export const Header: React.FC = () => {
                   </div>
                 )}
                 <span className="text-sm font-medium text-gray-700 hidden sm:block">{user.name}</span>
-                <button onClick={logout} className="text-gray-500 hover:text-gray-700 text-sm">
+                <button onClick={handleLogout} className="text-gray-500 hover:text-gray-700 text-sm">
                   {t('header.logout')}
                 </button>
               </div>

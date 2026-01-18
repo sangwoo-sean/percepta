@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hooks/useAuth';
+import { actionLogger } from '../services/actionLogger';
 
 export const AuthCallbackPage: React.FC = () => {
   const navigate = useNavigate();
@@ -13,9 +14,11 @@ export const AuthCallbackPage: React.FC = () => {
     const token = searchParams.get('token');
 
     if (token) {
+      actionLogger.authEvent('auth_login_success');
       login(token);
       navigate('/', { replace: true });
     } else {
+      actionLogger.authEvent('auth_login_failed');
       navigate('/login', { replace: true });
     }
   }, [searchParams, login, navigate]);

@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { actionLogger } from '../../services/actionLogger';
 
 interface NavItem {
   path: string;
@@ -78,6 +79,10 @@ const navItems: NavItem[] = [
 export const Sidebar: React.FC = () => {
   const { t } = useTranslation();
 
+  const handleNavClick = (path: string) => {
+    actionLogger.navEvent('nav_sidebar_click', { targetPath: path });
+  };
+
   return (
     <aside className="w-64 bg-white border-r border-gray-200 min-h-screen">
       <nav className="p-4 space-y-1">
@@ -86,6 +91,7 @@ export const Sidebar: React.FC = () => {
             key={item.path}
             to={item.path}
             end={item.path === '/'}
+            onClick={() => handleNavClick(item.path)}
             className={({ isActive }) =>
               `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                 isActive
