@@ -47,6 +47,9 @@ export class UserActionLog {
   @Column({ name: 'ip_address', type: 'varchar', length: 45, nullable: true })
   ipAddress: string | null;
 
+  @Column({ name: 'country', type: 'varchar', length: 2, nullable: true })
+  country: string | null;
+
   @Column({ name: 'user_agent', type: 'text', nullable: true })
   userAgent: string | null;
 
