@@ -49,7 +49,7 @@ export const PricingPage: React.FC = () => {
       {/* Credit Packages */}
       <Card>
         <CardHeader title={t('packages.title')} subtitle={t('packages.subtitle')} />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {creditPackages.map((pkg) => (
             <div
               key={pkg.name}
