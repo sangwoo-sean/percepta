@@ -8,6 +8,7 @@ build/
 .next/
 *.tsbuildinfo
 vite.config.js
+!landing-web/vite.config.js
 vite.config.d.ts
 vite.config.d.ts.map
 vitest.config.js
