@@ -224,7 +224,7 @@ function Footer() {
   return (
     <footer className="py-8 px-6 bg-slate-900 text-slate-400">
       <div className="max-w-4xl mx-auto text-center text-sm">
-        <p>&copy; 2025 Percepta. All rights reserved.</p>
+        <p>&copy; 2026 Percepta. All rights reserved.</p>
       </div>
     </footer>
   )
