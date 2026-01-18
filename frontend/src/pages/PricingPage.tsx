@@ -10,10 +10,12 @@ interface CreditPackage {
   discount: number;
   isFree?: boolean;
   isPopular?: boolean;
+  originalCredits?: number;
+  isPromotion?: boolean;
 }
 
 const creditPackages: CreditPackage[] = [
-  { name: 'trial', credits: 30, price: 0, pricePerCredit: 0, discount: 0, isFree: true },
+  { name: 'trial', credits: 50, price: 0, pricePerCredit: 0, discount: 0, isFree: true, originalCredits: 30, isPromotion: true },
   { name: 'small', credits: 50, price: 500, pricePerCredit: 10, discount: 0 },
   { name: 'basic', credits: 200, price: 1800, pricePerCredit: 9, discount: 10, isPopular: true },
   { name: 'large', credits: 500, price: 4000, pricePerCredit: 8, discount: 20 },
@@ -53,8 +55,13 @@ export const PricingPage: React.FC = () => {
           {creditPackages.map((pkg) => (
             <div
               key={pkg.name}
-              className={`relative rounded-lg border-2 p-5 transition-all ${pkg.isPopular ? 'border-primary-500 bg-primary-50' : 'border-gray-200 hover:border-gray-300'}`}
+              className={`relative rounded-lg border-2 p-5 transition-all ${pkg.isPromotion ? 'border-amber-500 bg-amber-50' : pkg.isPopular ? 'border-primary-500 bg-primary-50' : 'border-gray-200 hover:border-gray-300'}`}
             >
+              {pkg.isPromotion && (
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-500 text-white text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap">
+                  🎉 {t('packages.openBeta')}
+                </span>
+              )}
               {pkg.isPopular && (
                 <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary-500 text-white text-xs font-semibold px-3 py-1 rounded-full">{t('packages.popular')}</span>
               )}
@@ -65,9 +72,19 @@ export const PricingPage: React.FC = () => {
                   <span className="text-3xl font-bold text-gray-900">{pkg.isFree ? t('packages.free') : `₩${formatPrice(pkg.price)}`}</span>
                 </div>
                 <div className="mt-2 text-gray-500">
-                  <span className="text-xl font-semibold text-primary-600">{formatPrice(pkg.credits)}</span>
+                  {pkg.isPromotion && pkg.originalCredits ? (
+                    <>
+                      <span className="text-base text-gray-400 line-through mr-2">{formatPrice(pkg.originalCredits)}</span>
+                      <span className="text-xl font-semibold text-amber-600">{formatPrice(pkg.credits)}</span>
+                    </>
+                  ) : (
+                    <span className="text-xl font-semibold text-primary-600">{formatPrice(pkg.credits)}</span>
+                  )}
                   <span className="ml-1">{t('packages.credits')}</span>
                 </div>
+                {pkg.isPromotion && (
+                  <p className="mt-2 text-xs text-amber-600 font-medium">{t('packages.openBetaNote')}</p>
+                )}
                 {!pkg.isFree && <p className="mt-2 text-sm text-gray-500">{t('packages.perCredit', { price: pkg.pricePerCredit })}</p>}
               </div>
             </div>

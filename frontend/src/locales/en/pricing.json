@@ -7,6 +7,8 @@
     "credits": "credits",
     "free": "Free",
     "popular": "Popular",
+    "openBeta": "Open Beta Promo",
+    "openBetaNote": "Limited offer during open beta",
     "perCredit": "₩{{price}} per credit",
     "names": {
       "trial": "Trial",
