@@ -12,7 +12,6 @@ export class CreateActionLogDto {
     'auth_login_success',
     'auth_login_failed',
     'auth_logout',
-    'nav_sidebar_click',
     'nav_language_change',
   ])
   action: ActionType;

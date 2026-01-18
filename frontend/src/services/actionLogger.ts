@@ -6,7 +6,6 @@ type ActionType =
   | 'auth_login_success'
   | 'auth_login_failed'
   | 'auth_logout'
-  | 'nav_sidebar_click'
   | 'nav_language_change';
 
 interface ActionLogPayload {
@@ -57,7 +56,7 @@ export const actionLogger = {
   },
 
   navEvent(
-    action: 'nav_sidebar_click' | 'nav_language_change',
+    action: 'nav_language_change',
     metadata?: Record<string, unknown>,
   ): void {
     logAction({

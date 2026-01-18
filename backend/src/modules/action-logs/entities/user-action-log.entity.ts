@@ -15,7 +15,6 @@ export type ActionType =
   | 'auth_login_success'
   | 'auth_login_failed'
   | 'auth_logout'
-  | 'nav_sidebar_click'
   | 'nav_language_change';
 
 @Entity('user_action_logs')
