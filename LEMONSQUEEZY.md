@@ -65,9 +65,9 @@ BM.md의 크레딧 패키지를 LemonSqueezy 상품으로 생성합니다.
 
 | 패키지 | 크레딧 | 가격 | 상품 타입 |
 |--------|--------|------|-----------|
-| 기본 | 200 | ₩1,800 | Single Payment |
-| 대량 | 500 | ₩4,000 | Single Payment |
-| 프리미엄 | 1,000 | ₩7,000 | Single Payment |
+| 기본 | 200 | ₩2,000 | Single Payment |
+| 대량 | 500 | ₩4,500 | Single Payment |
+| 프리미엄 | 1,000 | ₩8,000 | Single Payment |
 
 ### 3.2 상품 생성 절차
 
@@ -76,7 +76,7 @@ BM.md의 크레딧 패키지를 LemonSqueezy 상품으로 생성합니다.
    - **Name**: `크레딧 200 (기본 패키지)` 또는 `200 Credits (Basic)`
    - **Description**: `Percepta 피드백 크레딧 200개`
    - **Pricing**: `Single payment` 선택
-   - **Price**: `₩1,800` 또는 `$1.25`
+   - **Price**: `₩2,000` 또는 `$1.40`
 3. **Variants** 섹션에서 기본 variant 확인
 4. **Save** 후 **Variant ID** 메모
 
@@ -177,9 +177,9 @@ export class PaymentService {
 
     // 크레딧 패키지 설정
     this.packages = new Map([
-      ['credits_200', { credits: 200, variantId: this.configService.get('LEMON_VARIANT_CREDITS_200'), price: 1800 }],
-      ['credits_500', { credits: 500, variantId: this.configService.get('LEMON_VARIANT_CREDITS_500'), price: 4000 }],
-      ['credits_1000', { credits: 1000, variantId: this.configService.get('LEMON_VARIANT_CREDITS_1000'), price: 7000 }],
+      ['credits_200', { credits: 200, variantId: this.configService.get('LEMON_VARIANT_CREDITS_200'), price: 2000 }],
+      ['credits_500', { credits: 500, variantId: this.configService.get('LEMON_VARIANT_CREDITS_500'), price: 4500 }],
+      ['credits_1000', { credits: 1000, variantId: this.configService.get('LEMON_VARIANT_CREDITS_1000'), price: 8000 }],
     ]);
   }
 
