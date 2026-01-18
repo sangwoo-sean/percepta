@@ -1,10 +1,44 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI, Schema, Type } from '@google/genai';
 import { Persona, PersonaData, AgeGroup } from '../personas/entities/persona.entity';
 import { FeedbackResult, Sentiment, PurchaseIntent } from '../feedback/entities/feedback-result.entity';
 import { AIProvider, AIFeedbackResponse, AICallContext } from './ai-provider.interface';
 import { AiLogService } from './ai-log.service';
+
+const FEEDBACK_SCHEMA: Schema = {
+  type: Type.OBJECT,
+  properties: {
+    feedbackText: { type: Type.STRING, description: '상세한 피드백 내용 (200-500자)' },
+    sentiment: { type: Type.STRING, enum: ['positive', 'neutral', 'negative'] },
+    purchaseIntent: { type: Type.STRING, enum: ['high', 'medium', 'low', 'none'] },
+    keyPoints: { type: Type.ARRAY, items: { type: Type.STRING }, description: '핵심 포인트 3개' },
+    score: { type: Type.NUMBER, description: '1-5 사이의 점수 (소수점 1자리까지)' },
+  },
+  required: ['feedbackText', 'sentiment', 'purchaseIntent', 'keyPoints', 'score'],
+};
+
+const PERSONA_SCHEMA: Schema = {
+  type: Type.ARRAY,
+  items: {
+    type: Type.OBJECT,
+    properties: {
+      name: { type: Type.STRING, description: '한국식 이름 (성 + 이름)' },
+      ageGroup: { type: Type.STRING, enum: ['10s', '20s', '30s', '40s', '50s', '60+'] },
+      gender: { type: Type.STRING, enum: ['male', 'female'] },
+      occupation: { type: Type.STRING, description: '직업' },
+      location: { type: Type.STRING, description: '거주지역 (시/구 단위)' },
+      education: { type: Type.STRING, description: '학력' },
+      incomeLevel: { type: Type.STRING, enum: ['하', '중하', '중', '중상', '상'] },
+      personalityTraits: { type: Type.ARRAY, items: { type: Type.STRING }, description: '3-5개의 성격 특성' },
+      dailyPattern: { type: Type.STRING, description: '일상 패턴 2-3문장' },
+      strengths: { type: Type.ARRAY, items: { type: Type.STRING }, description: '3-4개의 강점' },
+      weaknesses: { type: Type.ARRAY, items: { type: Type.STRING }, description: '2-3개의 약점' },
+      description: { type: Type.STRING, description: '소비 성향, 관심사 2-3문장' },
+    },
+    required: ['name', 'ageGroup', 'gender', 'occupation', 'personalityTraits', 'description'],
+  },
+};
 
 @Injectable()
 export class GeminiService implements AIProvider {
@@ -43,16 +77,7 @@ ${persona.description ? `- 추가 설명: ${persona.description}` : ''}
 ${content}
 ---
 
-다음 JSON 형식으로 응답해주세요:
-{
-  "feedbackText": "상세한 피드백 내용 (200-500자)",
-  "sentiment": "positive" | "neutral" | "negative",
-  "purchaseIntent": "high" | "medium" | "low" | "none",
-  "keyPoints": ["핵심 포인트 1", "핵심 포인트 2", "핵심 포인트 3"],
-  "score": 1-5 사이의 점수 (소수점 1자리까지)
-}
-
-JSON만 출력하고 다른 텍스트는 포함하지 마세요.`;
+200-500자 분량의 상세한 피드백과 함께 감정(긍정/중립/부정), 구매 의향, 핵심 포인트 3개, 1-5점 점수를 제공해주세요.`;
 
     try {
       const response = await this.ai.models.generateContent({
@@ -63,6 +88,8 @@ JSON만 출력하고 다른 텍스트는 포함하지 마세요.`;
           topK: 40,
           topP: 0.95,
           maxOutputTokens: 1024,
+          responseMimeType: 'application/json',
+          responseSchema: FEEDBACK_SCHEMA,
         },
       });
 
@@ -73,13 +100,7 @@ JSON만 출력하고 다른 텍스트는 포함하지 마세요.`;
         throw new Error('No response from Gemini API');
       }
 
-      // Extract JSON from response
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) {
-        throw new Error(`Invalid JSON response from Gemini API: ${text.substring(0, 500)}`);
-      }
-
-      const parsed = JSON.parse(jsonMatch[0]);
+      const parsed = JSON.parse(text);
 
       const result: AIFeedbackResponse = {
         feedbackText: parsed.feedbackText || '',
@@ -235,40 +256,8 @@ ${JSON.stringify(feedbackSummaries, null, 2)}
     const prompt = `당신은 한국의 다양한 소비자 페르소나를 생성하는 전문가입니다.
 
 다음 조건에 맞는 ${count}명의 페르소나를 생성해주세요:
-- 연령대: ${ageGroupsKorean} (이 연령대들 중에서 골고루 분배해서 생성해주세요)
-
-각 페르소나에 대해 다음 정보를 생성해주세요:
-1. name: 한국식 이름 (성 + 이름)
-2. ageGroup: 연령대 ("10s", "20s", "30s", "40s", "50s", "60+" 중 하나)
-3. gender: 성별 ("male" 또는 "female")
-4. occupation: 해당 연령대에 적합한 현실적인 직업
-5. location: 거주지역 (시/구 단위, 예: "서울시 강남구")
-6. education: 학력
-7. incomeLevel: 소득수준 ("하", "중하", "중", "중상", "상")
-8. personalityTraits: 3-5개의 성격 특성
-9. dailyPattern: 일상 패턴 2-3문장
-10. strengths: 3-4개의 강점
-11. weaknesses: 2-3개의 약점
-12. description: 소비 성향, 관심사 2-3문장
-
-JSON 배열 형식으로만 응답해주세요.
-예시:
-[
-  {
-    "name": "김민준",
-    "ageGroup": "20s",
-    "gender": "male",
-    "occupation": "소프트웨어 개발자",
-    "location": "서울시 강남구",
-    "education": "대학교 졸업",
-    "incomeLevel": "중상",
-    "personalityTraits": ["분석적", "트렌디한", "실용적"],
-    "dailyPattern": "평일에는 IT 기업에서 근무하며, 저녁에는 개인 프로젝트를 진행합니다.",
-    "strengths": ["기술에 대한 이해도가 높음", "빠른 의사결정", "논리적 사고"],
-    "weaknesses": ["충동구매 경향", "워라밸 관리 어려움"],
-    "description": "최신 기술과 가젯에 관심이 많으며, 품질 좋은 제품에는 과감히 투자하는 편입니다."
-  }
-]`;
+- 연령대: ${ageGroupsKorean} (이 연령대들 중에서 골고루 분배)
+- 각 페르소나는 현실적이고 구체적인 한국인 소비자여야 합니다.`;
 
     try {
       const response = await this.ai.models.generateContent({
@@ -279,6 +268,8 @@ JSON 배열 형식으로만 응답해주세요.
           topK: 40,
           topP: 0.95,
           maxOutputTokens: 4096,
+          responseMimeType: 'application/json',
+          responseSchema: PERSONA_SCHEMA,
         },
       });
 
@@ -289,13 +280,7 @@ JSON 배열 형식으로만 응답해주세요.
         throw new Error('No response from Gemini API');
       }
 
-      // Extract JSON array from response
-      const jsonMatch = text.match(/\[[\s\S]*\]/);
-      if (!jsonMatch) {
-        throw new Error(`Invalid JSON array response from Gemini API: ${text.substring(0, 500)}`);
-      }
-
-      const parsed = JSON.parse(jsonMatch[0]);
+      const parsed = JSON.parse(text);
 
       const validAgeGroups: AgeGroup[] = ['10s', '20s', '30s', '40s', '50s', '60+'];
       const result = parsed.map((item: Record<string, unknown>, index: number) => ({
