@@ -9,7 +9,7 @@
     "popular": "Popular",
     "openBeta": "Open Beta Promo",
     "openBetaNote": "Limited offer during open beta",
-    "perCredit": "₩{{price}} per credit",
+    "perCredit": "${{price}} per credit",
     "names": {
       "trial": "Trial",
       "basic": "Basic",

@@ -6,7 +6,9 @@ interface CreditPackage {
   name: string;
   credits: number;
   price: number;
+  priceUSD: number;
   pricePerCredit: number;
+  pricePerCreditUSD: number;
   discount: number;
   isFree?: boolean;
   isPopular?: boolean;
@@ -15,10 +17,10 @@ interface CreditPackage {
 }
 
 const creditPackages: CreditPackage[] = [
-  { name: 'trial', credits: 50, price: 0, pricePerCredit: 0, discount: 0, isFree: true, originalCredits: 30, isPromotion: true },
-  { name: 'basic', credits: 200, price: 2000, pricePerCredit: 10, discount: 0, isPopular: true },
-  { name: 'large', credits: 500, price: 4500, pricePerCredit: 9, discount: 10 },
-  { name: 'premium', credits: 1000, price: 8000, pricePerCredit: 8, discount: 20 },
+  { name: 'trial', credits: 50, price: 0, priceUSD: 0, pricePerCredit: 0, pricePerCreditUSD: 0, discount: 0, isFree: true, originalCredits: 30, isPromotion: true },
+  { name: 'basic', credits: 200, price: 2000, priceUSD: 1.49, pricePerCredit: 10, pricePerCreditUSD: 0.0075, discount: 0, isPopular: true },
+  { name: 'large', credits: 500, price: 4500, priceUSD: 2.99, pricePerCredit: 9, pricePerCreditUSD: 0.006, discount: 10 },
+  { name: 'premium', credits: 1000, price: 8000, priceUSD: 4.99, pricePerCredit: 8, pricePerCreditUSD: 0.005, discount: 20 },
 ];
 
 interface CreditUsage {
@@ -33,11 +35,18 @@ const creditUsages: CreditUsage[] = [
 ];
 
 export const PricingPage: React.FC = () => {
-  const { t } = useTranslation('pricing');
+  const { t, i18n } = useTranslation('pricing');
+  const isEnglish = i18n.language === 'en';
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('ko-KR').format(price);
+    return isEnglish
+      ? new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(price)
+      : new Intl.NumberFormat('ko-KR').format(price);
   };
+
+  const getCurrencySymbol = () => (isEnglish ? '$' : '₩');
+  const getPrice = (pkg: CreditPackage) => (isEnglish ? pkg.priceUSD : pkg.price);
+  const getPricePerCredit = (pkg: CreditPackage) => (isEnglish ? pkg.pricePerCreditUSD : pkg.pricePerCredit);
 
   return (
     <div className="space-y-8">
@@ -67,7 +76,7 @@ export const PricingPage: React.FC = () => {
               <div className="text-center">
                 <h3 className="text-lg font-semibold text-gray-900">{t(`packages.names.${pkg.name}`)}</h3>
                 <div className="mt-3">
-                  <span className="text-3xl font-bold text-gray-900">{pkg.isFree ? t('packages.free') : `₩${formatPrice(pkg.price)}`}</span>
+                  <span className="text-3xl font-bold text-gray-900">{pkg.isFree ? t('packages.free') : `${getCurrencySymbol()}${formatPrice(getPrice(pkg))}`}</span>
                 </div>
                 <div className="mt-2 text-gray-500">
                   {pkg.isPromotion && pkg.originalCredits ? (
@@ -83,7 +92,7 @@ export const PricingPage: React.FC = () => {
                 {pkg.isPromotion && (
                   <p className="mt-2 text-xs text-amber-600 font-medium">{t('packages.openBetaNote')}</p>
                 )}
-                {!pkg.isFree && <p className="mt-2 text-sm text-gray-500">{t('packages.perCredit', { price: pkg.pricePerCredit })}</p>}
+                {!pkg.isFree && <p className="mt-2 text-sm text-gray-500">{t('packages.perCredit', { price: formatPrice(getPricePerCredit(pkg)) })}</p>}
               </div>
             </div>
           ))}
