@@ -1,0 +1,9 @@
+export { HeroSection } from './HeroSection';
+export { SocialProofSection } from './SocialProofSection';
+export { ProblemSection } from './ProblemSection';
+export { DemoSection } from './DemoSection';
+export { HowItWorksSection } from './HowItWorksSection';
+export { PricingSection } from './PricingSection';
+export { CTASection } from './CTASection';
+export { Footer } from './Footer';
+export { LanguageToggle } from './LanguageToggle';

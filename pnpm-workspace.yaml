@@ -2,3 +2,4 @@ packages:
   - 'backend'
   - 'frontend'
   - 'landing-web'
+  - 'landing-v2'
