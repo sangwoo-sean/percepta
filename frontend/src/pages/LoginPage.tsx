@@ -40,7 +40,7 @@ export const LoginPage: React.FC = () => {
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <div className="text-center mb-8">
             <img src="/logo.png" alt="Percepta" className="w-20 h-20 mx-auto mb-4" />
-            <h1 className="text-3xl font-bold text-primary-600 mb-2">{t('login.title')}</h1>
+            <img src="/percepta.png" alt="Percepta" className="h-10 mx-auto mb-2" />
             <p className="text-gray-600">{t('login.subtitle')}</p>
           </div>
 

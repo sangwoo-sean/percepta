@@ -18,9 +18,8 @@ export const Header: React.FC = () => {
     <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <Link to="/" className="flex items-center gap-2">
-            <img src="/logo.png" alt="Percepta" className="w-8 h-8" />
-            <span className="text-xl font-bold text-primary-600">Percepta</span>
+          <Link to="/" className="flex items-center">
+            <img src="/percepta.png" alt="Percepta" className="h-8" />
           </Link>
 
           {user && (
