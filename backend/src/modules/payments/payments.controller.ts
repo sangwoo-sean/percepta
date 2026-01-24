@@ -15,8 +15,8 @@ import { LemonSqueezyWebhookGuard } from './guards/lemon-squeezy-webhook.guard';
 import { PaymentsService } from './payments.service';
 import { CreateCheckoutDto } from './dto/create-checkout.dto';
 
-interface JwtPayload {
-  sub: string;
+interface AuthenticatedUser {
+  id: string;
   email: string;
 }
 
@@ -32,9 +32,9 @@ export class PaymentsController {
     @Req() req: Request,
     @Body() dto: CreateCheckoutDto,
   ): Promise<{ checkoutUrl: string }> {
-    const user = req.user as JwtPayload;
+    const user = req.user as AuthenticatedUser;
     const checkoutUrl = await this.paymentsService.createCheckoutUrl(
-      user.sub,
+      user.id,
       dto.packageName,
     );
     return { checkoutUrl };
@@ -63,7 +63,7 @@ export class PaymentsController {
   @Get('history')
   @UseGuards(JwtAuthGuard)
   async getPaymentHistory(@Req() req: Request) {
-    const user = req.user as JwtPayload;
-    return this.paymentsService.getPaymentHistory(user.sub);
+    const user = req.user as AuthenticatedUser;
+    return this.paymentsService.getPaymentHistory(user.id);
   }
 }

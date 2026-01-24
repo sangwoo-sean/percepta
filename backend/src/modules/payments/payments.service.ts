@@ -12,6 +12,7 @@ import { UsersService } from '../users/users.service';
 
 interface PackageConfig {
   variantId: string;
+  checkoutId: string;
   credits: number;
   price: number;
 }
@@ -53,16 +54,19 @@ export class PaymentsService {
     this.packageConfigs = {
       basic: {
         variantId: this.configService.get<string>('LS_BASIC_VARIANT_ID', ''),
+        checkoutId: this.configService.get<string>('LS_BASIC_CHECKOUT_ID', ''),
         credits: 200,
         price: 2000,
       },
       large: {
         variantId: this.configService.get<string>('LS_LARGE_VARIANT_ID', ''),
+        checkoutId: this.configService.get<string>('LS_LARGE_CHECKOUT_ID', ''),
         credits: 500,
         price: 4500,
       },
       premium: {
         variantId: this.configService.get<string>('LS_PREMIUM_VARIANT_ID', ''),
+        checkoutId: this.configService.get<string>('LS_PREMIUM_CHECKOUT_ID', ''),
         credits: 1000,
         price: 8000,
       },
@@ -78,14 +82,13 @@ export class PaymentsService {
 
   async createCheckoutUrl(userId: string, packageName: PackageName): Promise<string> {
     const packageConfig = this.packageConfigs[packageName];
-    if (!packageConfig || !packageConfig.variantId) {
+    if (!packageConfig || !packageConfig.checkoutId) {
       throw new BadRequestException(`Invalid package: ${packageName}`);
     }
 
-    const storeId = this.configService.get<string>('LEMON_SQUEEZY_STORE_ID');
     const frontendUrl = this.configService.get<string>('FRONTEND_URL', 'http://localhost:5173');
 
-    const checkoutUrl = new URL(`https://percepta.lemonsqueezy.com/buy/${packageConfig.variantId}`);
+    const checkoutUrl = new URL(`https://percepta.lemonsqueezy.com/checkout/buy/${packageConfig.checkoutId}`);
     checkoutUrl.searchParams.set('checkout[custom][user_id]', userId);
     checkoutUrl.searchParams.set('checkout[success_url]', `${frontendUrl}/payment/success`);
     checkoutUrl.searchParams.set('checkout[cancel_url]', `${frontendUrl}/payment/cancel`);
