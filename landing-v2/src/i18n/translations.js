@@ -62,7 +62,7 @@ export const translations = {
       input: {
         label: 'Your Content',
         placeholder: 'Paste your headline, landing page copy, or any content...',
-        example: '"Start your year with healthy habits. Sign up now and get 50% off your first month!"',
+        example: '"I\'m creating an Instagram ad for a fitness app targeting health-conscious 25-35 year olds for a New Year campaign. Please evaluate this copy: \'Start your year with healthy habits. Sign up now and get 50% off your first month!\'"',
       },
       output: {
         label: 'AI Persona Feedback',
@@ -260,7 +260,7 @@ export const translations = {
       input: {
         label: '당신의 콘텐츠',
         placeholder: '헤드라인, 랜딩페이지 카피, 또는 어떤 콘텐츠든 붙여넣으세요...',
-        example: '"새해에는 건강한 습관으로 시작하세요. 지금 가입하면 첫 달 50% 할인!"',
+        example: '"피트니스 앱의 신년 캠페인 인스타그램 광고인데요, 건강에 관심 있는 25-35세를 타겟으로 하고 있어요. 이 카피 평가해주세요: \'새해에는 건강한 습관으로 시작하세요. 지금 가입하면 첫 달 50% 할인!\'"',
       },
       output: {
         label: 'AI 페르소나 피드백',
