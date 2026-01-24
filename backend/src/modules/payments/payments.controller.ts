@@ -44,17 +44,29 @@ export class PaymentsController {
   @UseGuards(LemonSqueezyWebhookGuard)
   @HttpCode(HttpStatus.OK)
   async handleWebhook(@Body() event: unknown): Promise<{ received: boolean }> {
-    this.logger.log(`Received webhook: ${JSON.stringify(event)}`);
-
     const webhookEvent = event as {
       meta: { event_name: string; custom_data?: { user_id?: string } };
       data: { id: string; attributes: { first_order_item: { variant_id: number }; total: number; currency: string; status: string } };
     };
 
-    if (webhookEvent.meta.event_name === 'order_created') {
-      await this.paymentsService.handleOrderCreated(webhookEvent);
-    } else {
-      this.logger.log(`Ignoring event: ${webhookEvent.meta.event_name}`);
+    const safeLogPayload = {
+      eventName: webhookEvent.meta?.event_name,
+      orderId: webhookEvent.data?.id,
+      status: webhookEvent.data?.attributes?.status,
+    };
+    this.logger.log(`Received webhook: ${JSON.stringify(safeLogPayload)}`);
+
+    const eventName = webhookEvent.meta.event_name;
+
+    switch (eventName) {
+      case 'order_created':
+        await this.paymentsService.handleOrderCreated(webhookEvent);
+        break;
+      case 'order_refunded':
+        await this.paymentsService.handleOrderRefunded(webhookEvent);
+        break;
+      default:
+        this.logger.log(`Ignoring event: ${eventName}`);
     }
 
     return { received: true };

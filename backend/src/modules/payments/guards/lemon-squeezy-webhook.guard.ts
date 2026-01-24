@@ -39,7 +39,15 @@ export class LemonSqueezyWebhookGuard implements CanActivate {
     const hmac = crypto.createHmac('sha256', webhookSecret);
     const digest = hmac.update(rawBody).digest('hex');
 
-    if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(digest))) {
+    const signatureBuffer = Buffer.from(signature);
+    const digestBuffer = Buffer.from(digest);
+
+    if (signatureBuffer.length !== digestBuffer.length) {
+      this.logger.warn('Invalid webhook signature (length mismatch)');
+      throw new UnauthorizedException('Invalid signature');
+    }
+
+    if (!crypto.timingSafeEqual(signatureBuffer, digestBuffer)) {
       this.logger.warn('Invalid webhook signature');
       throw new UnauthorizedException('Invalid signature');
     }

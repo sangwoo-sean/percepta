@@ -15,7 +15,8 @@ export type TransactionType =
   | 'refund_feedback_partial'
   | 'admin_add'
   | 'admin_deduct'
-  | 'purchase_credits';
+  | 'purchase_credits'
+  | 'refund_purchase';
 
 export type ReferenceType = 'feedback_session' | 'persona' | 'payment_record';
 
