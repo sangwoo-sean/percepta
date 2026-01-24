@@ -4,18 +4,18 @@ import { useTranslation } from 'react-i18next';
 import { useAppDispatch } from '../hooks/useAppDispatch';
 import { fetchCreditTransactions } from '../store/creditsSlice';
 import type { RootState } from '../store';
-import type { TransactionType } from '../types';
+import type { TransactionType, CreditTransaction, PackageName } from '../types';
 import { Card } from '../components/common';
 
 const getTransactionIcon = (type: TransactionType): React.ReactNode => {
-  if (type.startsWith('deduct')) {
+  if (type.startsWith('deduct') || type === 'refund_purchase') {
     return (
       <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
     );
   }
-  if (type.startsWith('refund') || type === 'admin_add') {
+  if (type.startsWith('refund') || type === 'admin_add' || type === 'purchase_credits') {
     return (
       <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -38,6 +38,22 @@ const getAmountColor = (amount: number): string => {
 const formatAmount = (amount: number): string => {
   if (amount > 0) return `+${amount}`;
   return String(amount);
+};
+
+const getTransactionDescription = (
+  transaction: CreditTransaction,
+  t: (key: string) => string,
+): string | null => {
+  const { transactionType, metadata } = transaction;
+
+  if (transactionType === 'purchase_credits' || transactionType === 'refund_purchase') {
+    const packageName = metadata?.packageName as PackageName | undefined;
+    if (packageName) {
+      return t(`packageName.${packageName}`);
+    }
+  }
+
+  return transaction.description;
 };
 
 export const CreditHistoryPage: React.FC = () => {
@@ -86,7 +102,9 @@ export const CreditHistoryPage: React.FC = () => {
       ) : (
         <Card>
           <div className="divide-y divide-gray-200">
-            {transactions.map((transaction) => (
+            {transactions.map((transaction) => {
+              const description = getTransactionDescription(transaction, t);
+              return (
               <div key={transaction.id} className="py-4 flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   {getTransactionIcon(transaction.transactionType)}
@@ -94,8 +112,8 @@ export const CreditHistoryPage: React.FC = () => {
                     <p className="font-medium text-gray-900">
                       {t(`transactionType.${transaction.transactionType}`)}
                     </p>
-                    {transaction.description && (
-                      <p className="text-sm text-gray-500">{transaction.description}</p>
+                    {description && (
+                      <p className="text-sm text-gray-500">{description}</p>
                     )}
                     <p className="text-xs text-gray-400 mt-1">
                       {new Date(transaction.createdAt).toLocaleString()}
@@ -111,7 +129,8 @@ export const CreditHistoryPage: React.FC = () => {
                   </p>
                 </div>
               </div>
-            ))}
+            );
+            })}
           </div>
         </Card>
       )}

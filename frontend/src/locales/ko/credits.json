@@ -14,6 +14,13 @@
     "deduct_feedback_session": "피드백 세션",
     "refund_feedback_partial": "피드백 부분 환불",
     "admin_add": "관리자 크레딧 추가",
-    "admin_deduct": "관리자 크레딧 차감"
+    "admin_deduct": "관리자 크레딧 차감",
+    "purchase_credits": "크레딧 충전",
+    "refund_purchase": "결제 환불"
+  },
+  "packageName": {
+    "basic": "기본 패키지",
+    "large": "대량 패키지",
+    "premium": "프리미엄 패키지"
   }
 }

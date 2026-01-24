@@ -14,6 +14,13 @@
     "deduct_feedback_session": "Feedback Session",
     "refund_feedback_partial": "Feedback Partial Refund",
     "admin_add": "Admin Credit Addition",
-    "admin_deduct": "Admin Credit Deduction"
+    "admin_deduct": "Admin Credit Deduction",
+    "purchase_credits": "Credit Purchase",
+    "refund_purchase": "Payment Refund"
+  },
+  "packageName": {
+    "basic": "Basic Package",
+    "large": "Large Package",
+    "premium": "Premium Package"
   }
 }
