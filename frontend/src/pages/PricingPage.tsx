@@ -46,14 +46,12 @@ export const PricingPage: React.FC = () => {
   const [loadingPackage, setLoadingPackage] = useState<string | null>(null);
 
   const formatPrice = (price: number) => {
-    return isEnglish
-      ? new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(price)
-      : new Intl.NumberFormat('ko-KR').format(price);
+    return new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(price);
   };
 
-  const getCurrencySymbol = () => (isEnglish ? '$' : '₩');
-  const getPrice = (pkg: CreditPackage) => (isEnglish ? pkg.priceUSD : pkg.price);
-  const getPricePerCredit = (pkg: CreditPackage) => (isEnglish ? pkg.pricePerCreditUSD : pkg.pricePerCredit);
+  const getCurrencySymbol = () => '$';
+  const getPrice = (pkg: CreditPackage) => pkg.priceUSD;
+  const getPricePerCredit = (pkg: CreditPackage) => pkg.pricePerCreditUSD;
 
   const handlePurchase = async (packageName: string) => {
     if (!isAuthenticated) {

@@ -214,7 +214,7 @@ export const translations = {
     hero: {
       badge: 'AI 기반 피드백',
       title: 'AI 페르소나로 콘텐츠를 테스트하세요.',
-      titleHighlight: '피드백 1건 100원.',
+      titleHighlight: '피드백 1건 $0.01.',
       subtitle: 'AI 페르소나가 타겟 고객의 반응을 시뮬레이션합니다. 감성 분석, 구매 의향, 실행 가능한 인사이트를 몇 초 만에 받아보세요.',
       cta: '무료로 시작하기 — 30크레딧',
       ctaSecondary: '데모 보기',
@@ -225,7 +225,7 @@ export const translations = {
     socialProof: {
       stats: [
         { value: '10,000+', label: '생성된 피드백' },
-        { value: '100원', label: '피드백 1건' },
+        { value: '$0.01', label: '피드백 1건' },
         { value: '< 30초', label: '평균 응답 시간' },
       ],
       badge: '마케터와 크리에이터가 신뢰하는 서비스',
@@ -335,12 +335,12 @@ export const translations = {
     // Pricing Section
     pricing: {
       title: '심플하고 투명한 가격',
-      subtitle: '피드백 1건 = 100원',
+      subtitle: '피드백 1건 = $0.01',
       plans: [
         {
           name: '무료',
           credits: '30 크레딧',
-          price: '₩0',
+          price: '$0',
           description: '체험용으로 완벽',
           features: ['5명 페르소나 피드백', '1회 종합 분석', '모든 페르소나 타입'],
           cta: '무료로 시작',
@@ -349,7 +349,7 @@ export const translations = {
         {
           name: '베이직',
           credits: '200 크레딧',
-          price: '₩2,000',
+          price: '$1.49',
           description: '일반 사용자용',
           features: ['~33회 페르소나 피드백', '무제한 종합 분석', '우선 지원'],
           cta: '시작하기',
@@ -358,20 +358,20 @@ export const translations = {
         {
           name: '프로',
           credits: '500 크레딧',
-          price: '₩4,500',
+          price: '$2.99',
           description: '최고의 가성비',
           features: ['~83회 페르소나 피드백', '무제한 종합 분석', '우선 지원'],
           cta: '시작하기',
           popular: false,
         },
       ],
-      note: '5명 피드백 + 종합 분석 = 6크레딧 = 600원',
+      note: '5명 피드백 + 종합 분석 = 6크레딧 = $0.06',
       comparison: {
         title: '비용 비교',
         items: [
           { name: 'FGI (포커스 그룹)', price: '50만원 ~ 500만원' },
           { name: '사용자 테스트', price: '5만원 이상/회' },
-          { name: 'Percepta', price: '600원에 5명 피드백', highlight: true },
+          { name: 'Percepta', price: '$0.06에 5명 피드백', highlight: true },
         ],
       },
     },
