@@ -118,9 +118,10 @@ export const PricingPage: React.FC = () => {
                   <Button
                     className="mt-4 w-full"
                     variant={pkg.isPopular ? 'primary' : 'outline'}
-                    disabled={true}
+                    onClick={() => handlePurchase(pkg.name)}
+                    disabled={loadingPackage === pkg.name}
                   >
-                    {t('packages.comingSoon', 'Coming Soon')}
+                    {loadingPackage === pkg.name ? t('packages.processing') : t('packages.purchase')}
                   </Button>
                 )}
               </div>
