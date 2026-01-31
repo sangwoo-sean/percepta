@@ -97,6 +97,7 @@ export class FeedbackService {
     sessionId: string,
     userId: string,
     personaIds?: string[],
+    locale?: string,
   ): Promise<FeedbackResult[]> {
     const session = await this.findSessionByIdOrFail(sessionId);
 
@@ -117,7 +118,7 @@ export class FeedbackService {
         const aiResponse = await this.aiProvider.generateFeedback(
           session.inputContent,
           persona,
-          { userId, sessionId, imageUrls: session.inputImageUrls || [] },
+          { userId, sessionId, imageUrls: session.inputImageUrls || [], locale: locale || 'ko' },
         );
 
         const result = this.resultsRepository.create({
@@ -162,7 +163,7 @@ export class FeedbackService {
     return results;
   }
 
-  async generateSummary(sessionId: string, userId: string): Promise<string> {
+  async generateSummary(sessionId: string, userId: string, locale?: string): Promise<string> {
     const session = await this.findSessionByIdOrFail(sessionId);
 
     if (session.userId !== userId) {
@@ -176,7 +177,7 @@ export class FeedbackService {
     const summary = await this.aiProvider.generateSummary(
       session.inputContent,
       session.results,
-      { userId, sessionId },
+      { userId, sessionId, locale: locale || 'ko' },
     );
 
     await this.sessionsRepository.update(sessionId, { summary });

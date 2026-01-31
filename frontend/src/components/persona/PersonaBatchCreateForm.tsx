@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { getCurrentLocale } from '../../i18n';
 import type { GeneratePersonasDto, AgeGroup } from '../../types';
 import { Button, Select, RangeSlider } from '../common';
 
@@ -47,6 +48,7 @@ export const PersonaBatchCreateForm: React.FC<PersonaBatchCreateFormProps> = ({
     onSubmit({
       ageGroups: selectedAgeGroups,
       count: parseInt(count, 10),
+      locale: getCurrentLocale(),
     });
   };
 

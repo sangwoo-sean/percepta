@@ -15,9 +15,15 @@ import { UsersService } from '../users/users.service';
 
 const CREDITS_PER_PERSONA = 1;
 
-const KOREAN_NAMES = {
-  male: ['민준', '서준', '도윤', '예준', '시우', '하준', '주원', '지호', '지후', '준서'],
-  female: ['서연', '서윤', '지우', '서현', '민서', '하은', '하윤', '윤서', '지민', '채원'],
+const NAMES = {
+  ko: {
+    male: ['민준', '서준', '도윤', '예준', '시우', '하준', '주원', '지호', '지후', '준서'],
+    female: ['서연', '서윤', '지우', '서현', '민서', '하은', '하윤', '윤서', '지민', '채원'],
+  },
+  en: {
+    male: ['James', 'Michael', 'David', 'Robert', 'William', 'Richard', 'Thomas', 'Christopher', 'Daniel', 'Matthew'],
+    female: ['Emma', 'Olivia', 'Sophia', 'Isabella', 'Mia', 'Charlotte', 'Amelia', 'Harper', 'Evelyn', 'Abigail'],
+  },
 };
 
 @Injectable()
@@ -32,9 +38,9 @@ export class PersonasService {
     private readonly usersService: UsersService,
   ) {}
 
-  private generateRandomName(): string {
+  private generateRandomName(locale: 'ko' | 'en' = 'ko'): string {
     const gender = Math.random() > 0.5 ? 'male' : 'female';
-    const names = KOREAN_NAMES[gender];
+    const names = NAMES[locale][gender];
     return names[Math.floor(Math.random() * names.length)];
   }
 
@@ -100,7 +106,7 @@ export class PersonasService {
 
     let generatedData: PersonaData[];
     try {
-      generatedData = await this.aiProvider.generatePersonas(dto.ageGroups, dto.count, { userId });
+      generatedData = await this.aiProvider.generatePersonas(dto.ageGroups, dto.count, { userId, locale: dto.locale || 'ko' });
     } catch (error) {
       await this.usersService.addCredits(userId, requiredCredits, {
         transactionType: 'refund_persona_generation',

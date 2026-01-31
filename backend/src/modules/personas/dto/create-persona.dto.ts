@@ -84,6 +84,10 @@ export class GeneratePersonasDto {
   @Min(1)
   @Max(10)
   count: number;
+
+  @IsEnum(['ko', 'en'])
+  @IsOptional()
+  locale?: 'ko' | 'en';
 }
 
 export class UpdatePersonaDataDto {

@@ -19,18 +19,20 @@ export const feedbackApi = {
 
   generateFeedback: async (
     sessionId: string,
-    personaIds?: string[]
+    personaIds?: string[],
+    locale?: string
   ): Promise<FeedbackResult[]> => {
     const response = await apiClient.post<FeedbackResult[]>(
       `/feedback/sessions/${sessionId}/generate`,
-      { personaIds }
+      { personaIds, locale }
     );
     return response.data;
   },
 
-  getSummary: async (sessionId: string): Promise<{ summary: string }> => {
+  getSummary: async (sessionId: string, locale?: string): Promise<{ summary: string }> => {
+    const params = locale ? `?locale=${locale}` : '';
     const response = await apiClient.get<{ summary: string }>(
-      `/feedback/sessions/${sessionId}/summary`
+      `/feedback/sessions/${sessionId}/summary${params}`
     );
     return response.data;
   },

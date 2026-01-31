@@ -64,4 +64,10 @@ i18n
     },
   });
 
+export type SupportedLocale = 'ko' | 'en';
+
+export function getCurrentLocale(): SupportedLocale {
+  return i18n.language === 'en' ? 'en' : 'ko';
+}
+
 export default i18n;

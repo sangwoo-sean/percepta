@@ -207,7 +207,7 @@ describe('PersonasService', () => {
       expect(usersService.deductCredits).toHaveBeenCalledWith('user-uuid', 2, expect.objectContaining({
         transactionType: 'deduct_persona_generation',
       }));
-      expect(aiProvider.generatePersonas).toHaveBeenCalledWith(['20s'], 2, { userId: 'user-uuid' });
+      expect(aiProvider.generatePersonas).toHaveBeenCalledWith(['20s'], 2, { userId: 'user-uuid', locale: 'ko' });
       expect(result).toHaveLength(2);
     });
 

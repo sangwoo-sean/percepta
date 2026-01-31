@@ -55,6 +55,7 @@ export interface CreatePersonaDto {
 export interface GeneratePersonasDto {
   ageGroups: AgeGroup[];
   count: number;
+  locale?: 'ko' | 'en';
 }
 
 export interface UpdatePersonaDto {

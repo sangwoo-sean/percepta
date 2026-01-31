@@ -28,4 +28,14 @@ export class GenerateFeedbackDto {
   @IsUUID('4', { each: true })
   @IsOptional()
   personaIds?: string[];
+
+  @IsEnum(['ko', 'en'])
+  @IsOptional()
+  locale?: 'ko' | 'en';
+}
+
+export class GenerateSummaryDto {
+  @IsEnum(['ko', 'en'])
+  @IsOptional()
+  locale?: 'ko' | 'en';
 }

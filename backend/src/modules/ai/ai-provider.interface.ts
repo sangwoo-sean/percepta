@@ -13,6 +13,7 @@ export interface AICallContext {
   userId?: string;
   sessionId?: string;
   imageUrls?: string[];
+  locale?: string;
 }
 
 export interface AIProvider {

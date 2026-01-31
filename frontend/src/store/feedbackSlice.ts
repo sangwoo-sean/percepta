@@ -54,11 +54,11 @@ export const createSession = createAsyncThunk(
 export const generateFeedback = createAsyncThunk(
   'feedback/generateFeedback',
   async (
-    { sessionId, personaIds }: { sessionId: string; personaIds?: string[] },
+    { sessionId, personaIds, locale }: { sessionId: string; personaIds?: string[]; locale?: string },
     { rejectWithValue }
   ) => {
     try {
-      const results = await feedbackApi.generateFeedback(sessionId, personaIds);
+      const results = await feedbackApi.generateFeedback(sessionId, personaIds, locale);
       return { sessionId, results };
     } catch (error) {
       return rejectWithValue('Failed to generate feedback');
@@ -68,9 +68,9 @@ export const generateFeedback = createAsyncThunk(
 
 export const fetchSummary = createAsyncThunk(
   'feedback/fetchSummary',
-  async (sessionId: string, { rejectWithValue }) => {
+  async ({ sessionId, locale }: { sessionId: string; locale?: string }, { rejectWithValue }) => {
     try {
-      const { summary } = await feedbackApi.getSummary(sessionId);
+      const { summary } = await feedbackApi.getSummary(sessionId, locale);
       return { sessionId, summary };
     } catch (error) {
       return rejectWithValue('Failed to fetch summary');

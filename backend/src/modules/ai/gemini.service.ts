@@ -7,7 +7,7 @@ import { FeedbackResult, Sentiment, PurchaseIntent } from '../feedback/entities/
 import { AIProvider, AIFeedbackResponse, AICallContext } from './ai-provider.interface';
 import { AiLogService } from './ai-log.service';
 
-const FEEDBACK_SCHEMA: Schema = {
+const FEEDBACK_SCHEMA_KO: Schema = {
   type: Type.OBJECT,
   properties: {
     feedbackText: { type: Type.STRING, description: '상세한 피드백 내용 (200-500자)' },
@@ -19,7 +19,19 @@ const FEEDBACK_SCHEMA: Schema = {
   required: ['feedbackText', 'sentiment', 'purchaseIntent', 'keyPoints', 'score'],
 };
 
-const PERSONA_SCHEMA: Schema = {
+const FEEDBACK_SCHEMA_EN: Schema = {
+  type: Type.OBJECT,
+  properties: {
+    feedbackText: { type: Type.STRING, description: 'Detailed feedback content (200-500 characters)' },
+    sentiment: { type: Type.STRING, enum: ['positive', 'neutral', 'negative'] },
+    purchaseIntent: { type: Type.STRING, enum: ['high', 'medium', 'low', 'none'] },
+    keyPoints: { type: Type.ARRAY, items: { type: Type.STRING }, description: '3 key points' },
+    score: { type: Type.NUMBER, description: 'Score between 1-5 (up to 1 decimal place)' },
+  },
+  required: ['feedbackText', 'sentiment', 'purchaseIntent', 'keyPoints', 'score'],
+};
+
+const PERSONA_SCHEMA_KO: Schema = {
   type: Type.ARRAY,
   items: {
     type: Type.OBJECT,
@@ -41,6 +53,28 @@ const PERSONA_SCHEMA: Schema = {
   },
 };
 
+const PERSONA_SCHEMA_EN: Schema = {
+  type: Type.ARRAY,
+  items: {
+    type: Type.OBJECT,
+    properties: {
+      name: { type: Type.STRING, description: 'Western-style name (first name + last name)' },
+      ageGroup: { type: Type.STRING, enum: ['10s', '20s', '30s', '40s', '50s', '60+'] },
+      gender: { type: Type.STRING, enum: ['male', 'female'] },
+      occupation: { type: Type.STRING, description: 'Occupation' },
+      location: { type: Type.STRING, description: 'Location (city/state level)' },
+      education: { type: Type.STRING, description: 'Education level' },
+      incomeLevel: { type: Type.STRING, enum: ['low', 'lower-middle', 'middle', 'upper-middle', 'high'] },
+      personalityTraits: { type: Type.ARRAY, items: { type: Type.STRING }, description: '3-5 personality traits' },
+      dailyPattern: { type: Type.STRING, description: 'Daily routine in 2-3 sentences' },
+      strengths: { type: Type.ARRAY, items: { type: Type.STRING }, description: '3-4 strengths' },
+      weaknesses: { type: Type.ARRAY, items: { type: Type.STRING }, description: '2-3 weaknesses' },
+      description: { type: Type.STRING, description: 'Consumption habits and interests in 2-3 sentences' },
+    },
+    required: ['name', 'ageGroup', 'gender', 'occupation', 'personalityTraits', 'description'],
+  },
+};
+
 @Injectable()
 export class GeminiService implements AIProvider {
   private ai: GoogleGenAI;
@@ -54,7 +88,18 @@ export class GeminiService implements AIProvider {
     this.ai = new GoogleGenAI({ apiKey });
   }
 
-  private buildPersonaPrompt(persona: Persona): string {
+  private buildPersonaPrompt(persona: Persona, locale: string = 'ko'): string {
+    if (locale === 'en') {
+      return `You are a persona with the following characteristics:
+- Name: ${persona.name}
+- Age group: ${persona.ageGroup}
+- Occupation: ${persona.occupation}
+- Personality traits: ${persona.personalityTraits.join(', ')}
+${persona.description ? `- Additional description: ${persona.description}` : ''}
+
+Please provide feedback on the given content from this persona's perspective.`;
+    }
+
     return `당신은 다음과 같은 특성을 가진 페르소나입니다:
 - 이름: ${persona.name}
 - 연령대: ${persona.ageGroup}
@@ -67,24 +112,38 @@ ${persona.description ? `- 추가 설명: ${persona.description}` : ''}
 
   async generateFeedback(content: string, persona: Persona, context?: AICallContext): Promise<AIFeedbackResponse> {
     const startTime = Date.now();
-    const personaPrompt = this.buildPersonaPrompt(persona);
+    const locale = context?.locale || 'ko';
+    const personaPrompt = this.buildPersonaPrompt(persona, locale);
     let responseText: string | undefined;
     const imageUrls = context?.imageUrls || [];
     const hasImages = imageUrls.length > 0;
 
     const imageInstruction = hasImages
-      ? `\n\n첨부된 ${imageUrls.length}개의 이미지도 함께 분석해주세요. 이미지의 디자인, 내용, 사용성 등을 종합적으로 평가해주세요.`
+      ? locale === 'en'
+        ? `\n\nPlease also analyze the ${imageUrls.length} attached image(s). Evaluate the design, content, and usability comprehensively.`
+        : `\n\n첨부된 ${imageUrls.length}개의 이미지도 함께 분석해주세요. 이미지의 디자인, 내용, 사용성 등을 종합적으로 평가해주세요.`
       : '';
 
-    const prompt = `${personaPrompt}
+    const feedbackInstruction = locale === 'en'
+      ? `Please evaluate the following content:
 
-다음 콘텐츠에 대해 평가해주세요:
+---
+${content}
+---${imageInstruction}
+
+Provide detailed feedback (200-500 characters) along with sentiment (positive/neutral/negative), purchase intent, 3 key points, and a score from 1-5.`
+      : `다음 콘텐츠에 대해 평가해주세요:
 
 ---
 ${content}
 ---${imageInstruction}
 
 200-500자 분량의 상세한 피드백과 함께 감정(긍정/중립/부정), 구매 의향, 핵심 포인트 3개, 1-5점 점수를 제공해주세요.`;
+
+    const prompt = `${personaPrompt}
+
+${feedbackInstruction}`;
+    const feedbackSchema = locale === 'en' ? FEEDBACK_SCHEMA_EN : FEEDBACK_SCHEMA_KO;
 
     try {
       // Build content parts for multimodal request
@@ -115,7 +174,7 @@ ${content}
           topP: 0.95,
           maxOutputTokens: 8192,
           responseMimeType: 'application/json',
-          responseSchema: FEEDBACK_SCHEMA,
+          responseSchema: feedbackSchema,
         },
       });
 
@@ -178,12 +237,16 @@ ${content}
       });
 
       console.error('Gemini API error:', error);
-      throw new Error('AI 서비스에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.');
+      const userErrorMessage = locale === 'en'
+        ? 'The AI service is temporarily unavailable. Please try again later.'
+        : 'AI 서비스에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.';
+      throw new Error(userErrorMessage);
     }
   }
 
   async generateSummary(content: string, results: FeedbackResult[], context?: AICallContext): Promise<string> {
     const startTime = Date.now();
+    const locale = context?.locale || 'ko';
     let responseText: string | undefined;
     const feedbackSummaries = results.map((r) => ({
       persona: r.persona?.name || 'Unknown',
@@ -193,7 +256,24 @@ ${content}
       keyPoints: r.keyPoints,
     }));
 
-    const prompt = `다음은 여러 페르소나로부터 받은 콘텐츠 피드백입니다.
+    const prompt = locale === 'en'
+      ? `The following is feedback from multiple personas on the content.
+
+Original content:
+${content.substring(0, 1000)}${content.length > 1000 ? '...' : ''}
+
+Feedback results:
+${JSON.stringify(feedbackSummaries, null, 2)}
+
+Please compile the feedback above into an analysis summary that includes:
+1. Overall evaluation
+2. Commonly mentioned positive aspects
+3. Commonly mentioned areas for improvement
+4. Recommended target audience
+5. Suggested next steps
+
+Please write approximately 500-800 characters.`
+      : `다음은 여러 페르소나로부터 받은 콘텐츠 피드백입니다.
 
 원본 콘텐츠:
 ${content.substring(0, 1000)}${content.length > 1000 ? '...' : ''}
@@ -224,7 +304,8 @@ ${JSON.stringify(feedbackSummaries, null, 2)}
 
       const text = response.text;
       responseText = text;
-      const summary = text || '요약을 생성할 수 없습니다.';
+      const fallbackMessage = locale === 'en' ? 'Unable to generate summary.' : '요약을 생성할 수 없습니다.';
+      const summary = text || fallbackMessage;
 
       await this.aiLogService.log({
         userId: context?.userId,
@@ -263,13 +344,18 @@ ${JSON.stringify(feedbackSummaries, null, 2)}
       });
 
       console.error('Gemini API error:', error);
-      throw new Error('AI 서비스에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.');
+      const summaryError = locale === 'en'
+        ? 'The AI service is temporarily unavailable. Please try again later.'
+        : 'AI 서비스에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.';
+      throw new Error(summaryError);
     }
   }
 
   async generatePersonas(ageGroups: AgeGroup[], count: number, context?: AICallContext): Promise<PersonaData[]> {
     const startTime = Date.now();
+    const locale = context?.locale || 'ko';
     let responseText: string | undefined;
+
     const ageGroupKorean: Record<AgeGroup, string> = {
       '10s': '10대',
       '20s': '20대',
@@ -279,13 +365,28 @@ ${JSON.stringify(feedbackSummaries, null, 2)}
       '60+': '60대 이상',
     };
 
-    const ageGroupsKorean = ageGroups.map((ag) => ageGroupKorean[ag]).join(', ');
+    const ageGroupEnglish: Record<AgeGroup, string> = {
+      '10s': 'teens',
+      '20s': '20s',
+      '30s': '30s',
+      '40s': '40s',
+      '50s': '50s',
+      '60+': '60+',
+    };
 
-    const prompt = `당신은 한국의 다양한 소비자 페르소나를 생성하는 전문가입니다.
+    const prompt = locale === 'en'
+      ? `You are an expert at creating diverse consumer personas.
+
+Please create ${count} personas that meet the following criteria:
+- Age groups: ${ageGroups.map((ag) => ageGroupEnglish[ag]).join(', ')} (distribute evenly among these age groups)
+- Each persona should be a realistic and specific consumer.`
+      : `당신은 한국의 다양한 소비자 페르소나를 생성하는 전문가입니다.
 
 다음 조건에 맞는 ${count}명의 페르소나를 생성해주세요:
-- 연령대: ${ageGroupsKorean} (이 연령대들 중에서 골고루 분배)
+- 연령대: ${ageGroups.map((ag) => ageGroupKorean[ag]).join(', ')} (이 연령대들 중에서 골고루 분배)
 - 각 페르소나는 현실적이고 구체적인 한국인 소비자여야 합니다.`;
+
+    const personaSchema = locale === 'en' ? PERSONA_SCHEMA_EN : PERSONA_SCHEMA_KO;
 
     try {
       const response = await this.ai.models.generateContent({
@@ -297,7 +398,7 @@ ${JSON.stringify(feedbackSummaries, null, 2)}
           topP: 0.95,
           maxOutputTokens: 8192,
           responseMimeType: 'application/json',
-          responseSchema: PERSONA_SCHEMA,
+          responseSchema: personaSchema,
         },
       });
 
@@ -311,11 +412,13 @@ ${JSON.stringify(feedbackSummaries, null, 2)}
       const parsed = JSON.parse(text);
 
       const validAgeGroups: AgeGroup[] = ['10s', '20s', '30s', '40s', '50s', '60+'];
+      const defaultName = locale === 'en' ? 'Unknown' : '무명';
+      const defaultOccupation = locale === 'en' ? 'Professional' : '직장인';
       const result = parsed.map((item: Record<string, unknown>, index: number) => ({
-        name: (item.name as string) || '무명',
+        name: (item.name as string) || defaultName,
         ageGroup: validAgeGroups.includes(item.ageGroup as AgeGroup) ? (item.ageGroup as AgeGroup) : ageGroups[index % ageGroups.length],
         gender: item.gender === 'male' || item.gender === 'female' ? item.gender : undefined,
-        occupation: (item.occupation as string) || '직장인',
+        occupation: (item.occupation as string) || defaultOccupation,
         location: item.location as string,
         education: item.education as string,
         incomeLevel: item.incomeLevel as string,
@@ -363,7 +466,10 @@ ${JSON.stringify(feedbackSummaries, null, 2)}
       });
 
       console.error('Gemini API error:', error);
-      throw new Error('AI 서비스에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.');
+      const personaError = locale === 'en'
+        ? 'The AI service is temporarily unavailable. Please try again later.'
+        : 'AI 서비스에 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.';
+      throw new Error(personaError);
     }
   }
 

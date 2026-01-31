@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import { getCurrentLocale } from '../i18n';
 import { useAppDispatch } from '../hooks/useAppDispatch';
 import { fetchSession, fetchSummary } from '../store/feedbackSlice';
 import type { RootState } from '../store';
@@ -28,7 +29,7 @@ export const FeedbackResultPage: React.FC = () => {
 
     setIsGeneratingSummary(true);
     try {
-      await dispatch(fetchSummary(id)).unwrap();
+      await dispatch(fetchSummary({ sessionId: id, locale: getCurrentLocale() })).unwrap();
     } finally {
       setIsGeneratingSummary(false);
     }

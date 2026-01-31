@@ -4,10 +4,11 @@ import {
   Post,
   Body,
   Param,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { FeedbackService } from './feedback.service';
-import { CreateSessionDto, GenerateFeedbackDto } from './dto/create-session.dto';
+import { CreateSessionDto, GenerateFeedbackDto, GenerateSummaryDto } from './dto/create-session.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { User } from '../users/entities/user.entity';
@@ -38,12 +39,16 @@ export class FeedbackController {
     @Param('id') id: string,
     @Body() dto: GenerateFeedbackDto,
   ) {
-    return this.feedbackService.generateFeedback(id, user.id, dto.personaIds);
+    return this.feedbackService.generateFeedback(id, user.id, dto.personaIds, dto.locale);
   }
 
   @Get('sessions/:id/summary')
-  async getSummary(@CurrentUser() user: User, @Param('id') id: string) {
-    const summary = await this.feedbackService.generateSummary(id, user.id);
+  async getSummary(
+    @CurrentUser() user: User,
+    @Param('id') id: string,
+    @Query() query: GenerateSummaryDto,
+  ) {
+    const summary = await this.feedbackService.generateSummary(id, user.id, query.locale);
     return { summary };
   }
 }

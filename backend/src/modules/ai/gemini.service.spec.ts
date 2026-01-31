@@ -12,6 +12,12 @@ jest.mock('@google/genai', () => ({
       generateContent: mockGenerateContent,
     },
   })),
+  Type: {
+    OBJECT: 'OBJECT',
+    STRING: 'STRING',
+    NUMBER: 'NUMBER',
+    ARRAY: 'ARRAY',
+  },
 }));
 
 describe('GeminiService', () => {

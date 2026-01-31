@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { getCurrentLocale } from '../i18n';
 import { useAppDispatch } from '../hooks/useAppDispatch';
 import { createSession, generateFeedback } from '../store/feedbackSlice';
 import { fetchCurrentUser } from '../store/authSlice';
@@ -50,6 +51,7 @@ export const NewFeedbackPage: React.FC = () => {
         generateFeedback({
           sessionId: session.id,
           personaIds: selectedPersonaIds,
+          locale: getCurrentLocale(),
         })
       ).unwrap();
 
