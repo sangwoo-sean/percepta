@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException, BadRequestException, Inject, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FeedbackSession } from './entities/feedback-session.entity';
@@ -9,10 +10,12 @@ import { AIProvider, AI_PROVIDER } from '../ai/ai-provider.interface';
 import { UsersService } from '../users/users.service';
 
 const CREDITS_PER_PERSONA = 1;
+const DEFAULT_CONCURRENCY = 4;
 
 @Injectable()
 export class FeedbackService {
   private readonly logger = new Logger(FeedbackService.name);
+  private readonly concurrency: number;
 
   constructor(
     @InjectRepository(FeedbackSession)
@@ -23,7 +26,41 @@ export class FeedbackService {
     @Inject(AI_PROVIDER)
     private readonly aiProvider: AIProvider,
     private readonly usersService: UsersService,
-  ) {}
+    private readonly configService: ConfigService,
+  ) {
+    this.concurrency = this.configService.get<number>('FEEDBACK_CONCURRENCY', DEFAULT_CONCURRENCY);
+    this.logger.log(`Feedback concurrency set to ${this.concurrency}`);
+  }
+
+  /**
+   * 동시성 제한을 적용하여 태스크들을 병렬 실행
+   */
+  private async runWithConcurrency<T>(
+    tasks: (() => Promise<T>)[],
+    concurrency: number,
+  ): Promise<PromiseSettledResult<T>[]> {
+    const results: PromiseSettledResult<T>[] = new Array(tasks.length);
+    let currentIndex = 0;
+
+    const worker = async (): Promise<void> => {
+      while (currentIndex < tasks.length) {
+        const index = currentIndex++;
+        try {
+          const value = await tasks[index]();
+          results[index] = { status: 'fulfilled', value };
+        } catch (reason) {
+          results[index] = { status: 'rejected', reason };
+        }
+      }
+    };
+
+    const workers = Array(Math.min(concurrency, tasks.length))
+      .fill(null)
+      .map(() => worker());
+
+    await Promise.all(workers);
+    return results;
+  }
 
   async findSessionsByUserId(userId: string): Promise<FeedbackSession[]> {
     return this.sessionsRepository.find({
@@ -108,38 +145,54 @@ export class FeedbackService {
     await this.sessionsRepository.update(sessionId, { status: 'processing' });
 
     const targetPersonaIds = personaIds || [];
+
+    this.logger.log(
+      `Generating feedback for ${targetPersonaIds.length} personas with concurrency ${this.concurrency}`,
+    );
+
+    // 각 페르소나에 대한 피드백 생성 태스크 정의
+    const tasks = targetPersonaIds.map((personaId) => async (): Promise<FeedbackResult> => {
+      const persona = await this.personasService.findByIdOrFail(personaId);
+
+      const aiResponse = await this.aiProvider.generateFeedback(
+        session.inputContent,
+        persona,
+        { userId, sessionId, imageUrls: session.inputImageUrls || [], locale: locale || 'ko' },
+      );
+
+      const result = this.resultsRepository.create({
+        session,
+        persona,
+        feedbackText: aiResponse.feedbackText,
+        sentiment: aiResponse.sentiment,
+        purchaseIntent: aiResponse.purchaseIntent,
+        keyPoints: aiResponse.keyPoints,
+        score: aiResponse.score,
+      });
+
+      await this.resultsRepository.save(result);
+      return result;
+    });
+
+    // 병렬 실행 (concurrency 제한 적용)
+    const settledResults = await this.runWithConcurrency(tasks, this.concurrency);
+
+    // 결과 분류
     const results: FeedbackResult[] = [];
     let failedCount = 0;
 
-    for (const personaId of targetPersonaIds) {
-      try {
-        const persona = await this.personasService.findByIdOrFail(personaId);
-
-        const aiResponse = await this.aiProvider.generateFeedback(
-          session.inputContent,
-          persona,
-          { userId, sessionId, imageUrls: session.inputImageUrls || [], locale: locale || 'ko' },
-        );
-
-        const result = this.resultsRepository.create({
-          session,
-          persona,
-          feedbackText: aiResponse.feedbackText,
-          sentiment: aiResponse.sentiment,
-          purchaseIntent: aiResponse.purchaseIntent,
-          keyPoints: aiResponse.keyPoints,
-          score: aiResponse.score,
-        });
-
-        await this.resultsRepository.save(result);
-        results.push(result);
-      } catch (error) {
+    settledResults.forEach((settled, index) => {
+      if (settled.status === 'fulfilled') {
+        results.push(settled.value);
+      } else {
         failedCount++;
         this.logger.error(
-          `Failed to generate feedback for persona ${personaId}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          `Failed to generate feedback for persona ${targetPersonaIds[index]}: ${
+            settled.reason instanceof Error ? settled.reason.message : 'Unknown error'
+          }`,
         );
       }
-    }
+    });
 
     // Refund credits for failed personas
     if (failedCount > 0) {

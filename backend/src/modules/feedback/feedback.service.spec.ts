@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigService } from '@nestjs/config';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
@@ -104,6 +105,15 @@ describe('FeedbackService', () => {
             deductCredits: jest.fn(),
             refundCredits: jest.fn(),
             addCredits: jest.fn(),
+          },
+        },
+        {
+          provide: ConfigService,
+          useValue: {
+            get: jest.fn((key: string, defaultValue?: number) => {
+              if (key === 'FEEDBACK_CONCURRENCY') return defaultValue ?? 4;
+              return defaultValue;
+            }),
           },
         },
       ],
